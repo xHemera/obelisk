@@ -1,3 +1,5 @@
+import { HEALER_S1_DESCRIPTION, HEALER_S2_DESCRIPTION, HEALER_S3_DESCRIPTION } from "./skill-description-segments";
+
 const ID = "healer";
 
 const PATH = `/gameResources/heroes/${ID}/assets`;
@@ -60,14 +62,13 @@ export const healer = {
       info: {
         name: "Healing Light",
         icon: spell1Icon,
-        description:
-          "Restores {multiplier}x Magical Damage + {flat} bonus HP to a single ally.",
+        description: HEALER_S1_DESCRIPTION,
       },
 
       unlockLevel: 1,
       manaCost: 10,
       scaling: [
-        // [healMultiplier, flatHealPerLevel]
+        // [healMultiplier, flatHealBonus]
         [0.6, 25],
         [0.7, 30],
         [0.8, 35],
@@ -88,13 +89,12 @@ export const healer = {
       info: {
         name: "Sanctuary",
         icon: spell2Icon,
-        description:
-          "Heals all allies for {multiplier}x Magical Damage + {flat} bonus HP and grants +{defenseBonus}% Defense for {duration} turns.",
+        description: HEALER_S2_DESCRIPTION,
       },
       unlockLevel: 7,
       manaCost: 18,
       scaling: [
-        // [healMultiplier, flatHealPerLevel, defenseBonus, duration]
+        // [healMultiplier, flatHealBonus, defenseBonus%, duration]
         [0.4, 15, 3, 2],
         [0.5, 18, 4, 2],
         [0.6, 21, 5, 2],
@@ -115,8 +115,7 @@ export const healer = {
       info: {
         name: "Divine Protection",
         icon: spell3Icon,
-        description:
-          "Target ally becomes immune to all damage for {duration} turn(s).",
+        description: HEALER_S3_DESCRIPTION,
       },
       unlockLevel: 14,
       manaCost: 35,

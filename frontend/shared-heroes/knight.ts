@@ -1,3 +1,5 @@
+import { KNIGHT_S1_DESCRIPTION, KNIGHT_S2_DESCRIPTION, KNIGHT_S3_DESCRIPTION } from "./skill-description-segments";
+
 const ID = "knight";
 
 const PATH = `/gameResources/heroes/${ID}/assets`;
@@ -63,15 +65,14 @@ export const knight = {
 
         icon: spell1Icon,
 
-        description:
-          "Deals {multiplier}x Physical Damage + {flat} bonus damage and has a {stunChance}% chance to Stun for {duration} turn(s).",
+        description: KNIGHT_S1_DESCRIPTION,
       },
 
       unlockLevel: 1,
       manaCost: 12,
 
       scaling: [
-        // [damageMultiplier, flatDamagePerLevel, stunChance, stunDuration]
+        // [damageMultiplier, flatDamageBonus, stunChance%, stunDuration]
         [1.1, 18, 20, 1],
         [1.2, 21, 23, 1],
         [1.3, 24, 26, 1],
@@ -94,15 +95,14 @@ export const knight = {
 
         icon: spell2Icon,
 
-        description:
-          "Taunts all enemies and reduces damage taken by {damageReduction}% for {duration} turns.",
+        description: KNIGHT_S2_DESCRIPTION,
       },
 
       unlockLevel: 5,
       manaCost: 15,
 
       scaling: [
-        // [damageReduction, duration]
+        // [damageReduction%, duration]
         [10, 2],
         [14, 2],
         [18, 2],
@@ -125,15 +125,14 @@ export const knight = {
 
         icon: spell3Icon,
 
-        description:
-          "When HP drops below {hpThreshold}%, automatically gain a shield equal to {shieldPercent}% of Max HP. Triggers once per battle.",
+        description: KNIGHT_S3_DESCRIPTION,
       },
 
       unlockLevel: 15,
       manaCost: 25,
 
       scaling: [
-        // [hpThreshold, shieldPercent]
+        // [hpThreshold%, shieldPercent]
         [30, 15],
         [30, 18],
         [30, 21],

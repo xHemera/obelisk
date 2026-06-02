@@ -18,7 +18,7 @@ import FloatingDamage from "@/components/atoms/game/FloatingDamage";
 import PixelAnimation from "@/components/atoms/game/PixelAnimation";
 import { getTargetAnim, getSpellAnim, preloadAllAnimations } from "@/lib/animationManager";
 import type { AnimDef } from "@/lib/animationManager";
-import type { CharacterState, DamageEvent, SpellEvent } from "./types";
+import type { CharacterState, DamageEvent, SpellEvent, ModEntry } from "./types";
 
 type DamageAnim = {
   id: number;
@@ -74,32 +74,56 @@ function findAnimForFighter(
   );
 }
 
+function maxTurns(mods: ModEntry[]): number | undefined {
+  const max = mods.reduce((acc, m) => Math.max(acc, m.turn), 0);
+  return max > 0 ? max : undefined;
+}
+
 function toStatusEffects(charState: CharacterState | undefined | null): StatusEffect[] {
   if (!charState) return [];
   const effects: StatusEffect[] = [];
 
   if (charState.stunned > 0) {
-    effects.push({ type: "cc", label: "Étourdissement", turns: charState.stunned });
+    effects.push({ type: "cc", label: "Stunned", turns: charState.stunned });
   }
   if (charState.invisible > 0) {
     effects.push({ type: "buff", label: "Invisible", turns: charState.invisible });
   }
   if (charState.shieldHp > 0) {
-    effects.push({ type: "buff", label: "Bouclier" });
+    effects.push({ type: "buff", label: "Shield" });
   }
   if (charState.overHp > 0) {
-    effects.push({ type: "buff", label: "Survie" });
+    effects.push({ type: "buff", label: "Overheal" });
   }
   if (charState.invul > 0) {
-    effects.push({ type: "buff", label: "Invulnérable", turns: charState.invul });
+    effects.push({ type: "buff", label: "Invulnerable", turns: charState.invul });
   }
   if (charState.taunted > 0) {
-    effects.push({ type: "debuff", label: "Provoqué", turns: charState.taunted });
+    effects.push({ type: "debuff", label: "Taunted", turns: charState.taunted });
   }
   for (const p of charState.poison) {
     if (p.turn > 0) {
       effects.push({ type: "dot", label: "Poison", turns: p.turn });
     }
+  }
+
+  if (charState.phyMod.length > 0) {
+    effects.push({ type: "buff", label: "Phys. Attack", turns: maxTurns(charState.phyMod) });
+  }
+  if (charState.magMod.length > 0) {
+    effects.push({ type: "buff", label: "Mag. Attack", turns: maxTurns(charState.magMod) });
+  }
+  if (charState.phyResMod.length > 0) {
+    effects.push({ type: "buff", label: "Phys. Defense", turns: maxTurns(charState.phyResMod) });
+  }
+  if (charState.magResMod.length > 0) {
+    effects.push({ type: "buff", label: "Mag. Defense", turns: maxTurns(charState.magResMod) });
+  }
+  if (charState.critChanceMod.length > 0) {
+    effects.push({ type: "buff", label: "Crit Chance", turns: maxTurns(charState.critChanceMod) });
+  }
+  if (charState.critDamageMod.length > 0) {
+    effects.push({ type: "buff", label: "Crit Damage", turns: maxTurns(charState.critDamageMod) });
   }
 
   return effects;

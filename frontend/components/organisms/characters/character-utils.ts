@@ -1,6 +1,8 @@
 import { CHARACTERS } from "@/public/gameResources/heroes";
 import { resolveSpellDescriptionSegments } from "@/lib/spell-description";
+import type { SpellDescriptionSegment } from "@/lib/spell-description";
 import type { CharacterSkill, CharacterStats, ResolvedSkillEffect } from "./types";
+import type { DescriptionSegment } from "@/shared-heroes/skill-description-segments";
 
 type HeroSkillDefinition = (typeof CHARACTERS)[number]["skills"][number];
 
@@ -55,12 +57,13 @@ const formatNumber = (value: number): string => {
   if (Number.isInteger(value)) {
     return value.toString();
   }
-
-  return (Math.round(value * 10) / 10).toString();
+  const str = value.toFixed(2);
+  return str.replace(/\.?0+$/, "");
 };
 
 const buildContext = (stats: CharacterStats, skill: CharacterSkill) => {
-  return {
+  const scalingRow = getScalingRow(skill);
+  const ctx: Record<string, number> = {
     level: skill.level,
     skilllevel: skill.level,
     spelllevel: skill.level,
@@ -74,7 +77,12 @@ const buildContext = (stats: CharacterStats, skill: CharacterSkill) => {
     physicalresistance: stats.physicalResistance,
     magicalresistance: stats.magicalResistance,
     speed: stats.speed,
-  } as const;
+  };
+  scalingRow.forEach((value, index) => {
+    ctx[`value${index + 1}`] = value;
+    ctx[`v${index + 1}`] = value;
+  });
+  return ctx;
 };
 
 const findSkillDefinition = (skill: CharacterSkill): HeroSkillDefinition | null => {
@@ -142,23 +150,68 @@ const evaluateFormula = (expression: string, stats: CharacterStats, skill: Chara
 
 // Parse a description and resolve all formulas
 export const resolveSkillDescription = (
-  description: string,
+  description: string | DescriptionSegment[],
   stats: CharacterStats,
-  skill: CharacterSkill
+  skill: CharacterSkill,
+  characterName?: string,
 ): ResolvedSkillEffect => {
-  const scalingRow = getScalingRow(skill);
-  const segments = resolveSpellDescriptionSegments(description, ({ token, tokenIndex }) => {
-    // Prefer scaling array value by position
-    // This ensures {critChance} returns the spell's scaling value, not the hero's base stat
-    if (typeof scalingRow[tokenIndex] === "number") {
-      return formatNumber(scalingRow[tokenIndex]);
-    }
+  // Helper function to evaluate expressions
+  const evaluateExpr = (expression: string): number | null => {
+    const result = evaluateFormula(expression, stats, skill);
+    return result;
+  };
 
+  // Helper function to build context
+  const buildCtx = () => {
+    const scalingRow = getScalingRow(skill);
+    return buildContext(stats, skill);
+  };
+
+  // Check if description is the new segment format
+  if (Array.isArray(description)) {
+    const scalingRow = getScalingRow(skill);
+    const segments: SpellDescriptionSegment[] = description.map((segment) => {
+      if (segment.type === "text") {
+        return { text: segment.content };
+      }
+
+      if (segment.type === "value") {
+        const value = scalingRow[segment.index];
+        if (typeof value === "number") {
+          return {
+            text: formatNumber(value),
+            highlight: segment.highlight,
+          };
+        }
+        return { text: `[VALUE ${segment.index}]` };
+      }
+
+      if (segment.type === "calc") {
+        const result = evaluateExpr(segment.expression);
+        if (result !== null) {
+          return {
+            text: formatNumber(result),
+            highlight: segment.highlight,
+          };
+        }
+        return { text: `[ERROR]` };
+      }
+
+      return { text: "[UNKNOWN]" };
+    });
+
+    return {
+      title: skill.name,
+      segments,
+    };
+  }
+
+  // Fallback to old string-based parsing
+  const segments = resolveSpellDescriptionSegments(description, ({ token }) => {
     const result = evaluateFormula(token, stats, skill);
     if (result !== null) {
       return formatNumber(result);
     }
-
     return null;
   });
 

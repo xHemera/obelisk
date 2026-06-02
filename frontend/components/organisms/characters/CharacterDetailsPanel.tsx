@@ -86,6 +86,7 @@ export default function CharacterDetailsPanel({
               onToggleDetails={onToggleSkill}
               onUpgrade={onUpgradeSkill}
               onPlusOne={onPlusOneSkill}
+              characterName={selectedCharacter.name}
             />
           ))}
         </div>

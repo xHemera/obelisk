@@ -1,3 +1,5 @@
+import { ARCHER_S1_DESCRIPTION, ARCHER_S2_DESCRIPTION, ARCHER_S3_DESCRIPTION } from "./skill-description-segments";
+
 const ID = "archer";
 
 const PATH = `/gameResources/heroes/${ID}/assets`;
@@ -62,8 +64,7 @@ export const archer = {
       info: {
         name: "Piercing Shot",
         icon: spell1Icon,
-        description:
-          "Deals {multiplier} Physical Damage + {flat} bonus damage to a single target. Ignores {armorPen}% armor.",
+        description: ARCHER_S1_DESCRIPTION,
       },
       unlockLevel: 1,
       manaCost: 8,
@@ -89,8 +90,7 @@ export const archer = {
       info: {
         name: "Rain of Arrows",
         icon: spell2Icon,
-        description:
-          "Deals {multiplier} Physical Damage + {flat} bonus damage to all enemies.",
+        description: ARCHER_S2_DESCRIPTION,
       },
       unlockLevel: 5,
       manaCost: 12,
@@ -116,8 +116,7 @@ export const archer = {
       info: {
         name: "Precision Focus",
         icon: spell3Icon,
-        description:
-          "Increases Crit Chance by {critChance}% and Crit Damage by {critDamage}% for {duration} turns.",
+        description: ARCHER_S3_DESCRIPTION,
       },
       unlockLevel: 10,
       manaCost: 15,

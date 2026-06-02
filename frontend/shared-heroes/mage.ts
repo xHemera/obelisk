@@ -1,3 +1,5 @@
+import { MAGE_S1_DESCRIPTION, MAGE_S2_DESCRIPTION, MAGE_S3_DESCRIPTION } from "./skill-description-segments";
+
 const ID = "mage";
 
 const PATH = `/gameResources/heroes/${ID}/assets`;
@@ -63,15 +65,14 @@ export const mage = {
 
         icon: spell1Icon,
 
-        description:
-          "Deals {multiplier}x Magical Damage + {flat} bonus Fire damage to a single target with a {burnChance}% chance to apply Burn for {duration} turns.",
+        description: MAGE_S1_DESCRIPTION,
       },
 
       unlockLevel: 1,
       manaCost: 12,
 
       scaling: [
-        // [damageMultiplier, flatDamagePerLevel, burnChance, duration]
+        // [damageMultiplier, flatDamageBonus, burnChance%, duration]
         [1.3, 18, 30, 1],
         [1.4, 22, 32, 1],
         [1.5, 26, 34, 1],
@@ -94,8 +95,7 @@ export const mage = {
 
         icon: spell2Icon,
 
-        description:
-          "Launches {missiles} missiles, each dealing {multiplier}x Magical Damage to random enemies.",
+        description: MAGE_S2_DESCRIPTION,
       },
 
       unlockLevel: 8,
@@ -125,15 +125,14 @@ export const mage = {
 
         icon: spell3Icon,
 
-        description:
-          "Deals {multiplier}x Magical Damage + {flat} bonus damage to all enemies.",
+        description: MAGE_S3_DESCRIPTION,
       },
 
       unlockLevel: 15,
       manaCost: 20,
 
       scaling: [
-        // [damageMultiplier, flatDamagePerLevel]
+        // [damageMultiplier, flatDamageBonus]
         [2.2, 40],
         [2.4, 45],
         [2.6, 50],

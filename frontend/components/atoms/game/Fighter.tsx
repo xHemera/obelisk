@@ -135,16 +135,18 @@ export default function Fighter({
   const renderEffects = () => {
     if (!effects || effects.length === 0) return null;
     return (
-      <div className="flex flex-wrap justify-center gap-1">
+      <div className="pointer-events-auto flex flex-wrap justify-center gap-1">
         {effects.map((effect, i) => {
           const s = effectStyles[effect.type];
           return (
             <div
               key={i}
               className={`group relative flex h-[22px] w-[22px] items-center justify-center rounded-[3px] border ${s.border} ${s.glow} bg-[#14100a]`}
-              title={effect.turns ? `${effect.label} (${effect.turns} turns)` : effect.label}
             >
               <span className={`h-2 w-2 rotate-45 ${s.label}`} />
+              <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded border border-[#3c3650] bg-[#0f0e13] px-2 py-1 text-[10px] leading-tight text-[#cfc8e6] opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100">
+                {effect.label}{effect.turns != null ? ` (${effect.turns} turn${effect.turns > 1 ? "s" : ""})` : ""}
+              </div>
             </div>
           );
         })}

@@ -3,6 +3,11 @@ export type PlayerState = {
   characters: CharacterState[];
 };
 
+export type ModEntry = {
+  value: number;
+  turn: number;
+};
+
 export type CharacterState = {
   uid: string;
   currentHp: number;
@@ -17,6 +22,12 @@ export type CharacterState = {
   invul: number;
   taunted: number;
   poison: { value: number; turn: number }[];
+  phyMod: ModEntry[];
+  magMod: ModEntry[];
+  phyResMod: ModEntry[];
+  magResMod: ModEntry[];
+  critChanceMod: ModEntry[];
+  critDamageMod: ModEntry[];
   lastStandUsable: boolean;
   lastStandUsed: boolean;
 };
