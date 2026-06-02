@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { CHARACTERS } from "@/public/gameResources/heroes";
 
-type StatusEffect = {
+export type StatusEffect = {
   type: "buff" | "debuff" | "dot" | "cc";
   label: string;
   turns?: number;

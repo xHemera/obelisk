@@ -8,7 +8,7 @@ import { useGameSocket } from "./useGameSocket";
 import { useTurnInfo } from "./useTurnInfo";
 import { useTargeting } from "./useTargeting";
 import ProfileInfo from "@/components/atoms/game/ProfileInfo";
-import Fighter from "@/components/atoms/game/Fighter";
+import Fighter, { type StatusEffect } from "@/components/atoms/game/Fighter";
 import TurnQueue from "@/components/atoms/game/TurnQueue";
 import InfoModal from "@/components/atoms/game/InfoModal";
 import GameLoadingScreen from "@/components/atoms/game/GameLoadingScreen";
@@ -72,6 +72,37 @@ function findAnimForFighter(
   return anims.find(
     a => a.targetHeroId === heroId && a.targetUid.startsWith(ownerPrefix + "_"),
   );
+}
+
+function toStatusEffects(charState: CharacterState | undefined | null): StatusEffect[] {
+  if (!charState) return [];
+  const effects: StatusEffect[] = [];
+
+  if (charState.stunned > 0) {
+    effects.push({ type: "cc", label: "Étourdissement", turns: charState.stunned });
+  }
+  if (charState.invisible > 0) {
+    effects.push({ type: "buff", label: "Invisible", turns: charState.invisible });
+  }
+  if (charState.shieldHp > 0) {
+    effects.push({ type: "buff", label: "Bouclier" });
+  }
+  if (charState.overHp > 0) {
+    effects.push({ type: "buff", label: "Survie" });
+  }
+  if (charState.invul > 0) {
+    effects.push({ type: "buff", label: "Invulnérable", turns: charState.invul });
+  }
+  if (charState.taunted > 0) {
+    effects.push({ type: "debuff", label: "Provoqué", turns: charState.taunted });
+  }
+  for (const p of charState.poison) {
+    if (p.turn > 0) {
+      effects.push({ type: "dot", label: "Poison", turns: p.turn });
+    }
+  }
+
+  return effects;
 }
 
 export default function Game() {
@@ -346,7 +377,7 @@ export default function Game() {
                         variant="enemy"
                         character={character}
                         currentHp={charState ? Math.round(charState.currentHp) : 0}
-                        effects={[]}
+                        effects={toStatusEffects(charState)}
                         active={charState ? charState.uid === activeCharacterUid : false}
                         onClick={isTarget(charState?.uid, oppCharacters) && charState ? () => handleTargetSelect(charState.uid) : undefined}
                         isTargetable={isTarget(charState?.uid, oppCharacters)}
@@ -396,6 +427,7 @@ export default function Game() {
                                 : selectedHero?.identity.id === character.identity.id
                             }
                             currentHp={charState ? Math.round(charState.currentHp) : 0}
+                            effects={toStatusEffects(charState)}
                             onClick={isTarget(charState?.uid, myCharacters) && charState ? () => handleTargetSelect(charState.uid) : undefined}
                             isTargetable={isTarget(charState?.uid, myCharacters)}
                           />
