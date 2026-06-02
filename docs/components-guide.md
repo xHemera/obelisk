@@ -60,14 +60,22 @@ Utilisés sur la home page. `FeatureActionTile` = tuile cliquable (PvP, Pong, Mi
 | `ProfileViewer` | Modal de profil utilisateur |
 | `AdminPanel` | Interface d'admin |
 
+### Backgrounds
+
+Composants décoratifs dans `components/backgrounds/` : `BottomBar`, `GameArenaBackground`.
+
 ## Pages (app/)
 
-| Route | Composant | Description |
-|-------|-----------|-------------|
-| `/` | Page d'accueil (non connecté) |
+| Route | Description |
+|-------|-------------|
+| `/` | Landing page (non connecté) |
 | `/home` | Dashboard : Mine, PvP, Pong, TeamBuilder |
 | `/game` | Écran de combat PvP |
 | `/characters` | Gestion des héros |
-| `/social` | Messagerie, amis |
+| `/social` | Messagerie, amis, défis |
+| `/pong` | Mini-jeu Pong multijoueur |
 | `/admin` | Panel admin |
+| `/profile/[pseudo]` | Profil public d'un joueur |
 | `/not-connected` | Page "pas connecté" |
+| `/policy` | Politique de confidentialité |
+| `/terms` | Conditions d'utilisation |

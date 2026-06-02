@@ -1,10 +1,10 @@
 services:
   db:
     image: postgres:16-alpine
-    container_name: aqua-db-temp
+    container_name: obelisk-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: aqua_temp
+      POSTGRES_DB: obelisk
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -12,7 +12,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d aqua_temp"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d obelisk"]
       interval: 3s
       timeout: 2s
       retries: 5
@@ -20,7 +20,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: aqua-redis
+    container_name: obelisk-redis
     restart: unless-stopped
     ports:
       - "6380:6379"
@@ -36,7 +36,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: aqua-frontend
+    container_name: obelisk-frontend
     restart: unless-stopped
     working_dir: /app
     ports:
@@ -65,7 +65,7 @@ services:
     build:
       context: ./websockets
       dockerfile: Dockerfile
-    container_name: aqua-websockets
+    container_name: obelisk-websockets
     restart: unless-stopped
     working_dir: /app
     stdin_open: true
@@ -82,7 +82,7 @@ services:
       - backend_bun_cache:/home/bun/.bun/install/cache
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/aqua_temp
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/obelisk
       PORT: 4001
     depends_on:
       db:

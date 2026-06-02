@@ -27,12 +27,18 @@ frontend/
 
 | Route | Page | Type |
 |-------|------|------|
-| `/` | Landing page | Server component |
+| Route | Page | Type |
+|-------|------|------|
+| `/` | Landing page (non connecté) | Server component |
 | `/home` | Dashboard (Mine, PvP, Team) | Client component |
 | `/game` | Combat PvP | Client component (sockets) |
-| `/characters` | Gestion héros | Client component |
-| `/social` | Messagerie | Client component (sockets) |
+| `/characters` | Gestion des héros | Client component |
+| `/social` | Messagerie / amis / défis | Client component (sockets) |
+| `/pong` | Mini-jeu Pong multijoueur | Client component (sockets) |
 | `/admin` | Panel admin | Client component |
+| `/profile/[pseudo]` | Profil public | Client component |
+| `/policy` | Politique de confidentialité | Server component |
+| `/terms` | Conditions d'utilisation | Server component |
 | `/not-connected` | Page erreur | Server component |
 
 ## Conventions

@@ -178,9 +178,9 @@ Map<roomId, {
    - `broadcastGameState(roomId)` → envoie l'état initial aux 2 joueurs
    - Émet `"gameReady"` → le frontend sait que la partie est prête
 
-### Handler `"gameAction"` (pas encore câblé)
+### Handler `"gameAction"`
 
-Recevra les actions des joueurs (`{ userUid, targetUids, type, skillId }`) et appellera `processAction()` côté serveur.
+Reçoit les actions des joueurs (`{ userUid, targetUids, type, skillId }`) et appelle `processAction()` côté serveur. Le câblage côté serveur est fonctionnel ; le frontend est en cours d'intégration pour envoyer et écouter ces events.
 
 ---
 
