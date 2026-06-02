@@ -201,11 +201,9 @@ export default function CharactersPage() {
     <div className="flex h-screen w-full overflow-hidden bg-[#0c0a0f] font-serif">
       {showNotification && notification && notifSender && (<NotificationToast onClose={() => setShowNotification(false)} msg={notification} sender={notifSender} />)}
       {/* Sidebar */}
-      <div className="shrink-0 p-3">
-        <Sidebar />
-      </div>
+      <Sidebar />
       {/* Main Content */}
-      <main className="flex-1 overflow-hidden p-3 pl-0">
+      <main className="flex-1 overflow-hidden p-3 lg:pl-0 pt-14 lg:pt-3">
         {selectedCharacter && (
           <CharacterViewer
             characters={characters}

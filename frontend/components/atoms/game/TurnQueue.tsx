@@ -49,12 +49,12 @@ export default function TurnQueue({ turnQueue, isYourTurn, userPseudo }: TurnQue
     : "text-[#8b82a6]";
 
   return (
-    <div className="fixed left-4 top-4 z-30">
-      <p className={`mb-3 text-xs font-semibold uppercase tracking-[0.2em] ${labelColor}`}>
+    <div className="fixed left-4 top-4 z-30 sm:left-4 sm:top-4">
+      <p className={`mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] sm:text-xs sm:mb-3 ${labelColor}`}>
         {turnLabel}
       </p>
 
-      <div className="flex flex-col gap-2">
+      <div className="relative flex flex-row gap-1 sm:flex-col sm:gap-2">
         {visibleTurns.map((entry) => {
           if (!entry.character) return null;
 
@@ -63,12 +63,12 @@ export default function TurnQueue({ turnQueue, isYourTurn, userPseudo }: TurnQue
           return (
             <div
               key={entry.characterUid}
-              className="flex items-center gap-2"
+              className="flex items-center gap-1 sm:gap-2"
             >
               <div
-                className={`relative h-12 w-12 shrink-0 overflow-hidden rounded-full transition-all duration-200 ${
+                className={`relative h-8 w-8 shrink-0 overflow-hidden rounded-full transition-all duration-200 sm:h-12 sm:w-12 ${
                   isActive
-                    ? "ring-2 ring-[#c9a84c] ring-offset-2 ring-offset-[#0a0806] shadow-[0_0_10px_rgba(201,168,76,0.4)]"
+                    ? "ring-2 ring-[#c9a84c] ring-offset-1 ring-offset-[#0a0806] shadow-[0_0_10px_rgba(201,168,76,0.4)] sm:ring-offset-2"
                     : "opacity-50"
                 }`}
               >
@@ -77,7 +77,7 @@ export default function TurnQueue({ turnQueue, isYourTurn, userPseudo }: TurnQue
                   alt={entry.character.identity.name}
                   fill
                   className="object-cover"
-                  sizes="44px"
+                  sizes="(max-width: 640px) 32px, 44px"
                   unoptimized
                 />
                 {isActive && (
@@ -85,7 +85,7 @@ export default function TurnQueue({ turnQueue, isYourTurn, userPseudo }: TurnQue
                 )}
               </div>
               <span
-                className={`text-[10px] font-semibold uppercase tracking-wider ${
+                className={`text-[8px] font-semibold uppercase tracking-wider sm:text-[10px] ${
                   entry.isOwn ? "text-[#7aaa6a]" : "text-[#8a5a5a]"
                 }`}
               >

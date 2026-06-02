@@ -264,7 +264,7 @@ export default function ProfileClientView({
       )}
 
       <div className="flex-1 w-full flex flex-col overflow-hidden">
-        <div className="mx-auto flex flex-1 w-full max-w-7xl flex-col gap-8 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mx-auto flex flex-1 w-full max-w-7xl flex-col gap-6 overflow-y-auto px-3 py-4 sm:px-6 sm:py-6 lg:px-8 lg:gap-8">
         <ProfileHeader
           profileName={profileName}
           isOwnProfile={isOwnProfile}
@@ -297,34 +297,28 @@ export default function ProfileClientView({
         />
 
         {/* Match History Section */}
-        <Card className="overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#15131d]/92 p-0 shadow-[0_20px_60px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+        <div className="border border-white/10 bg-[#15131d]/60 rounded-[2.5rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.28)] backdrop-blur-xl">
           {/* Header */}
-          <div className="border-b border-white/10 px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <h2 className="text-2xl sm:text-3xl font-black text-white break-words" style={{ fontFamily: "var(--font-display), serif" }}>
-                  Match History
-                </h2>
-              </div>
-              <div className="shrink-0 flex gap-3 sm:gap-4">
-                <div className="rounded-2xl border border-[#c9a227]/30 bg-[#c9a227]/10 px-4 py-2 sm:px-5 sm:py-3 shadow-[0_8px_16px_rgba(201,162,39,0.1)]">
-                  <div className="text-xs uppercase tracking-[0.18em] text-[#c9a227]/80 mb-1">Wins</div>
-                  <div className="text-xl sm:text-2xl font-black text-white" style={{ fontFamily: "var(--font-display), serif" }}>
-                    {totalWins}
-                  </div>
+          <div className="border-b border-white/10 px-3 py-2 sm:px-6 sm:py-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+              <h2 className="text-lg sm:text-3xl font-black text-white break-words" style={{ fontFamily: "var(--font-display), serif" }}>
+                Match History
+              </h2>
+              <div className="flex gap-2">
+                <div className="border border-[#c9a227]/30 bg-[#c9a227]/10 rounded-xl px-2 py-1 sm:px-3 sm:py-1.5 whitespace-nowrap">
+                  <span className="text-[10px] uppercase tracking-[0.12em] text-[#c9a227]/80">Total Fights</span>
+                  <span className="ml-1.5 text-sm sm:text-lg font-black text-white" style={{ fontFamily: "var(--font-display), serif" }}>{totalMatches}</span>
                 </div>
-                <div className="rounded-2xl border border-[#c9a227]/30 bg-[#c9a227]/10 px-4 py-2 sm:px-5 sm:py-3 shadow-[0_8px_16px_rgba(201,162,39,0.1)]">
-                  <div className="text-xs uppercase tracking-[0.18em] text-[#c9a227]/80 mb-1">Combats</div>
-                  <div className="text-xl sm:text-2xl font-black text-white" style={{ fontFamily: "var(--font-display), serif" }}>
-                    {totalMatches}
-                  </div>
+                <div className="border border-[#c9a227]/30 bg-[#c9a227]/10 rounded-xl px-2 py-1 sm:px-3 sm:py-1.5 whitespace-nowrap">
+                  <span className="text-[10px] uppercase tracking-[0.12em] text-[#c9a227]/80">Winrate</span>
+                  <span className="ml-1.5 text-sm sm:text-lg font-black text-white" style={{ fontFamily: "var(--font-display), serif" }}>{totalMatches > 0 ? Math.round((totalWins / totalMatches) * 100) : 0}%</span>
                 </div>
               </div>
             </div>
           </div>
 
           <MatchHistoryList matches={matchHistory} />
-        </Card>
+        </div>
         </div>
       </div>
       <Footer />

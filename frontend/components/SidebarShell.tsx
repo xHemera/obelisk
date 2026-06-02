@@ -6,7 +6,7 @@ type SidebarShellProps = {
 
 export default function SidebarShell({ className = "" }: SidebarShellProps) {
   return (
-    <div className={`shrink-0 p-3 ${className}`.trim()}>
+    <div className={`hidden lg:block lg:p-3 ${className}`.trim()}>
       <Sidebar />
     </div>
   );

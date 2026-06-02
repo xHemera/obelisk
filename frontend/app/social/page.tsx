@@ -1080,8 +1080,8 @@ export default function SocialPage() {
         </div>
       )}
 
-      <div className="flex w-full justify-center px-4">
-        <section className="checkered-bg flex h-[calc(100vh-2rem)] w-full flex-col overflow-hidden rounded-3xl border border-[#c9a227]/25 bg-black/15 font-['Arial',_Helvetica,_sans-serif] shadow-2xl">
+      <div className="flex min-h-0 flex-1 w-full justify-center px-2 sm:px-4">
+        <section className="checkered-bg flex min-h-0 w-full flex-col overflow-hidden rounded-3xl border border-[#c9a227]/25 bg-black/15 font-['Arial',_Helvetica,_sans-serif] shadow-2xl">
 
           <ConversationList
             users={users}
@@ -1132,7 +1132,7 @@ export default function SocialPage() {
               hasMoreMessages={hasMoreMessages}
             />
 
-            <footer className="sticky bottom-0 border-t border-[#c9a227]/30 bg-[#15131d] p-4">
+            <footer className="sticky bottom-0 border-t border-[#c9a227]/30 bg-[#15131d] p-2 sm:p-4">
               {selectedUser && (<div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2 rounded-full border border-[#c9a227]/30 bg-[#242033] px-2 py-2 focus-within:border-[#c9a227]/30 focus-within:ring-0">
                   <input

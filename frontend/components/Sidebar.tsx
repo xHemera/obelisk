@@ -76,6 +76,7 @@ export default function Sidebar() {
   const [badges, setBadges] = useState<string[]>([]);
   const [socialUnread, setSocialUnread] = useState<number>(0);
   const [customUserAvatar, setCustomUserAvatar] = useState<string | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const unreadRequestSeqRef = useRef(0);
 
   const scheduleDeferredWork = (task: () => void) => {
@@ -203,11 +204,8 @@ export default function Sidebar() {
 
   const isProfileActive = pathname.startsWith("/profile");
 
-  return (
-    <aside
-      className="flex h-full w-20 shrink-0 flex-col items-center gap-3 rounded-xl border-2 border-[#c9a227]/30 bg-gradient-to-b from-[#1e1a24] via-[#15121a] to-[#0c0a0f] p-3 shadow-[0_0_20px_rgba(0,0,0,0.5)]"
-      style={{ boxShadow: "inset 0 1px 0 rgba(201,162,39,0.1), 0 4px 12px rgba(0,0,0,0.5)" }}
-    >
+  const sidebarContent = (
+    <>
       {/* Decorative top element */}
       <div className="mb-1 flex h-8 w-8 items-center justify-center">
         <i className="fa-solid fa-dragon text-lg text-[#c9a227]" />
@@ -229,6 +227,7 @@ export default function Sidebar() {
             key={href}
             href={href}
             title={label}
+            onClick={() => setMobileOpen(false)}
             className={`group relative flex h-12 w-12 items-center justify-center rounded-lg border-2 transition-all duration-300 ${
               isActive
                 ? "border-[#c9a227] bg-[#c9a227]/20 text-[#f5e6c8] shadow-[0_0_15px_rgba(201,162,39,0.3)]"
@@ -253,7 +252,7 @@ export default function Sidebar() {
       {/* Profile Button */}
       <Button
         type="button"
-        onClick={handleProfileClick}
+        onClick={(e) => { handleProfileClick(e); setMobileOpen(false); }}
         title={pseudo ?? "Profile"}
         variant="ghost"
         className={`relative h-12 w-12 p-0 overflow-hidden rounded-lg border-2 transition-all duration-300 ${
@@ -281,6 +280,46 @@ export default function Sidebar() {
           />
         )}
       </Button>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile hamburger button */}
+      <button
+        type="button"
+        onClick={() => setMobileOpen(!mobileOpen)}
+        className="fixed left-3 top-3 z-50 flex h-10 w-10 items-center justify-center rounded-lg border border-[#c9a227]/30 bg-[#1e1a24] text-[#c9a227] shadow-lg lg:hidden"
+        aria-label="Toggle navigation menu"
+      >
+        <i className={`fa-solid ${mobileOpen ? "fa-xmark" : "fa-bars"} text-lg`} />
+      </button>
+
+      {/* Mobile overlay backdrop */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 lg:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Mobile drawer (hidden on desktop) */}
+      <aside
+        className={`fixed left-0 top-0 z-50 flex h-full w-20 shrink-0 flex-col items-center gap-3 rounded-r-xl border-2 border-[#c9a227]/30 bg-gradient-to-b from-[#1e1a24] via-[#15121a] to-[#0c0a0f] p-3 shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-transform duration-300 lg:hidden ${
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+        style={{ boxShadow: "inset 0 1px 0 rgba(201,162,39,0.1), 0 4px 12px rgba(0,0,0,0.5)" }}
+      >
+        {sidebarContent}
+      </aside>
+
+      {/* Desktop sidebar (hidden on mobile, visible on lg+) */}
+      <aside
+        className="hidden h-full w-20 shrink-0 flex-col items-center gap-3 rounded-xl border-2 border-[#c9a227]/30 bg-gradient-to-b from-[#1e1a24] via-[#15121a] to-[#0c0a0f] p-3 shadow-[0_0_20px_rgba(0,0,0,0.5)] lg:flex lg:mr-3 lg:ml-2"
+        style={{ boxShadow: "inset 0 1px 0 rgba(201,162,39,0.1), 0 4px 12px rgba(0,0,0,0.5)" }}
+      >
+        {sidebarContent}
+      </aside>
+    </>
   );
 }

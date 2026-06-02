@@ -84,6 +84,7 @@ body {
   position: relative;
   min-height: 100vh;
   overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
 }
 
 /* Parchment Texture Background */

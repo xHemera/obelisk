@@ -336,7 +336,7 @@ export default function Game() {
     return (
       <div className="flex w-full justify-center px-4">
         <div className="rounded border border-[#3c3650] bg-[#0f0e13] p-4 text-[#cfc8e6]">
-          Chargement...
+          Loading...
         </div>
       </div>
     );
@@ -383,11 +383,11 @@ export default function Game() {
       />
 
       {/* Arena */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-4 py-6">
-        <div className="w-full max-w-4xl -translate-y-20 rounded-3xl">
-          <div className="flex flex-col gap-4 sm:gap-5">
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-2 py-2 sm:px-4 sm:py-6">
+        <div className="w-full max-w-4xl -translate-y-16 rounded-3xl sm:-translate-y-20">
+          <div className="flex flex-col gap-3 sm:gap-5">
             {/* Enemy team */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+            <div className="grid grid-cols-3 gap-1 sm:gap-3">
               {enemyTeam.map((character, slotIndex) => {
                 const heroId = character.identity.id;
                 const charState = findCharByHeroId(oppCharacters, heroId);
@@ -487,11 +487,11 @@ export default function Game() {
       </div>
 
       {/* Opponent info */}
-      <div className="flex flex-col items-end gap-1">
+      <div className="flex flex-col items-end gap-1 pr-2 sm:pr-0">
         <div className="flex items-start justify-end gap-4">
           <ProfileInfo account={{ pseudo: opponent, profilePhoto: oppAvatar }} />
         </div>
-        <p className="text-xs text-[#8b82a6]">
+        <p className="hidden text-xs text-[#8b82a6] sm:block">
           Session ID: {roomId || "—"}
         </p>
       </div>
@@ -515,7 +515,7 @@ export default function Game() {
 
       {/* Game Over overlay */}
       {isGameOver && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-2">
           <div
             className={`relative w-full max-w-lg overflow-hidden rounded-3xl border-2 p-1 shadow-[0_0_60px_rgba(201,168,76,0.12)] ${
               isWinner
@@ -537,7 +537,7 @@ export default function Game() {
                 isWinner
                   ? "bg-gradient-to-b from-[#1f1810] to-[#15100a]"
                   : "bg-gradient-to-b from-[#1a0f0f] to-[#120a0a]"
-              } p-8`}
+              } p-4 sm:p-8`}
             >
               {/* Loading state */}
               {isRewarding && !rewards && (
@@ -551,9 +551,9 @@ export default function Game() {
               {rewards && (
                 <>
                   {/* Victory / Defeat banner */}
-                  <div className="mb-6 text-center">
+                  <div className="mb-4 text-center sm:mb-6">
                     <h1
-                      className={`font-serif text-4xl font-bold tracking-wide ${
+                      className={`font-serif text-2xl font-bold tracking-wide sm:text-4xl ${
                         isWinner ? "text-[#e8dcc8]" : "text-[#c8a0a0]"
                       }`}
                     >
@@ -562,8 +562,8 @@ export default function Game() {
                   </div>
 
                   {/* Rewards summary */}
-                  <div className="mb-5 grid grid-cols-2 gap-3">
-                    <div className="rounded-xl border border-[#3c3650]/50 bg-[#0f0e13]/80 px-4 py-3 text-center">
+                  <div className="mb-5 grid grid-cols-2 gap-2 sm:gap-3">
+                    <div className="rounded-xl border border-[#3c3650]/50 bg-[#0f0e13]/80 px-2 py-2 sm:px-4 sm:py-3 text-center">
                       <p className="text-xs uppercase tracking-wider text-[#8b82a6]">XP gagnée</p>
                       <p className="mt-1 font-bold text-[#a8e6cf] text-xl">
                         +{rewards.xpGained}
