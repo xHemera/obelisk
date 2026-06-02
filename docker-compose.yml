@@ -46,6 +46,7 @@ services:
       - ./websockets/engine/heroes:/app/shared-heroes
       - frontend_bun_cache:/home/bun/.bun/install/cache
     environment:
+      NODE_ENV: production
       BETTER_AUTH_URL: $BETTER_AUTH_URL
       BETTER_AUTH_SECRET: $BETTER_AUTH_SECRET
       BETTER_AUTH_DATABASE_URL: $BETTER_AUTH_DATABASE_URL
@@ -80,6 +81,7 @@ services:
       - ./websockets:/app
       - backend_bun_cache:/home/bun/.bun/install/cache
     environment:
+      NODE_ENV: production
       DATABASE_URL: postgresql://postgres:postgres@db:5432/aqua_temp
       PORT: 4001
     depends_on:

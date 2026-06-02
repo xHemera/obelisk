@@ -2,7 +2,6 @@
 set -e
 
 bun install --ignore-scripts
-bunx prisma generate
 bunx prisma migrate dev --name init --url "$DATABASE_URL"
 
 # Turbopack misresolves require('.prisma/client/') from @prisma/client/

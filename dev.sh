@@ -325,7 +325,7 @@ start_services() {
     
     docker compose up --build -d
 
-    wait_for_url "http://localhost:3000" "Frontend" 180
+    wait_for_url "http://localhost:3000" "Frontend" 300
 
     print_success "Services démarrés et site accessible"
     print_info "Frontend: http://localhost:3000"
@@ -337,7 +337,7 @@ restart_services() {
     print_header "Redémarrage des services"
     docker compose restart
 
-    wait_for_url "http://localhost:3000" "Frontend" 180
+    wait_for_url "http://localhost:3000" "Frontend" 300
 
     print_success "Services redémarrés et site accessible"
 }

@@ -32,7 +32,7 @@ type SpellSelectorProps = {
 
 const manaIcon = "/gameResources/items/mana.webp";
 
-const basicAttackIcon = "/gameResources/spells/attack_boost.png";
+const basicAttackIcon = "/gameResources/heroes/basic_attack.png";
 
 const formatNumber = (value: number) => {
   if (Number.isInteger(value)) {
