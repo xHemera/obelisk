@@ -88,13 +88,7 @@ Retourne le profil du user connecté :
 { "image": null, "avatar": { "url": null }, "profileBackground": null, "profileBanner": null }
 ```
 
-### `PUT /api/profile`
-
-Déconnexion (signale le offline).
-
-### `POST /api/profile/resources`
-
-Click-to-earn rubis (gain 12-35 random).
+Les routes `/api/profile` sont listées dans la section Profile plus bas.
 
 ## Admin
 
@@ -126,6 +120,23 @@ Sauvegarde l'équipe : `{ userPseudo, char: ["Archer", ...] }`
 ### `DELETE /api/home?userPseudo=xxx`
 
 Quitte la file PvP.
+
+## Pong
+
+Même pattern que Home :
+
+| Route | Description |
+|-------|-------------|
+| `POST /api/pong` | Rejoint la file Pong → Redis `pong_queue` |
+| `DELETE /api/pong?userPseudo=xxx` | Quitte la file Pong |
+
+## Profile
+
+| Route | Méthode | Description |
+|-------|---------|-------------|
+| `GET /api/profile` | GET | Retourne le profil (avatar, bannière, fond) |
+| `PUT /api/profile` | PUT | Déconnexion (signale offline) |
+| `POST /api/profile/resources` | POST | Click-to-earn rubis (gain 12-35 aléatoire) |
 
 ## Error handling
 

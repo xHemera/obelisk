@@ -1,5 +1,5 @@
 import { CharacterInstance } from "../Instances/CharacterInstance";
-import { applyDamage, resolvePhyDamage } from "../Utils/resolveDamage";
+import { applyDamage, resolvePhyDamage, pushSpellEvent } from "../Utils/resolveDamage";
 import { Spell } from "./Spell";
 
 export class PiercingShot extends Spell {
@@ -39,7 +39,7 @@ export class RainOfArrows extends Spell {
 
 		const raw = idUser.character.stats.physicalDamage * multiplier + flat;
 		idTargets.forEach(target => {
-			const damage = resolvePhyDamage(raw, idUser, target);
+			const damage = resolvePhyDamage(raw, idUser, target, undefined, true);
 			applyDamage(target, damage);
 		});
 	}
@@ -61,5 +61,6 @@ export class PrecisionFocus extends Spell {
 
 		idUser.critChanceMod.push({ value: critChance, turn: duration });
 		idUser.critDamageMod.push({ value: critDamage, turn: duration });
+		pushSpellEvent({ type: "buff_crit", targetUid: idUser.uid });
 	}
 }

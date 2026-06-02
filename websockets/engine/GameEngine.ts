@@ -1,11 +1,9 @@
 import { GameState } from "./GameState/GameState";
 import { advanceTurn, getActiveCharacter, initTurnQueue } from "./GameState/TurnSystem";
 import { CharacterInstance, ModEntry } from "./Instances/CharacterInstance";
-import { applyDamage, resolvePhyDamage, clearDamageEvents, getDamageEvents } from "./Utils/resolveDamage";
+import { applyDamage, applyPoisonDamage, resolvePhyDamage, clearDamageEvents, getDamageEvents, getSpellEvents } from "./Utils/resolveDamage";
 import { GameAction } from "./Utils/GameAction";
-import { checkLastStand } from "./Utils/lastStand";
 import { findCharacter, resolveTargets } from "./Utils/resolveTargets";
-import { stat } from "fs";
 import { PlayerInstance } from "./Instances/PlayerInstance";
 
 function tickAllMods(character: CharacterInstance): void {
@@ -32,8 +30,8 @@ function tickPoison(state: GameState): GameState {
 		const totalDamage   = character.poison.reduce((acc, { value }) => acc + value, 0);
 		if (totalDamage > 0) {
 			console.log(`[GameEngine] tickPoison — ${character.uid} takes ${totalDamage} poison damage (hp=${character.currentHp}→${Math.max(0, character.currentHp - totalDamage)})`);
+			applyPoisonDamage(character, totalDamage, "");
 		}
-		applyDamage(character, totalDamage);
 		character.poison    = character.poison
 			.map(e => ({ ...e, turn: e.turn - 1 }))
 			.filter(e => e.turn > 0);
@@ -72,9 +70,10 @@ function checkWinner(state: GameState): GameState {
 }
 
 function resolveBasicAttack(user: CharacterInstance, targets: CharacterInstance[]): void {
+	const isAoE = targets.length > 1;
 	targets.forEach(target => {
 		const raw    = user.character.stats.physicalDamage;
-		const damage = resolvePhyDamage(raw, user, target);
+		const damage = resolvePhyDamage(raw, user, target, undefined, isAoE, "basic");
 		console.log(`[GameEngine] resolveBasicAttack — user=${user.character.name}(${user.uid}) raw=${raw} target=${target.character.name}(${target.uid}) hpBefore=${target.currentHp} damage=${damage}`);
 		applyDamage(target, damage);
 		console.log(`[GameEngine] resolveBasicAttack — after apply: ${target.uid} hp=${target.currentHp} shield=${target.shieldHp} invul=${target.invul}`);
@@ -105,12 +104,12 @@ export function processAction(state: GameState, action: GameAction): GameState {
 
 	const character = findCharacter(state, action.userUid);
 
-	if (!character) return { ...state, damageEvents: getDamageEvents() };
+	if (!character) return { ...state, damageEvents: getDamageEvents(), spellEvents: getSpellEvents() };
 
 	if (character.stunned > 0) {
 		tickAllMods(character);
 		const advanced = advanceTurn(state);
-		return { ...advanced, damageEvents: getDamageEvents() };
+		return { ...advanced, damageEvents: getDamageEvents(), spellEvents: getSpellEvents() };
 	}
 	tickAllMods(character);
 
@@ -134,10 +133,6 @@ export function processAction(state: GameState, action: GameAction): GameState {
 		}
 	}
 
-	newState.players
-		.flatMap(p => p.characters)
-		.forEach(c => checkLastStand(c));
-
 		newState = removeDeadCharacters(newState);
 		console.log(`[GameEngine] processAction — after removeDead: players chars=${newState.players.map(p => `P${p.id}:${p.characters.length}`).join(", ")} turnQueue=${newState.turnQueue.length}`);
 		newState = checkWinner(newState);
@@ -145,12 +140,12 @@ export function processAction(state: GameState, action: GameAction): GameState {
 
 	if (newState.gamePhase === "end") {
 		console.log(`[GameEngine] processAction END (game over) — turn=${newState.turn} winnerId=${newState.winnerId}`);
-		return { ...newState, damageEvents: getDamageEvents() };
+		return { ...newState, damageEvents: getDamageEvents(), spellEvents: getSpellEvents() };
 	}
 
 	newState = advanceTurn(newState);
 	console.log(`[GameEngine] processAction END — turn now ${newState.turn} active=${newState.turnQueue[0]?.characterUid} queue=${newState.turnQueue.map(e => `${e.characterUid}@${Math.round(e.charge)}`).join(" > ")}`);
-	return { ...newState, damageEvents: getDamageEvents() };
+	return { ...newState, damageEvents: getDamageEvents(), spellEvents: getSpellEvents() };
 }
 
 export function getCurrentTurnCharacter(state: GameState): CharacterInstance | undefined {

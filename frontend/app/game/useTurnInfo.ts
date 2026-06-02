@@ -30,9 +30,9 @@ export function useTurnInfo(
   const hasShownStartModal = useRef(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
 
-  // Delayed turn transition: when damage events are present, keep the
-  // previous active character / game phase visible for 1.5s so damage
-  // animations can play before the turn visually advances.
+  // Delayed turn transition: when events are present, keep the previous
+  // active character / game phase visible for 1.5s so animations can play
+  // before the turn visually advances.
   const [delayedTurnState, setDelayedTurnState] = useState<{
     uid: string | null;
     phase: string;
@@ -40,14 +40,14 @@ export function useTurnInfo(
   }>({ uid: null, phase: "battle", winnerId: null });
   const [turnTransitioning, setTurnTransitioning] = useState(false);
   const turnTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const lastGameTurnRef = useRef(-1);
 
   useEffect(() => {
     if (!gameState) return;
     const newUid   = gameState.turnQueue[0]?.characterUid ?? null;
     const newPhase = gameState.gamePhase;
     const newWinnerId = gameState.winnerId ?? null;
-    const hasDamage = (gameState.damageEvents?.length ?? 0) > 0;
+    const hasEvents = (gameState.damageEvents?.length ?? 0) > 0
+      || (gameState.spellEvents?.length ?? 0) > 0;
 
     if (gameState.gamePhase === "end") {
       if (turnTimerRef.current) clearTimeout(turnTimerRef.current);
@@ -60,7 +60,7 @@ export function useTurnInfo(
       return;
     }
 
-    if (hasDamage && gameState.turn > 0) {
+    if (hasEvents && gameState.turn > 0) {
       if (turnTimerRef.current) clearTimeout(turnTimerRef.current);
       setTurnTransitioning(true);
       turnTimerRef.current = setTimeout(() => {
@@ -135,8 +135,9 @@ export function useTurnInfo(
 
     if (gameState.turn !== prevTurnRef.current) {
       prevTurnRef.current = gameState.turn;
-      const hasDamage = (gameState.damageEvents?.length ?? 0) > 0;
-      if (hasDamage) {
+      const hasEvents = (gameState.damageEvents?.length ?? 0) > 0
+        || (gameState.spellEvents?.length ?? 0) > 0;
+      if (hasEvents) {
         setTimeout(() => setIsInfoModalOpen(true), 1500);
       } else {
         requestAnimationFrame(() => setIsInfoModalOpen(true));

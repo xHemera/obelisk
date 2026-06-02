@@ -131,17 +131,6 @@ body::before {
   }
 }
 
-@keyframes feature-card-slide-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .mine-reward-pop {
   animation: mine-pop 0.62s cubic-bezier(0.2, 0.75, 0.28, 1) forwards;
   will-change: transform, opacity;

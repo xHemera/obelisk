@@ -96,8 +96,12 @@ L'armor pen de Piercing Shot remplace `totalResistance` par `totalResistance * (
 - ✅ Matchmaking fonctionnel
 - ✅ GameState créé côté serveur avec l'engine
 - ✅ État initial broadcast aux 2 joueurs
-- ❌ Les actions de jeu (sorts, attaques) ne sont PAS encore reliées au `processAction()` de l'engine
-- ❌ Le frontend n'écoute pas encore `"gameStateUpdate"` pour mettre à jour l'affichage
+- ✅ Server-side `gameAction` → `processAction()` câblé
+- 🚧 Frontend de combat en cours d'intégration (affichage temps réel, sélection de cibles)
+
+## Pong Mini-Game
+
+Un Pong multijoueur temps réel accessible depuis la home page. File d'attente dédiée (`pong_queue` dans Redis), matchmaking séparé (`matchmakingpong.js`). Les gains en XP sont reversés dans le système de progression des héros.
 
 ## Progression
 
@@ -110,19 +114,26 @@ L'armor pen de Piercing Shot remplace `totalResistance` par `totalResistance * (
 ### Sorts
 
 - Chaque sort a son propre niveau (1-10)
-- PUT `/api/characters` → level up (`increment`)
-- PATCH `/api/characters` → XP (`plus one`), coûte des rubis
+- `PUT /api/characters` → level up (`increment`)
+- `PATCH /api/characters` → XP (`plus one`), coûte des rubis
+
+### Badges
+
+Badges attribués automatiquement selon les victoires PvP :
+- BEGINNER → 5 victoires
+- AMATEUR → 10 victoires
+- EXPERT → 20 victoires
+- MASTER → 50 victoires
 
 ### Rubis
 
 - Click-to-earn sur le bouton Mine de la home page
-- POST `/api/profile/resources` → gain random 12-35 rubis
-- Stocké dans `GameState.rubis`
+- `POST /api/profile/resources` → gain aléatoire 12-35 rubis
+- Stocké dans `GameState.rubis` (Prisma)
 
 ## Ce qui n'existe PAS (malgré ce que disent les vieux docs)
 
 - ❌ Système d'expédition
 - ❌ MMR / ranking / leaderboard
-- ❌ Badges et achievements
 - ❌ Mode "Defend" / "Item" en combat
 - ❌ Stats `attack`/`defense` plates (remplacées par `physicalDamage`/`magicalDamage`/`physicalResistance`/`magicalResistance`)
