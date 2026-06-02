@@ -1,22 +1,44 @@
 import { CharacterInstance, ModEntry } from "../Instances/CharacterInstance";
 import { applyCrit, rollCrit } from "./crit";
 
+export type DamageSource = "basic" | "skill" | "poison";
+
+export type SpellEventType = "heal" | "buff_attack" | "buff_defense" | "buff_crit" | "invisible" | "invulnerability" | "buff_haste" | "buff_other";
+
+export type SpellEvent = {
+	type: SpellEventType;
+	targetUid: string;
+	value?: number;
+};
+
 export type DamageEvent = {
 	targetUid: string;
 	attackerUid: string;
 	damage: number;
 	isCrit: boolean;
 	lethal: boolean;
+	isAoE: boolean;
+	source: DamageSource;
 };
 
 const damageEvents: DamageEvent[] = [];
+const spellEvents: SpellEvent[] = [];
 
 export function clearDamageEvents(): void {
 	damageEvents.length = 0;
+	spellEvents.length = 0;
 }
 
 export function getDamageEvents(): DamageEvent[] {
 	return [...damageEvents];
+}
+
+export function getSpellEvents(): SpellEvent[] {
+	return [...spellEvents];
+}
+
+export function pushSpellEvent(event: SpellEvent): void {
+	spellEvents.push(event);
 }
 
 function applyAndTick(mods: ModEntry[], raw: number): { result: number; mods: ModEntry[] } {
@@ -45,7 +67,9 @@ export function resolvePhyDamage(
     raw: number,
     idUser: CharacterInstance,
     idTarget: CharacterInstance,
-    resOverride?: number  // optionnel, remplace phyRes si fourni
+    resOverride?: number,
+    isAoE: boolean = false,
+    source: DamageSource = "skill",
 ): number {
     const { result: afterUser,   mods: newPhyMod    } = applyAndTick(idUser.phyMod, raw);
     const baseRes = resOverride ?? idTarget.phyRes;
@@ -64,6 +88,8 @@ export function resolvePhyDamage(
         damage: rounded,
         isCrit,
         lethal: idTarget.currentHp - rounded <= 0,
+        isAoE,
+        source,
     });
 
     return rounded;
@@ -73,7 +99,9 @@ export function resolveMagDamage(
     raw: number,
     idUser: CharacterInstance,
     idTarget: CharacterInstance,
-    resOverride?: number
+    resOverride?: number,
+    isAoE: boolean = false,
+    source: DamageSource = "skill",
 ): number {
     const { result: afterUser,   mods: newMagMod    } = applyAndTick(idUser.magMod, raw);
     const baseRes = resOverride ?? idTarget.magRes;
@@ -92,9 +120,25 @@ export function resolveMagDamage(
         damage: rounded,
         isCrit,
         lethal: idTarget.currentHp - rounded <= 0,
+        isAoE,
+        source,
     });
 
     return rounded;
+}
+
+export function applyPoisonDamage(target: CharacterInstance, damage: number, attackerUid: string): void {
+	const isLethal = target.currentHp - damage <= 0;
+	damageEvents.push({
+		targetUid: target.uid,
+		attackerUid,
+		damage: Math.round(damage),
+		isCrit: false,
+		lethal: isLethal,
+		isAoE: false,
+		source: "poison",
+	});
+	applyDamage(target, damage);
 }
 
 export function applyDamage(target: CharacterInstance, damage: number): void {

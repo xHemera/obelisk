@@ -27,12 +27,24 @@ export type TurnQueueEntry = {
   charge: number;
 };
 
+export type DamageSource = "basic" | "skill" | "poison";
+
 export type DamageEvent = {
   targetUid: string;
   attackerUid: string;
   damage: number;
   isCrit: boolean;
   lethal: boolean;
+  isAoE: boolean;
+  source: DamageSource;
+};
+
+export type SpellEventType = "heal" | "buff_attack" | "buff_defense" | "buff_crit" | "invisible" | "invulnerability" | "buff_haste" | "buff_other";
+
+export type SpellEvent = {
+  type: SpellEventType;
+  targetUid: string;
+  value?: number;
 };
 
 export type GameStatePayload = {
@@ -40,8 +52,8 @@ export type GameStatePayload = {
   gamePhase: string;
   winnerId: number | null;
   activePlayerOwner: number;
-  playerId: number;
   turnQueue: TurnQueueEntry[];
   players: PlayerState[];
   damageEvents: DamageEvent[];
+  spellEvents: SpellEvent[];
 };

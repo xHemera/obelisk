@@ -15,19 +15,35 @@ import GameLoadingScreen from "@/components/atoms/game/GameLoadingScreen";
 import GameArenaBackground from "@/components/backgrounds/GameArenaBackground";
 import BottomBar from "@/components/backgrounds/BottomBar";
 import FloatingDamage from "@/components/atoms/game/FloatingDamage";
-import type { CharacterState, DamageEvent } from "./types";
+import PixelAnimation from "@/components/atoms/game/PixelAnimation";
+import { getTargetAnim, getSpellAnim, preloadAllAnimations } from "@/lib/animationManager";
+import type { AnimDef } from "@/lib/animationManager";
+import type { CharacterState, DamageEvent, SpellEvent } from "./types";
 
 type DamageAnim = {
   id: number;
   targetUid: string;
   targetHeroId: string;
+  attackerUid: string;
   damage: number;
   isCrit: boolean;
   lethal: boolean;
+  isAoE: boolean;
+  source: string;
+};
+
+type PixelAnimInstance = {
+  id: number;
+  uid: string;
+  anim: AnimDef;
 };
 
 function findCharByHeroId(chars: CharacterState[] | undefined, heroId: string) {
   return chars?.find(c => c.uid.split("_").at(-2) === heroId) ?? null;
+}
+
+function findCharByUid(chars: CharacterState[] | undefined, uid: string) {
+  return chars?.find(c => c.uid === uid) ?? null;
 }
 
 function eventsToAnims(events: DamageEvent[], startId: number): DamageAnim[] {
@@ -35,9 +51,12 @@ function eventsToAnims(events: DamageEvent[], startId: number): DamageAnim[] {
     id: startId + i,
     targetUid: e.targetUid,
     targetHeroId: e.targetUid.split("_").at(-2) ?? "",
+    attackerUid: e.attackerUid,
     damage: e.damage,
     isCrit: e.isCrit,
     lethal: e.lethal,
+    isAoE: e.isAoE,
+    source: e.source,
   }));
 }
 
@@ -102,9 +121,16 @@ export default function Game() {
     handleSkipTurn,
   } = useTargeting(activeCharacterUid, myCharacters, oppCharacters, activeHeroDef);
 
-  // Damage animations
+  // Preload all animation frames on mount (while loading screen is shown)
+  useEffect(() => {
+    Promise.allSettled(preloadAllAnimations());
+  }, []);
+
+  // Damage & pixel animations
   const [damageAnims, setDamageAnims] = useState<DamageAnim[]>([]);
+  const [pixelAnims, setPixelAnims] = useState<PixelAnimInstance[]>([]);
   const animIdRef = useRef(0);
+  const pixAnimIdRef = useRef(0);
   const lastEventsTurnRef = useRef(-1);
 
   useEffect(() => {
@@ -114,11 +140,41 @@ export default function Game() {
       const newAnims = eventsToAnims(gameState.damageEvents, animIdRef.current);
       animIdRef.current += gameState.damageEvents.length;
       setDamageAnims(prev => [...prev, ...newAnims]);
+
+      const newPix: PixelAnimInstance[] = [];
+      for (const ev of gameState.damageEvents) {
+        newPix.push({
+          id: pixAnimIdRef.current,
+          uid: ev.targetUid,
+          anim: getTargetAnim(ev.isCrit, ev.isAoE, ev.source),
+        });
+        pixAnimIdRef.current += 1;
+      }
+      setPixelAnims(prev => [...prev, ...newPix]);
+    }
+
+    if (gameState.spellEvents?.length) {
+      const newPix: PixelAnimInstance[] = [];
+      for (const ev of gameState.spellEvents) {
+        const anim = getSpellAnim(ev.type);
+        if (!anim) continue;
+        newPix.push({
+          id: pixAnimIdRef.current,
+          uid: ev.targetUid,
+          anim,
+        });
+        pixAnimIdRef.current += 1;
+      }
+      setPixelAnims(prev => [...prev, ...newPix]);
     }
   }, [gameState]);
 
   const removeAnim = useCallback((id: number) => {
     setDamageAnims(prev => prev.filter(a => a.id !== id));
+  }, []);
+
+  const removePixelAnim = useCallback((id: number) => {
+    setPixelAnims(prev => prev.filter(a => a.id !== id));
   }, []);
 
   const isAnimating = damageAnims.length > 0 || turnTransitioning;
@@ -277,27 +333,38 @@ export default function Game() {
           <div className="flex flex-col gap-4 sm:gap-5">
             {/* Enemy team */}
             <div className="grid grid-cols-3 gap-2 sm:gap-3">
-              {enemyTeam.map((character) => {
+              {enemyTeam.map((character, slotIndex) => {
                 const heroId = character.identity.id;
                 const charState = findCharByHeroId(oppCharacters, heroId);
                 const dead = !charState;
                 const anim = findAnimForFighter(damageAnims, heroId, opponent, charState);
+                const pixs = pixelAnims.filter(p => p.uid === (anim?.targetUid ?? charState?.uid));
                 return (
-                  <div key={heroId} className={`relative w-full transition-opacity duration-300 ${dead ? "opacity-30 pointer-events-none" : "opacity-90"}`}>
-                    <Fighter
-                      variant="enemy"
-                      character={character}
-                      currentHp={charState ? Math.round(charState.currentHp) : 0}
-                      effects={[]}
-                      active={charState ? charState.uid === activeCharacterUid : false}
-                      onClick={isTarget(charState?.uid, oppCharacters) && charState ? () => handleTargetSelect(charState.uid) : undefined}
-                      isTargetable={isTarget(charState?.uid, oppCharacters)}
-                    />
+                  <div key={heroId} className="relative w-full">
+                    <div className={`transition-opacity duration-300 ${dead ? "opacity-30 pointer-events-none" : "opacity-90"}`}>
+                      <Fighter
+                        variant="enemy"
+                        character={character}
+                        currentHp={charState ? Math.round(charState.currentHp) : 0}
+                        effects={[]}
+                        active={charState ? charState.uid === activeCharacterUid : false}
+                        onClick={isTarget(charState?.uid, oppCharacters) && charState ? () => handleTargetSelect(charState.uid) : undefined}
+                        isTargetable={isTarget(charState?.uid, oppCharacters)}
+                      />
+                    </div>
+                    {pixs.map(p => (
+                      <PixelAnimation
+                        key={p.id}
+                        anim={p.anim}
+                        onComplete={() => removePixelAnim(p.id)}
+                      />
+                    ))}
                     {anim && (
                       <FloatingDamage
                         damage={anim.damage}
                         isCrit={anim.isCrit}
                         lethal={anim.lethal}
+                        delay={250}
                         onComplete={() => removeAnim(anim.id)}
                       />
                     )}
@@ -310,31 +377,42 @@ export default function Game() {
             <div className="grid grid-cols-3 gap-2 sm:gap-3">
               {teamSelected.map((character, index) => {
                 const heroId = character?.identity.id;
-                const charState = character
+                const charState = heroId
                   ? findCharByHeroId(myCharacters, heroId)
                   : undefined;
                 const dead = !charState;
                 const anim = heroId ? findAnimForFighter(damageAnims, heroId, userPseudo, charState) : undefined;
+                const pixs = pixelAnims.filter(p => p.uid === (anim?.targetUid ?? charState?.uid));
                 return (
                   <div key={heroId ?? `own-slot-${index}`}>
                     {character ? (
-                      <div className={`relative transition-opacity duration-300 ${dead ? "opacity-30 pointer-events-none" : ""}`}>
-                        <Fighter
-                          character={character}
-                          active={
-                            charState
-                              ? charState.uid === activeCharacterUid
-                              : selectedHero?.identity.id === character.identity.id
-                          }
-                          currentHp={charState ? Math.round(charState.currentHp) : 0}
-                          onClick={isTarget(charState?.uid, myCharacters) && charState ? () => handleTargetSelect(charState.uid) : undefined}
-                          isTargetable={isTarget(charState?.uid, myCharacters)}
-                        />
+                      <div className="relative">
+                        <div className={`transition-opacity duration-300 ${dead ? "opacity-30 pointer-events-none" : ""}`}>
+                          <Fighter
+                            character={character}
+                            active={
+                              charState
+                                ? charState.uid === activeCharacterUid
+                                : selectedHero?.identity.id === character.identity.id
+                            }
+                            currentHp={charState ? Math.round(charState.currentHp) : 0}
+                            onClick={isTarget(charState?.uid, myCharacters) && charState ? () => handleTargetSelect(charState.uid) : undefined}
+                            isTargetable={isTarget(charState?.uid, myCharacters)}
+                          />
+                        </div>
+                        {pixs.map(p => (
+                          <PixelAnimation
+                            key={p.id}
+                            anim={p.anim}
+                            onComplete={() => removePixelAnim(p.id)}
+                          />
+                        ))}
                         {anim && (
                           <FloatingDamage
                             damage={anim.damage}
                             isCrit={anim.isCrit}
                             lethal={anim.lethal}
+                            delay={250}
                             onComplete={() => removeAnim(anim.id)}
                           />
                         )}

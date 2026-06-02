@@ -1,5 +1,5 @@
 import { CharacterInstance } from "../Instances/CharacterInstance";
-import { applyDamage, resolvePhyDamage } from "../Utils/resolveDamage";
+import { applyDamage, resolvePhyDamage, pushSpellEvent } from "../Utils/resolveDamage";
 import { Spell } from "./Spell";
 
 export class ShieldBash extends Spell {
@@ -39,9 +39,11 @@ export class IronWill extends Spell {
     const [damageReduction, duration] = this.scaling[skillLevel - 1];
     user.phyResMod.push({ value: damageReduction, turn: duration });
     user.magResMod.push({ value: damageReduction, turn: duration });
+    pushSpellEvent({ type: "buff_defense", targetUid: user.uid });
 
     targets.forEach(enemy => {
       enemy.taunted = Math.max(enemy.taunted, duration);
+      pushSpellEvent({ type: "buff_other", targetUid: enemy.uid });
     });
   }
 }

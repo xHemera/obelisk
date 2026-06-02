@@ -1,6 +1,6 @@
 import { PlayerInstance } from "../Instances/PlayerInstance";
 import { TurnEntry } from "./TurnSystem";
-import { DamageEvent } from "../Utils/resolveDamage";
+import { DamageEvent, SpellEvent } from "../Utils/resolveDamage";
 
 export type GamePhase = "draft" | "battle" | "end";
 
@@ -12,4 +12,5 @@ export type GameState = {
 	gamePhase:		GamePhase;
 	winnerId?:		number;
 	damageEvents:	DamageEvent[];
+	spellEvents:	SpellEvent[];
 }

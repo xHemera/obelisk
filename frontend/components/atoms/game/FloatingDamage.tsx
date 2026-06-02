@@ -4,17 +4,15 @@ type FloatingDamageProps = {
   damage: number;
   isCrit: boolean;
   lethal?: boolean;
+  delay?: number;
   onComplete: () => void;
 };
 
-export default function FloatingDamage({ damage, isCrit, lethal, onComplete }: FloatingDamageProps) {
+export default function FloatingDamage({ damage, isCrit, lethal, delay = 0, onComplete }: FloatingDamageProps) {
   const isLethal = lethal ?? false;
 
   return (
-    <div
-      className="pointer-events-none absolute inset-0 z-30 flex items-start justify-center"
-      onAnimationEnd={onComplete}
-    >
+    <div className="pointer-events-none absolute inset-0 z-30 flex items-start justify-center">
       {/* Red flash overlay on lethal */}
       {isLethal && (
         <div
@@ -22,6 +20,7 @@ export default function FloatingDamage({ damage, isCrit, lethal, onComplete }: F
           style={{
             background: "radial-gradient(circle, rgba(200,0,0,0.35) 0%, rgba(200,0,0,0) 70%)",
             animation: "lethalFlash 1.2s ease-out forwards",
+            animationDelay: `${delay}ms`,
           }}
         />
       )}
@@ -45,6 +44,10 @@ export default function FloatingDamage({ damage, isCrit, lethal, onComplete }: F
               ? "0 0 20px rgba(255,0,0,0.6), 0 0 40px rgba(255,0,0,0.3)"
               : "0 3px 8px rgba(0,0,0,0.7)",
             animation: isCrit ? "critDmg 1.4s ease-out forwards" : "dmgPop 1.2s ease-out forwards",
+            animationDelay: `${delay}ms`,
+          }}
+          onAnimationEnd={(e) => {
+            if (e.animationName === (isCrit ? "critDmg" : "dmgPop")) onComplete();
           }}
         >
           {damage}
@@ -58,6 +61,7 @@ export default function FloatingDamage({ damage, isCrit, lethal, onComplete }: F
               WebkitTextStroke: "1px rgba(0,0,0,0.85)",
               textShadow: "0 0 15px rgba(255,0,0,0.5)",
               animation: "skullPop 1.2s ease-out forwards",
+              animationDelay: `${delay}ms`,
             }}
           >
             ☠

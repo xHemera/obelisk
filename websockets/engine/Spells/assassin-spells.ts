@@ -1,6 +1,6 @@
 import { CharacterInstance } from "../Instances/CharacterInstance";
 import { Spell } from "./Spell";
-import { applyDamage, resolvePhyDamage } from "../Utils/resolveDamage";
+import { applyDamage, resolvePhyDamage, pushSpellEvent } from "../Utils/resolveDamage";
 
 export class ShadowStrike extends Spell {
     constructor(scaling: number[][]) {
@@ -60,5 +60,6 @@ applyEffect(idUser: CharacterInstance, idTargets: CharacterInstance[]): void {
   const [duration, nextAttackBonus] = this.scaling[skillLevel - 1];
   idUser.invisible       = Math.max(idUser.invisible, duration);
   idUser.nextAttackBonus = nextAttackBonus;
+  pushSpellEvent({ type: "invisible", targetUid: idUser.uid });
 }
 }

@@ -84,6 +84,7 @@ export function broadcastGameState(roomId) {
     winnerId: state.winnerId ?? null,
     activePlayerOwner: currentOwner,
     damageEvents: state.damageEvents ?? [],
+    spellEvents: state.spellEvents ?? [],
     turnQueue: state.turnQueue.map(e => ({
       characterUid: e.characterUid,
       playerOwner: e.playerOwner,
