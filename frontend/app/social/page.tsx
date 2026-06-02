@@ -620,7 +620,8 @@ export default function SocialPage() {
   }, []);
 
   const handleProfileClick = useCallback((userName: string) => {
-    if (userName === currentUser?.name) {
+    if (!currentUser) return;
+    if (userName === currentUser.name) {
       router.push(`/profile/${userName}`);
       return;
     }
@@ -685,18 +686,18 @@ export default function SocialPage() {
       }
 
       //makes a new inbox for both users and updates it
-      const [cres, ires] = await Promise.all([
-        fetch("/api/social/contact", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({currentUser: currentUser.name, addUser: inviteUsername}),
-        }),
-        fetch(`/api/social/inbox?username=${currentUser.name}`, {
-          method: "GET",
-        }),
-      ])
+      
+      const cres = await fetch("/api/social/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({currentUser: currentUser.name, addUser: inviteUsername}),
+      });
+      const ires = await fetch(`/api/social/inbox?username=${currentUser.name}`, {
+        method: "GET",
+      });
+      
       if (!cres.ok)
         throw Error("No new contact");
       if (!ires.ok)
