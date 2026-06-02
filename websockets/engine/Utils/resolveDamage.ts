@@ -63,7 +63,10 @@ function applyResistance(damage: number, baseRes: number, resMods: ModEntry[]): 
     };
 }
 
-export function resolvePhyDamage(
+export type DamageType = "phy" | "mag";
+
+function resolveDamage(
+    type: DamageType,
     raw: number,
     idUser: CharacterInstance,
     idTarget: CharacterInstance,
@@ -71,12 +74,21 @@ export function resolvePhyDamage(
     isAoE: boolean = false,
     source: DamageSource = "skill",
 ): number {
-    const { result: afterUser,   mods: newPhyMod    } = applyAndTick(idUser.phyMod, raw);
-    const baseRes = resOverride ?? idTarget.phyRes;
-    const { result: afterTarget, mods: newPhyResMod } = applyResistance(afterUser, baseRes, idTarget.phyResMod);
+    const [userMod, targetBaseRes, targetResMod]: [ModEntry[], number, ModEntry[]] = type === "phy"
+        ? [idUser.phyMod, idTarget.phyRes, idTarget.phyResMod]
+        : [idUser.magMod, idTarget.magRes, idTarget.magResMod];
 
-    idUser.phyMod      = newPhyMod;
-    idTarget.phyResMod = newPhyResMod;
+    const { result: afterUser,   mods: newMod    } = applyAndTick(userMod, raw);
+    const baseRes = resOverride ?? targetBaseRes;
+    const { result: afterTarget, mods: newResMod } = applyResistance(afterUser, baseRes, targetResMod);
+
+    if (type === "phy") {
+        idUser.phyMod      = newMod;
+        idTarget.phyResMod = newResMod;
+    } else {
+        idUser.magMod      = newMod;
+        idTarget.magResMod = newResMod;
+    }
 
     const isCrit   = rollCrit(idUser, idTarget);
     const finalDmg = isCrit ? applyCrit(afterTarget, idUser) : afterTarget;
@@ -95,37 +107,11 @@ export function resolvePhyDamage(
     return rounded;
 }
 
-export function resolveMagDamage(
-    raw: number,
-    idUser: CharacterInstance,
-    idTarget: CharacterInstance,
-    resOverride?: number,
-    isAoE: boolean = false,
-    source: DamageSource = "skill",
-): number {
-    const { result: afterUser,   mods: newMagMod    } = applyAndTick(idUser.magMod, raw);
-    const baseRes = resOverride ?? idTarget.magRes;
-    const { result: afterTarget, mods: newMagResMod } = applyResistance(afterUser, baseRes, idTarget.magResMod);
+export const resolvePhyDamage = (raw: number, idUser: CharacterInstance, idTarget: CharacterInstance, resOverride?: number, isAoE?: boolean, source?: DamageSource): number =>
+    resolveDamage("phy", raw, idUser, idTarget, resOverride, isAoE, source);
 
-    idUser.magMod      = newMagMod;
-    idTarget.magResMod = newMagResMod;
-
-    const isCrit   = rollCrit(idUser, idTarget);
-    const finalDmg = isCrit ? applyCrit(afterTarget, idUser) : afterTarget;
-    const rounded  = Math.round(finalDmg);
-
-    damageEvents.push({
-        targetUid: idTarget.uid,
-        attackerUid: idUser.uid,
-        damage: rounded,
-        isCrit,
-        lethal: idTarget.currentHp - rounded <= 0,
-        isAoE,
-        source,
-    });
-
-    return rounded;
-}
+export const resolveMagDamage = (raw: number, idUser: CharacterInstance, idTarget: CharacterInstance, resOverride?: number, isAoE?: boolean, source?: DamageSource): number =>
+    resolveDamage("mag", raw, idUser, idTarget, resOverride, isAoE, source);
 
 export function applyPoisonDamage(target: CharacterInstance, damage: number, attackerUid: string): void {
 	const isLethal = target.currentHp - damage <= 0;

@@ -69,17 +69,17 @@ export const archer = {
       unlockLevel: 1,
       manaCost: 8,
       scaling: [
-        // [multiplier, flatDamageBonus, armorPenetration]
-        [1.2, 15, 15],
-        [1.3, 18, 17],
-        [1.4, 21, 19],
-        [1.5, 24, 21],
-        [1.6, 27, 23],
-        [1.7, 30, 25],
-        [1.8, 33, 27],
-        [1.9, 36, 29],
-        [2.0, 40, 32],
-        [2.2, 45, 35],
+  // [multiplier, flatDamagePerLevel, armorPen]
+          [1.2, 15, 15],
+          [1.3, 18, 17],
+          [1.4, 21, 19],
+          [1.5, 24, 21],
+          [1.6, 27, 23],
+          [1.7, 30, 25],
+          [1.8, 33, 27],
+          [1.9, 36, 29],
+          [2.0, 40, 32],
+          [2.2, 45, 35],
       ],
     },
 
@@ -95,7 +95,7 @@ export const archer = {
       unlockLevel: 5,
       manaCost: 12,
       scaling: [
-        // [multiplier, flatDamageBonus]
+        // [multiplier, flatDamagePerLevel]
         [0.8, 10],
         [0.9, 12],
         [1.0, 14],
@@ -121,7 +121,7 @@ export const archer = {
       unlockLevel: 10,
       manaCost: 15,
       scaling: [
-        // [critChanceIncrease, critDamageIncrease, duration]
+        // [critChance, critDamage, duration]
         [5, 8, 3],
         [7, 10, 3],
         [9, 12, 3],

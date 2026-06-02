@@ -1,8 +1,8 @@
-import { archer } from "../heroes/archer";
-import { assassin } from "../heroes/assassin";
-import { healer } from "../heroes/healer";
-import { knight } from "../heroes/knight";
-import { mage } from "../heroes/mage";
+import { archer } from "hero-data/archer";
+import { assassin } from "hero-data/assassin";
+import { healer } from "hero-data/healer";
+import { knight } from "hero-data/knight";
+import { mage } from "hero-data/mage";
 import { PiercingShot, PrecisionFocus, RainOfArrows } from "./archer-spells";
 import { PhantomStep, ShadowStrike, VenomBlade } from "./assassin-spells";
 import { DivineProtection, HealingLight, Sanctuary } from "./healer-spells";

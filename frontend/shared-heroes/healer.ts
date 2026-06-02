@@ -68,7 +68,7 @@ export const healer = {
       unlockLevel: 1,
       manaCost: 10,
       scaling: [
-        // [healMultiplier, flatHealBonus]
+        // [healMultiplier, flatHealPerLevel]
         [0.6, 25],
         [0.7, 30],
         [0.8, 35],
@@ -94,7 +94,7 @@ export const healer = {
       unlockLevel: 7,
       manaCost: 18,
       scaling: [
-        // [healMultiplier, flatHealBonus, defenseBonus%, duration]
+        // [healMultiplier, flatHealPerLevel, defenseBonus, duration]
         [0.4, 15, 3, 2],
         [0.5, 18, 4, 2],
         [0.6, 21, 5, 2],
@@ -111,7 +111,7 @@ export const healer = {
     {
       id: "s3",
       type: "invulnerability",
-      targeting: "teamAoe",
+      targeting: "teamSingle",
       info: {
         name: "Divine Protection",
         icon: spell3Icon,

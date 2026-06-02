@@ -72,7 +72,7 @@ export const mage = {
       manaCost: 12,
 
       scaling: [
-        // [damageMultiplier, flatDamageBonus, burnChance%, duration]
+        // [damageMultiplier, flatDamagePerLevel, burnChance, duration]
         [1.3, 18, 30, 1],
         [1.4, 22, 32, 1],
         [1.5, 26, 34, 1],
@@ -132,7 +132,7 @@ export const mage = {
       manaCost: 20,
 
       scaling: [
-        // [damageMultiplier, flatDamageBonus]
+        // [damageMultiplier, flatDamagePerLevel]
         [2.2, 40],
         [2.4, 45],
         [2.6, 50],

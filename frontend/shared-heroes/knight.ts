@@ -72,7 +72,7 @@ export const knight = {
       manaCost: 12,
 
       scaling: [
-        // [damageMultiplier, flatDamageBonus, stunChance%, stunDuration]
+        // [damageMultiplier, flatDamagePerLevel, stunChance, stunDuration]
         [1.1, 18, 20, 1],
         [1.2, 21, 23, 1],
         [1.3, 24, 26, 1],
@@ -102,7 +102,7 @@ export const knight = {
       manaCost: 15,
 
       scaling: [
-        // [damageReduction%, duration]
+        // [damageReduction, duration]
         [10, 2],
         [14, 2],
         [18, 2],
@@ -132,7 +132,7 @@ export const knight = {
       manaCost: 25,
 
       scaling: [
-        // [hpThreshold%, shieldPercent]
+        // [hpThreshold, shieldPercent]
         [30, 15],
         [30, 18],
         [30, 21],

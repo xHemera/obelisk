@@ -338,7 +338,7 @@ export default function ProfileViewerModal({
           </div>
         )}
         <Card
-          className="w-full max-w-md rounded-2xl border border-[#3c3650] bg-[#15131d] p-6 shadow-2xl"
+          className="w-full max-w-md rounded-2xl border border-[#3c3650] bg-[#15131d] p-6 font-['Arial',_Helvetica,_sans-serif] shadow-2xl"
           role="dialog"
           aria-modal="true"
           aria-labelledby="profileviewer-title"
@@ -369,7 +369,7 @@ export default function ProfileViewerModal({
                 <div className="min-w-0">
                   <h2
                     id="profileviewer-title"
-                    className="truncate text-xl font-black uppercase tracking-wide text-white"
+                    className="truncate text-lg font-bold text-white"
                   >
                     {displayedPseudo}
                   </h2>

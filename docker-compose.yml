@@ -34,8 +34,8 @@ services:
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./frontend/Dockerfile
     container_name: obelisk-frontend
     restart: unless-stopped
     working_dir: /app
@@ -43,7 +43,6 @@ services:
       - "3000:3000"
     volumes:
       - ./frontend:/app
-      - ./websockets/engine/heroes:/app/shared-heroes
       - frontend_bun_cache:/home/bun/.bun/install/cache
     environment:
       NODE_ENV: production
@@ -63,8 +62,8 @@ services:
 
   websockets:
     build:
-      context: ./websockets
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./websockets/Dockerfile
     container_name: obelisk-websockets
     restart: unless-stopped
     working_dir: /app
@@ -79,6 +78,7 @@ services:
       - "4001:4001"
     volumes:
       - ./websockets:/app
+      - ./packages:/packages
       - backend_bun_cache:/home/bun/.bun/install/cache
     environment:
       NODE_ENV: production
@@ -92,9 +92,6 @@ services:
 
 volumes:
   postgres_data:
-  frontend_node_modules:
   frontend_bun_cache:
-  backend_node_modules:
   backend_bun_cache:
-  game_engine_node_modules:
-  game_engine_bun_cache:
+

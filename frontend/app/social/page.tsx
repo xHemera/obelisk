@@ -1042,8 +1042,8 @@ export default function SocialPage() {
       {opponent}
       {isAddContactModalOpen && (
         <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/60 px-4">
-          <div className="w-full max-w-md rounded-2xl border border-[#c9a227]/25 bg-[#1b1826] p-5 shadow-2xl">
-            <h3 className="text-lg font-bold text-white">Enter a username to send DM invitation</h3>
+          <div className="w-full max-w-md rounded-2xl border border-[#c9a227]/25 bg-[#1b1826] p-5 font-['Arial',_Helvetica,_sans-serif] shadow-2xl">
+            <h3 className="text-base font-bold text-white">Enter a username to send DM invitation</h3>
 
             <input
               type="text"
@@ -1081,7 +1081,7 @@ export default function SocialPage() {
       )}
 
       <div className="flex w-full justify-center px-4">
-        <section className="checkered-bg flex h-[calc(100vh-2rem)] w-full flex-col overflow-hidden rounded-3xl border border-[#c9a227]/25 bg-black/15 shadow-2xl">
+        <section className="checkered-bg flex h-[calc(100vh-2rem)] w-full flex-col overflow-hidden rounded-3xl border border-[#c9a227]/25 bg-black/15 font-['Arial',_Helvetica,_sans-serif] shadow-2xl">
 
           <ConversationList
             users={users}
@@ -1163,7 +1163,7 @@ export default function SocialPage() {
                     }}
                     onKeyDown={handleInputKeyDown}
                     maxLength={MAX_MESSAGE_LENGTH}
-                    className={`flex-1 bg-transparent px-1 text-xl outline-none focus:ring-0 focus:outline-none ${
+                    className={`flex-1 bg-transparent px-1 text-base outline-none focus:ring-0 focus:outline-none ${
                         isBlocked || hasBlocked
                           ? "text-gray-500 placeholder:text-gray-600 cursor-not-allowed"
                           : "text-gray-200 placeholder:text-gray-500"

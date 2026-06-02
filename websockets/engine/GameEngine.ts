@@ -3,9 +3,7 @@ import { advanceTurn, getActiveCharacter, initTurnQueue } from "./GameState/Turn
 import { CharacterInstance, ModEntry } from "./Instances/CharacterInstance";
 import { applyDamage, applyPoisonDamage, resolvePhyDamage, clearDamageEvents, getDamageEvents, getSpellEvents } from "./Utils/resolveDamage";
 import { GameAction } from "./Utils/GameAction";
-import { checkLastStand } from "./Utils/lastStand";
 import { findCharacter, resolveTargets } from "./Utils/resolveTargets";
-import { stat } from "fs";
 import { PlayerInstance } from "./Instances/PlayerInstance";
 
 function tickAllMods(character: CharacterInstance): void {
@@ -134,10 +132,6 @@ export function processAction(state: GameState, action: GameAction): GameState {
 			}
 		}
 	}
-
-	newState.players
-		.flatMap(p => p.characters)
-		.forEach(c => checkLastStand(c));
 
 		newState = removeDeadCharacters(newState);
 		console.log(`[GameEngine] processAction — after removeDead: players chars=${newState.players.map(p => `P${p.id}:${p.characters.length}`).join(", ")} turnQueue=${newState.turnQueue.length}`);
