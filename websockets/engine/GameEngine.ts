@@ -98,17 +98,41 @@ function resolveSkill(skillId: string, user: CharacterInstance, targets: Charact
 export function processAction(state: GameState, action: GameAction): GameState {
 	clearDamageEvents();
 
+	// Validate action is for the active character (turnQueue[0])
+	const activeEntry = state.turnQueue[0];
+	if (!activeEntry || action.userUid !== activeEntry.characterUid) {
+		console.warn(`[GameEngine] processAction — action.userUid=${action.userUid} does not match turnQueue[0]=${activeEntry?.characterUid ?? "none"}, rejecting`);
+		return { ...state, damageEvents: getDamageEvents(), spellEvents: getSpellEvents() };
+	}
+
 	state.players
 		.flatMap(p => p.characters)
 		.forEach(c => c.hasBeenCrit = false);
 
 	const character = findCharacter(state, action.userUid);
 
-	if (!character) return { ...state, damageEvents: getDamageEvents(), spellEvents: getSpellEvents() };
+	// If character is dead/removed, auto-advance the turn (skip them)
+	if (!character) {
+		console.warn(`[GameEngine] processAction — character ${action.userUid} not found (dead?), auto-advancing`);
+		let newState = tickPoison(state);
+		newState = removeDeadCharacters(newState);
+		newState = checkWinner(newState);
+		if (newState.gamePhase === "end") {
+			return { ...newState, damageEvents: getDamageEvents(), spellEvents: getSpellEvents() };
+		}
+		newState = advanceTurn(newState);
+		return { ...newState, damageEvents: getDamageEvents(), spellEvents: getSpellEvents() };
+	}
 
 	if (character.stunned > 0) {
 		tickAllMods(character);
-		const advanced = advanceTurn(state);
+		let newState = tickPoison(state);
+		newState = removeDeadCharacters(newState);
+		newState = checkWinner(newState);
+		if (newState.gamePhase === "end") {
+			return { ...newState, damageEvents: getDamageEvents(), spellEvents: getSpellEvents() };
+		}
+		const advanced = advanceTurn(newState);
 		return { ...advanced, damageEvents: getDamageEvents(), spellEvents: getSpellEvents() };
 	}
 	tickAllMods(character);
@@ -116,6 +140,10 @@ export function processAction(state: GameState, action: GameAction): GameState {
 	let	newState = tickPoison(state);
 		newState = removeDeadCharacters(newState);
 		newState = checkWinner(newState);
+
+	if (newState.gamePhase === "end") {
+		return { ...newState, damageEvents: getDamageEvents(), spellEvents: getSpellEvents() };
+	}
 
 	if (action.type === "skip") {
 		character.currentMp = Math.min(
@@ -150,5 +178,6 @@ export function processAction(state: GameState, action: GameAction): GameState {
 
 export function getCurrentTurnCharacter(state: GameState): CharacterInstance | undefined {
 	const entry = getActiveCharacter(state);
+	if (!entry) return undefined;
 	return findCharacter(state, entry.characterUid);
 }

@@ -28,7 +28,7 @@ export function initTurnQueue(state: GameState): TurnEntry[] {
 	return sortQueue(allCharacters);
 }
 
-export function getActiveCharacter(state: GameState): TurnEntry {
+export function getActiveCharacter(state: GameState): TurnEntry | undefined {
 	return state.turnQueue[0];
 }
 
@@ -40,6 +40,9 @@ function findCharacter(state: GameState, uid: string): CharacterInstance | undef
 
 export function advanceTurn(state: GameState): GameState {
     const [current, ...rest] = state.turnQueue;
+
+    // If queue is empty, return state unchanged
+    if (!current) return { ...state, turn: state.turn + 1 };
 
     const character = findCharacter(state, current.characterUid);
     const speed     = character?.character.stats.speed ?? 1;

@@ -20,53 +20,42 @@ export function useGameData() {
   const [loadingPhase, setLoadingPhase] = useState<LoadingPhase>("connecting");
 
   useEffect(() => {
-    console.log("[GameData] useEffect mount — fetching...");
     let cancelled = false;
 
     async function load() {
       try {
         setLoadingPhase("fetching");
-        console.log("[GameData] Step 1: fetching session...");
 
         const { data } = await authClient.getSession();
-        console.log("[GameData] Step 2: session result:", data?.user?.name ?? "null");
         if (cancelled) return;
         if (!data || !data.user.name) throw new Error("Session non trouvée");
         setUserPseudo(data.user.name);
-        console.log("[GameData] Step 3: pseudo set, fetching team+opponent...");
 
         await loadTeamAndOpponent(data.user.name);
         if (cancelled) return;
 
-        console.log("[GameData] Step 4: team+opponent done, setting loaded");
         setLoadingPhase("loaded");
 
         await Promise.all([
           loadPlayerCharacters(data.user.name),
           loadProfileAvatar(),
         ]);
-        console.log("[GameData] Step 5: secondary data loaded (characters, avatar)");
       } catch (err) {
         if (cancelled) return;
         const message = err instanceof Error ? err.message : "Une erreur est survenue";
-        console.log("[GameData] ERROR caught:", message, err);
         emitGlobalError(message);
         setLoadingPhase("error");
       }
     }
 
     async function loadTeamAndOpponent(pseudo: string) {
-      console.log("[GameData] loadTeamAndOpponent — fetching /api/user and /api/user/opponent for", pseudo);
       const [cres, ores] = await Promise.all([
         fetch(`/api/user?pseudo=${pseudo}`, { method: "GET" }),
         fetch(`/api/user/opponent?pseudo=${pseudo}`, { method: "GET" }),
       ]);
-      console.log("[GameData] cres status:", cres.status, "ores status:", ores.status);
 
       if (!cres.ok || !ores.ok) {
-        console.log("[GameData] One or both API calls failed. cres.ok:", cres.ok, "ores.ok:", ores.ok);
         if (ores.status === 429) {
-          console.log("[GameData] 429 rate limit, retrying with backoff...");
           const result = await retryWithBackoff(async () => {
             if (cancelled) return null;
             const [cres2, ores2] = await Promise.all([
@@ -78,23 +67,20 @@ export function useGameData() {
             const opp2 = await ores2.json();
             return { res: res2, opp: opp2 };
           }, () => cancelled);
-          if (!result || cancelled) return;
+          if (cancelled) return;
+          if (!result) throw new Error("Impossible de récupérer les données adverses après plusieurs tentatives");
           finishInit(pseudo, result.res, result.opp);
           return;
         }
-        console.log("[GameData] Throwing error: API responded with status", cres.status, ores.status);
         throw new Error("Impossible de récupérer les données adverses");
       }
 
-      console.log("[GameData] Parsing JSON responses...");
       const res = await cres.json();
       const opp = await ores.json();
-      console.log("[GameData] cres.team:", res.team, "opp.name:", opp.name, "opp.team:", opp.team);
       finishInit(pseudo, res, opp);
     }
 
     function finishInit(pseudo: string, res: { team: string[]; levels: number[]; spellsLevels: number[] }, opp: { name: string; team: string[]; avatar: string | null; roomId: number }) {
-      console.log("[GameData] finishInit called — team:", res.team, "opponent:", opp.name);
       const teamData: Team = {
         owner: pseudo,
         characters: res.team,
@@ -107,7 +93,6 @@ export function useGameData() {
       setOppAvatar(opp.avatar);
       setRoomId(opp.roomId);
       spells.initialData(teamData, opp.roomId);
-      console.log("[GameData] finishInit done — states set");
     }
 
     async function loadPlayerCharacters(pseudo: string) {
@@ -145,10 +130,8 @@ export function useGameData() {
 
     load();
 
-    return () => { cancelled = true; console.log("[GameData] cleanup — cancelled"); };
+    return () => { cancelled = true; };
   }, []);
-
-  console.log("[GameData] render — loadingPhase:", loadingPhase, "userPseudo:", userPseudo, "team:", team, "oppTeam:", oppTeam);
 
   return {
     userPseudo,
