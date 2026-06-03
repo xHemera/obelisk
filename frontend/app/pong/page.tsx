@@ -382,8 +382,15 @@ export default function PongPage() {
           const randomAngle = (Math.random() * Math.PI / 3) - Math.PI / 6; // -30° to +30°
           const randomDirection = Math.random() < 0.5 ? 1 : -1; // Left or right
           const speed = 5;
-          const speedX = randomDirection * speed * Math.cos(randomAngle);
-          const speedY = speed * Math.sin(randomAngle);
+          let speedX = randomDirection * speed * Math.cos(randomAngle);
+          let speedY = speed * Math.sin(randomAngle);
+          
+          // Éviter que la balle aille trop à l'horizontale
+          const minVerticalSpeed = 2.5;
+          if (Math.abs(speedY) < minVerticalSpeed) {
+            speedY = (speedY >= 0 ? 1 : -1) * minVerticalSpeed;
+            speedX = Math.sign(speedX) * Math.sqrt(speed * speed - speedY * speedY);
+          }
           
           console.log("[Pong] Player 1 launching ball with angle:", randomAngle, "direction:", randomDirection);
           
@@ -536,15 +543,6 @@ export default function PongPage() {
       context.fillStyle = "white";
       context.font = "30px Arial";
       context.fillText(`XP: ${xp.current}`, boardWidth - 150, 50);
-      
-      // Display countdown if ball not started
-      if (!b.started && countdown > 0) {
-        context.fillStyle = "rgba(255, 255, 255, 0.8)";
-        context.font = "bold 80px Arial";
-        context.textAlign = "center";
-        context.fillText(countdown.toString(), boardWidth / 2, boardHeight / 2);
-        context.textAlign = "left";
-      }
 
       paddleCollision(b, p1, true);
       paddleCollision(b, p2, false);
