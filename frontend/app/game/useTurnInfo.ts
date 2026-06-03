@@ -30,6 +30,11 @@ export function useTurnInfo(
   const hasShownStartModal = useRef(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
 
+  // Guard: track which turn's transition we are currently animating.
+  // After Fast Refresh the setTimeout is cleared but state is preserved,
+  // so we need to re-start the timer if it was lost.
+  const lastTransitionTurnRef = useRef(-1);
+
   // Delayed turn transition: when events are present, keep the previous
   // active character / game phase visible for 1.5s so animations can play
   // before the turn visually advances.
@@ -43,11 +48,34 @@ export function useTurnInfo(
 
   useEffect(() => {
     if (!gameState) return;
+
     const newUid   = gameState.turnQueue[0]?.characterUid ?? null;
     const newPhase = gameState.gamePhase;
     const newWinnerId = gameState.winnerId ?? null;
     const hasEvents = (gameState.damageEvents?.length ?? 0) > 0
       || (gameState.spellEvents?.length ?? 0) > 0;
+
+    // Fast Refresh guard: if the timer was cleared by unmount but the
+    // component re-mounts with the same turn and events, re-start it.
+    const needsTimerRestart = hasEvents && gameState.turn > 0
+      && gameState.turn === lastTransitionTurnRef.current
+      && !turnTimerRef.current;
+
+    // Skip if already handled for this turn (prevents double animation
+    // when the same gameState is broadcast multiple times).
+    if (gameState.turn === lastTransitionTurnRef.current && !needsTimerRestart) {
+      return;
+    }
+
+    if (gameState.turn !== lastTransitionTurnRef.current) {
+      lastTransitionTurnRef.current = gameState.turn;
+    }
+
+    console.log(
+      `[useTurnInfo] turn=${gameState.turn} phase=${newPhase} activePlayerOwner=${gameState.activePlayerOwner} ` +
+      `hasEvents=${hasEvents} newUid=${newUid} prevPhase=${delayedTurnState.phase}` +
+      (needsTimerRestart ? " (timer restarted after Fast Refresh)" : "")
+    );
 
     if (gameState.gamePhase === "end") {
       if (turnTimerRef.current) clearTimeout(turnTimerRef.current);
@@ -81,7 +109,12 @@ export function useTurnInfo(
       );
     }
 
-    return () => { if (turnTimerRef.current) clearTimeout(turnTimerRef.current); };
+    return () => {
+      if (turnTimerRef.current) {
+        clearTimeout(turnTimerRef.current);
+        turnTimerRef.current = null;
+      }
+    };
   }, [gameState]);
 
   const isYourTurn = playerId !== null && gameState !== null

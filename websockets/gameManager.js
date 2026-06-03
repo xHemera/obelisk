@@ -70,7 +70,7 @@ export function broadcastGameState(roomId) {
 
   const state = room.gameState;
   const turnCharacter = getCurrentTurnCharacter(state);
-  const currentOwner = turnCharacter?.owner ?? 0;
+  const currentOwner = turnCharacter?.owner ?? state.turnQueue[0]?.playerOwner ?? 0;
 
   const activeUid = state.turnQueue[0]?.characterUid ?? "none";
   const charCounts = state.players.map(p => `P${p.id}:${p.characters.length}`).join(" ");
