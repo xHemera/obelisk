@@ -31,7 +31,7 @@ export const archer = {
       critDamage: 175,
 
       hp: 1240,
-      mp: 180,
+      mp: 80,
 
       physicalResistance: 12,
       magicalResistance: 8,

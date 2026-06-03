@@ -31,7 +31,7 @@ export const assassin = {
     critDamage: 200,
 
     hp: 1080,
-    mp: 150,
+    mp: 70,
 
     physicalResistance: 10,
     magicalResistance: 6,

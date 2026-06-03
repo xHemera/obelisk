@@ -30,7 +30,7 @@ export const healer = {
     critDamage: 150,
 
     hp: 1380,
-    mp: 320,
+    mp: 120,
 
     physicalResistance: 9,
     magicalResistance: 14,
