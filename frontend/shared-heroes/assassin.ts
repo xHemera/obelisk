@@ -1,3 +1,5 @@
+import { ASSASSIN_S1_DESCRIPTION, ASSASSIN_S2_DESCRIPTION, ASSASSIN_S3_DESCRIPTION } from "./skill-description-segments";
+
 const ID = "assassin";
 
 const PATH = `/gameResources/heroes/${ID}/assets`;
@@ -61,8 +63,7 @@ export const assassin = {
       info: {
         name: "Shadow Strike",
         icon: spell1Icon,
-        description:
-          "Deals {multiplier}x Physical Damage + {flat} bonus damage. Damage increased by {executeBonus}% if target HP is below {hpThreshold}%.",
+        description: ASSASSIN_S1_DESCRIPTION,
       },
       unlockLevel: 1,
       manaCost: 10,
@@ -88,8 +89,7 @@ export const assassin = {
       info: {
         name: "Venom Blade",
         icon: spell2Icon,
-        description:
-          "Deals {multiplier}x Physical Damage + {flat} bonus damage and applies Poison for {duration} turns dealing {poison} damage per turn.",
+        description: ASSASSIN_S2_DESCRIPTION,
       },
       unlockLevel: 6,
       manaCost: 14,
@@ -115,8 +115,7 @@ export const assassin = {
       info: {
         name: "Phantom Step",
         icon: spell3Icon,
-        description:
-          "Grants Invisibility for {duration} turn(s). The next attack deals {bonusDamage}% more damage.",
+        description: ASSASSIN_S3_DESCRIPTION,
       },
       unlockLevel: 12,
       manaCost: 18,

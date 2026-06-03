@@ -27,11 +27,9 @@ export default function AppPageShell({
 
       {showSidebar ? (
         <div className="flex h-screen w-full overflow-hidden bg-[#0c0a0f] font-serif text-white">
-          <div className="shrink-0 p-3 pl-2">
-            <Sidebar />
-          </div>
+          <Sidebar />
 
-          <main className="relative flex-1 overflow-hidden p-3 pl-0">
+          <main className="relative flex-1 overflow-hidden p-3 lg:pl-0 pt-14 lg:pt-3">
             <div className={joinClasses("relative flex h-full min-h-0 flex-col", containerClassName)}>
               {children}
             </div>

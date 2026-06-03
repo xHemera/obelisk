@@ -10,7 +10,7 @@ import { authClient } from "@/lib/auth-client";
 import { MineSection } from "@/components/organisms/home/MineSection";
 import { TeamBuilder } from "@/components/organisms/home/TeamBuilder";
 import { CHARACTERS } from "@/public/gameResources/heroes";
-import SidebarShell from "@/components/SidebarShell";
+import Sidebar from "@/components/Sidebar";
 import {socket} from "../../socket"
 import { handleLogout } from "@/lib/logout";
 import NotificationToast from "@/components/organisms/home/NotificationToast";
@@ -421,11 +421,11 @@ export default function Home() {
   return (
     <div className="flex h-screen w-full overflow-hidden bg-[#0c0a0f] font-serif text-white">
 
-      <SidebarShell />
+      <Sidebar />
       {showNotification && notification && notifSender && (<NotificationToast onClose={() => setShowNotification(false)} msg={notification} sender={notifSender} />)}
 
       <div className="flex flex-1 flex-col overflow-hidden">
-      <main className="relative flex-1 overflow-hidden p-3 pl-0">
+      <main className="relative flex-1 overflow-hidden p-3 lg:pl-0 pt-14 lg:pt-3">
         <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#0c0a0f] via-[#12101a] to-[#0a0810]" />
         <div
           className="absolute inset-0 rounded-3xl opacity-[0.02]"
@@ -436,17 +436,17 @@ export default function Home() {
         />
 
 
-        <div className="relative z-10 flex h-full min-h-0 flex-col gap-5 rounded-3xl border border-[#c9a227]/20 bg-black/10 p-5">
+        <div className="relative z-10 flex h-full min-h-0 flex-col gap-5 rounded-3xl border border-[#c9a227]/20 bg-black/10 p-3 sm:p-5">
           <MineSection pseudo={userPseudo ?? "Hero"} rubyCount={ruby} />
 
           {/* Main Content Grid */}
           <div className="flex min-h-0 flex-1 flex-col gap-5">
             {/* Features Row */}
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <button
                 type="button"
                 onClick={handleMine}
-                className="mine-clicker group relative flex min-h-[160px] w-full flex-col justify-between overflow-hidden rounded-xl border border-[#c9a227]/40 bg-gradient-to-br from-[#1a1422] to-[#0f0c14] p-4 text-left shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-300 hover:border-[#e6c55a]/70 hover:shadow-[0_12px_40px_rgba(201,162,39,0.15)] lg:min-h-[140px]"
+                className="mine-clicker group relative flex min-h-[100px] w-full flex-col justify-between overflow-hidden rounded-xl border border-[#c9a227]/40 bg-gradient-to-br from-[#1a1422] to-[#0f0c14] p-2 text-left shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-300 hover:border-[#e6c55a]/70 hover:shadow-[0_12px_40px_rgba(201,162,39,0.15)] sm:min-h-[140px] sm:p-4"
               >
                 <div className="pointer-events-none absolute -inset-1 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                   <div className="absolute inset-0 bg-gradient-to-br from-[#c7662d]/15 via-transparent to-[#2a2234]/15 rounded-xl" />

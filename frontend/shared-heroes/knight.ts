@@ -1,3 +1,5 @@
+import { KNIGHT_S1_DESCRIPTION, KNIGHT_S2_DESCRIPTION, KNIGHT_S3_DESCRIPTION } from "./skill-description-segments";
+
 const ID = "knight";
 
 const PATH = `/gameResources/heroes/${ID}/assets`;
@@ -63,8 +65,7 @@ export const knight = {
 
         icon: spell1Icon,
 
-        description:
-          "Deals {multiplier}x Physical Damage + {flat} bonus damage and has a {stunChance}% chance to Stun for {duration} turn(s).",
+        description: KNIGHT_S1_DESCRIPTION,
       },
 
       unlockLevel: 1,
@@ -94,8 +95,7 @@ export const knight = {
 
         icon: spell2Icon,
 
-        description:
-          "Taunts all enemies and reduces damage taken by {damageReduction}% for {duration} turns.",
+        description: KNIGHT_S2_DESCRIPTION,
       },
 
       unlockLevel: 5,
@@ -125,8 +125,7 @@ export const knight = {
 
         icon: spell3Icon,
 
-        description:
-          "When HP drops below {hpThreshold}%, automatically gain a shield equal to {shieldPercent}% of Max HP. Triggers once per battle.",
+        description: KNIGHT_S3_DESCRIPTION,
       },
 
       unlockLevel: 15,

@@ -43,7 +43,7 @@ export class ArcaneMissiles extends Spell{
         if (livingTargets.length === 0) break;
 
         const target = livingTargets[Math.floor(Math.random() * livingTargets.length)];
-        const damage = resolveMagDamage(raw, idUser, target);
+        const damage = resolveMagDamage(raw, idUser, target, undefined, true);
 		applyDamage(target, damage);
     }
 	}
@@ -64,7 +64,7 @@ export class Meteor extends Spell{
 
 		const raw	= idUser.character.stats.magicalDamage * multiplier + flat;
 		idTargets.forEach(target => {
-			const damage = resolveMagDamage(raw, idUser, target);
+			const damage = resolveMagDamage(raw, idUser, target, undefined, true);
 			applyDamage(target, damage);
 		});
 	}

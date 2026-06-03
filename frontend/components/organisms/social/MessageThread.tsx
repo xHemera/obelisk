@@ -108,7 +108,7 @@ export const MessageThread = memo(function MessageThread({
   }
 
   return (
-    <div ref={messageListRef} className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-5">
+    <div ref={messageListRef} className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3 sm:gap-4 sm:p-5">
       {hasMoreMessages && (
         <button
           onClick={onLoadOlderMessages}

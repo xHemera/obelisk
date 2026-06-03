@@ -69,7 +69,7 @@ export function MessageBubble({
         >
           {message.message && (
             <div>
-              <p className="text-l leading-relaxed whitespace-pre-wrap break-words">
+              <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
                 {displayText}
               </p>
               {shouldShowExpandButton && (

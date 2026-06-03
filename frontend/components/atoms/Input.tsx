@@ -10,7 +10,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ classNam
     <input
       ref={ref}
       className={joinClasses(
-        "w-full rounded-xl border border-[#3c3650] bg-[#242033] py-3 px-4 text-gray-200 placeholder-gray-400 transition focus:border-[var(--accent-color)] focus:outline-none",
+        "w-full rounded-xl border border-[#3c3650] bg-[#242033] py-2.5 px-3 text-gray-200 placeholder-gray-400 transition focus:border-[var(--accent-color)] focus:outline-none sm:py-3 sm:px-4",
         className,
       )}
       {...props}

@@ -25,10 +25,10 @@ export function ConversationList({
   onAddContactClick,
 }: ConversationListProps) {
   return (
-    <header className="flex items-center border-b border-[#c9a227]/30 px-5 py-3">
+    <header className="flex items-center border-b border-[#c9a227]/30 px-3 py-2 sm:px-5 sm:py-3">
       {/* Contacts scroll horizontally */}
-      <div className="flex-1 overflow-x-auto px-4">
-        <div className="flex gap-2">
+      <div className="flex-1 overflow-x-auto px-2 sm:px-4">
+        <div className="flex gap-1 sm:gap-2">
           {users.map((user) => {
             const isActive = selectedUser === user.name;
             if (user.name === currentUserName) return null;

@@ -112,7 +112,16 @@ model Match_history {
 }
 ```
 
-Existe dans le schéma mais pas encore utilisé par le code du jeu.
+Enregistre les résultats de combat après chaque match PvP.
+
+### Avatar / ProfileBanner
+
+```prisma
+model Avatar { ... }          // Options d'avatar disponibles
+model ProfileBanner { ... }   // Bannières de profil
+```
+
+Modèles de cosmétiques pour la personnalisation du profil.
 
 ## Relations clés
 

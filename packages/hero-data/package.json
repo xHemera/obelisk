@@ -1,0 +1,17 @@
+{
+  "name": "hero-data",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./archer": "./archer.ts",
+    "./assassin": "./assassin.ts",
+    "./healer": "./healer.ts",
+    "./knight": "./knight.ts",
+    "./mage": "./mage.ts",
+    "./skill-description-segments": "./skill-description-segments.ts"
+  }
+}

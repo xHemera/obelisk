@@ -1,3 +1,5 @@
+import { MAGE_S1_DESCRIPTION, MAGE_S2_DESCRIPTION, MAGE_S3_DESCRIPTION } from "./skill-description-segments";
+
 const ID = "mage";
 
 const PATH = `/gameResources/heroes/${ID}/assets`;
@@ -63,8 +65,7 @@ export const mage = {
 
         icon: spell1Icon,
 
-        description:
-          "Deals {multiplier}x Magical Damage + {flat} bonus Fire damage to a single target with a {burnChance}% chance to apply Burn for {duration} turns.",
+        description: MAGE_S1_DESCRIPTION,
       },
 
       unlockLevel: 1,
@@ -94,8 +95,7 @@ export const mage = {
 
         icon: spell2Icon,
 
-        description:
-          "Launches {missiles} missiles, each dealing {multiplier}x Magical Damage to random enemies.",
+        description: MAGE_S2_DESCRIPTION,
       },
 
       unlockLevel: 8,
@@ -125,8 +125,7 @@ export const mage = {
 
         icon: spell3Icon,
 
-        description:
-          "Deals {multiplier}x Magical Damage + {flat} bonus damage to all enemies.",
+        description: MAGE_S3_DESCRIPTION,
       },
 
       unlockLevel: 15,

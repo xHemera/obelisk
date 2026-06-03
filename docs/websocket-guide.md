@@ -69,7 +69,8 @@ Le serveur tourne sur le port 4001 avec Socket.IO. Le client est dans `frontend/
 | `initiate` | client → serveur | Envoie sa team data + roomId pour init la partie |
 | `"gameStateUpdate"` | serveur → room | Broadcast le state sérialisé aux 2 joueurs |
 | `"gameReady"` | serveur → room | La partie est prête (GameState créé) |
-| `gameAction` | client → serveur | **PAS ENCORE CABLÉ** (placeholder) |
+| `gameAction` | client → serveur | Action de jeu (`{ userUid, targetUids, type, skillId }`) → `processAction()` |
+| `forfeit` | client → serveur | Abandonner la partie |
 
 ### Matchmaking
 

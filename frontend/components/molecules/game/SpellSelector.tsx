@@ -5,8 +5,8 @@ import Image from "next/image";
 import type { CharacterData } from "@/components/organisms/characters/types";
 import SpellButton from "@/components/atoms/game/SpellButton";
 import type { SpellDescriptionSegment } from "@/lib/spell-description";
-import { resolveSpellDescriptionSegments } from "@/lib/spell-description";
 import { CHARACTERS } from "@/public/gameResources/heroes";
+import type { DescriptionSegment } from "@/shared-heroes/skill-description-segments";
 
 type HeroDefinition = (typeof CHARACTERS)[number];
 type HeroSkill = HeroDefinition["skills"][number];
@@ -32,14 +32,14 @@ type SpellSelectorProps = {
 
 const manaIcon = "/gameResources/items/mana.webp";
 
-const basicAttackIcon = "/gameResources/spells/attack_boost.png";
+const basicAttackIcon = "/gameResources/heroes/basic_attack.png";
 
 const formatNumber = (value: number) => {
   if (Number.isInteger(value)) {
     return value.toString();
   }
-
-  return (Math.round(value * 10) / 10).toString();
+  const str = value.toFixed(2);
+  return str.replace(/\.?0+$/, "");
 };
 
 const getSkillLevel = (character: CharacterData | null, skill: HeroSkill, index: number) => {
@@ -87,6 +87,44 @@ const buildContext = (stats: CharacterData["stats"], skillLevel: number, scaling
   return context;
 };
 
+const resolveDescriptionSegments = (
+  segments: DescriptionSegment[],
+  stats: CharacterData["stats"],
+  skillLevel: number,
+  scalingRow: number[],
+): SpellDescriptionSegment[] => {
+  return segments.map((segment) => {
+    if (segment.type === "text") {
+      return { text: segment.content };
+    }
+
+    if (segment.type === "value") {
+      const value = scalingRow[segment.index];
+      if (typeof value === "number") {
+        return {
+          text: formatNumber(value),
+          highlight: segment.highlight,
+        };
+      }
+      return { text: `[VALUE ${segment.index}]` };
+    }
+
+    if (segment.type === "calc") {
+      const context = buildContext(stats, skillLevel, scalingRow);
+      const evaluated = evaluateExpression(segment.expression, context);
+      if (evaluated !== null) {
+        return {
+          text: formatNumber(evaluated),
+          highlight: segment.highlight,
+        };
+      }
+      return { text: `[ERROR: ${segment.expression}]` };
+    }
+
+    return { text: "[UNKNOWN]" };
+  });
+};
+
 const evaluateExpression = (expression: string, context: Record<string, number>) => {
   try {
     const normalized = expression
@@ -112,38 +150,6 @@ const evaluateExpression = (expression: string, context: Record<string, number>)
   }
 };
 
-const resolveToken = (
-  token: string,
-  tokenIndex: number,
-  scalingRow: number[],
-  stats: CharacterData["stats"],
-  skillLevel: number,
-) => {
-  const normalizedToken = token.trim().toLowerCase();
-  const context = buildContext(stats, skillLevel, scalingRow);
-
-  if (normalizedToken in context) {
-    return context[normalizedToken];
-  }
-
-  if (typeof scalingRow[tokenIndex] === "number") {
-    const rawValue = scalingRow[tokenIndex];
-
-    if (normalizedToken === "multiplier" || normalizedToken === "flat") {
-      return rawValue;
-    }
-
-    const directExpression = evaluateExpression(token, context);
-    if (directExpression !== null) {
-      return directExpression;
-    }
-
-    return rawValue;
-  }
-
-  return null;
-};
-
 const resolveSpellPreview = (
   hero: HeroDefinition,
   skill: HeroSkill,
@@ -153,10 +159,22 @@ const resolveSpellPreview = (
   const level = getSkillLevel(character, skill, index);
   const stats = character?.stats ?? hero.baseStats;
   const scalingRow = getScalingRow(skill, level);
-  const segments = resolveSpellDescriptionSegments(skill.info.description, ({ token, tokenIndex }) => {
-    const resolved = resolveToken(token, tokenIndex, scalingRow, stats, level);
-    return resolved !== null ? formatNumber(resolved) : null;
-  });
+
+  // Handle both new segment format and legacy string format
+  let segments: SpellDescriptionSegment[] = [];
+  
+  if (Array.isArray(skill.info.description)) {
+    // New segment format
+    segments = resolveDescriptionSegments(
+      skill.info.description,
+      stats,
+      level,
+      scalingRow
+    );
+  } else if (typeof skill.info.description === "string") {
+    // Legacy string format fallback
+    segments = [{ text: skill.info.description }];
+  }
 
   return {
     id: skill.id,
@@ -253,7 +271,7 @@ export default function SpellSelector({ hero, character, activeMp, onCastSpell, 
                 {hoveredSpell.segments.map((segment: SpellDescriptionSegment, index: number) => (
                   <span
                     key={`${hoveredSpell.id}-${index}`}
-                    style={segment.highlight ? { color: "#e8dcc8", fontWeight: 600 } : undefined}
+                    style={segment.highlight ? { color: "#daa520", fontWeight: 600 } : undefined}
                   >
                     {segment.text}
                   </span>

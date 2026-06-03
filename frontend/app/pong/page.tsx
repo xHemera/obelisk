@@ -170,7 +170,7 @@ export default function PongPage() {
 
     const handleForceDisconnect = (data: { reason: string }) => {
       console.log("[Pong] Received forceDisconnect event:", data);
-      setError("L'adversaire s'est déconnecté. Retour à l'accueil...");
+      setError("Your opponent disconnected. Returning to home...");
       setTimeout(() => {
         socket.disconnect();
         router.push("home");
@@ -274,7 +274,7 @@ export default function PongPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.error || "Erreur lors de la récolte d'XP");
+        setError(errorData.error || "Error collecting XP");
         setIsCollectingXp(false);
         return;
       }
@@ -282,7 +282,7 @@ export default function PongPage() {
       setXpCollected(true);
       setIsCollectingXp(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inconnue");
+      setError(err instanceof Error ? err.message : "Unknown error");
       setIsCollectingXp(false);
     }
   };
@@ -306,14 +306,14 @@ export default function PongPage() {
 
         if (!response.ok) {
           const errorData = await response.json();
-          setError(errorData.error || "Erreur lors de la récolte d'XP");
+          setError(errorData.error || "Error collecting XP");
           return;
         }
 
         console.log("[Pong] XP collected successfully:", xp.current);
         setXpCollected(true);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Erreur inconnue");
+        setError(err instanceof Error ? err.message : "Unknown error");
       }
     };
 
@@ -382,8 +382,15 @@ export default function PongPage() {
           const randomAngle = (Math.random() * Math.PI / 3) - Math.PI / 6; // -30° to +30°
           const randomDirection = Math.random() < 0.5 ? 1 : -1; // Left or right
           const speed = 5;
-          const speedX = randomDirection * speed * Math.cos(randomAngle);
-          const speedY = speed * Math.sin(randomAngle);
+          let speedX = randomDirection * speed * Math.cos(randomAngle);
+          let speedY = speed * Math.sin(randomAngle);
+          
+          // Éviter que la balle aille trop à l'horizontale
+          const minVerticalSpeed = 2.5;
+          if (Math.abs(speedY) < minVerticalSpeed) {
+            speedY = (speedY >= 0 ? 1 : -1) * minVerticalSpeed;
+            speedX = Math.sign(speedX) * Math.sqrt(speed * speed - speedY * speedY);
+          }
           
           console.log("[Pong] Player 1 launching ball with angle:", randomAngle, "direction:", randomDirection);
           
@@ -536,15 +543,6 @@ export default function PongPage() {
       context.fillStyle = "white";
       context.font = "30px Arial";
       context.fillText(`XP: ${xp.current}`, boardWidth - 150, 50);
-      
-      // Display countdown if ball not started
-      if (!b.started && countdown > 0) {
-        context.fillStyle = "rgba(255, 255, 255, 0.8)";
-        context.font = "bold 80px Arial";
-        context.textAlign = "center";
-        context.fillText(countdown.toString(), boardWidth / 2, boardHeight / 2);
-        context.textAlign = "left";
-      }
 
       paddleCollision(b, p1, true);
       paddleCollision(b, p2, false);
@@ -561,28 +559,31 @@ export default function PongPage() {
   }, [opponent]);
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center relative">
+    <div className="min-h-screen bg-black flex items-center justify-center relative p-2 sm:p-4">
       {!opponent ? (
         <div className="text-center space-y-4">
-          <h2 className="text-2xl font-bold text-white">Recherche de l'adversaire...</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-white">Searching for opponent...</h2>
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
-          <p className="text-white text-sm">Assurez-vous d'avoir lancé le matchmaking</p>
+          <p className="text-white text-sm">Make sure you started matchmaking</p>
         </div>
       ) : (
         <>
-          <canvas
-            ref={canvasRef}
-            width={boardWidth}
-            height={boardHeight}
-            className="border-4 border-white"
-          />
+          <div className="w-full max-w-[1500px] overflow-auto">
+            <canvas
+              ref={canvasRef}
+              width={boardWidth}
+              height={boardHeight}
+              className="border-2 sm:border-4 border-white max-w-none"
+              style={{ maxWidth: "none", width: `${boardWidth}px`, height: `${boardHeight}px` }}
+            />
+          </div>
 
           {/* MODAL WIN */}
           {winner && (
-            <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
-              <div className="bg-white text-black p-8 rounded-xl text-center space-y-4">
-                <h2 className="text-2xl font-bold">
-                  Vous avez gagné {xp.current} XP pour chaque personnage !
+            <div className="fixed inset-0 bg-black/80 flex items-center justify-center px-4">
+              <div className="bg-white text-black p-6 sm:p-8 rounded-xl text-center space-y-4 max-w-md w-full">
+                <h2 className="text-xl sm:text-2xl font-bold">
+                  You earned {xp.current} XP for each character!
                 </h2>
 
                 {error && (
@@ -590,7 +591,7 @@ export default function PongPage() {
                 )}
 
                 {xpCollected && (
-                  <p className="text-green-600 font-semibold">✓ XP récolté avec succès !</p>
+                  <p className="text-green-600 font-semibold">✓ XP collected successfully!</p>
                 )}
 
                 <button
@@ -602,7 +603,7 @@ export default function PongPage() {
                     router.push("home");
                   }}
                 >
-                  Retour à l'accueil
+                  Back to home
                 </button>
               </div>
             </div>

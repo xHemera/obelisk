@@ -3,39 +3,33 @@
 ## Démarrer
 
 ```bash
-git clone <repo> && cd RPG
+git clone <repo> && cd obelisk
 docker compose up --build -d
 ```
 
 Services :
 - Frontend → `http://localhost:3000`
-- WebSocket → port 4001
-- PostgreSQL → port 5432
-- Redis → port 6379
-- Prisma Studio → `bun run prisma studio` (port 5555)
+- WebSocket → `http://localhost:4001`
+- PostgreSQL → `postgresql://postgres:postgres@localhost:5432/obelisk`
+- Redis → `redis://localhost:6380`
 
 ## Frontend
 
 Hot reload automatique. Édite un fichier, le navigateur se met à jour.
+Prisma Studio : `cd frontend && npx prisma studio`
 
-Ajouter une page : créer `app/mapage/page.tsx`
-Ajouter une API : créer `app/api/mon-route/route.ts`
+## WebSocket
 
-## WebSocket (server.js)
-
-Modifier → redémarrer le container :
-
+Modifier `websockets/server.js` → redémarrer le container :
 ```bash
-docker compose restart websocket
+docker compose restart websockets
 ```
 
-Les events sont dans `io.on("connection", ...)`. Voir `websocket-guide.md` pour la liste complète.
+## Engine (`websockets/engine/`)
 
-## Engine (engine/)
+TypeScript pur, sans side-effects. Les changements sont pris en compte au prochain rebuild Docker.
 
-TypeScript pur, pas de serveur. Les changements sont pris en compte au prochain rebuild Docker.
-
-## Prisma / DB
+## Base de données
 
 ```bash
 cd frontend
@@ -43,34 +37,13 @@ npx prisma migrate dev --name description
 npx prisma generate
 ```
 
-## Git
-
-```bash
-git checkout -b feature/ma-branche
-# coder...
-git add .
-git commit -m "(type): description en français simple"
-git push
-```
-
-Types de commit : `(ajout)`, `(modif)`, `(supp)`, `(fix)`, `(docs)`.
-
-## Checklist manuelle
-
-- [ ] Créer compte / login
-- [ ] Home page — Mine, PvP queue, team build
-- [ ] PvP queue → matchmaking → écran game
-- [ ] Personnages — level up sorts
-- [ ] Social — messages, amis, défis
-- [ ] Admin — ban, modos, reports
-
 ## Debug
 
 ```bash
-docker logs aqua-web           # Frontend
-docker logs aqua-websockets    # WebSocket
-docker logs aqua-db            # PostgreSQL
+docker compose logs -f            # Tous les logs
+docker compose logs frontend -f   # Frontend uniquement
+docker compose logs websockets -f # WebSocket uniquement
+docker compose logs db -f         # PostgreSQL uniquement
 ```
 
-Prisma Studio : `cd frontend && npx prisma studio`
 Socket events : `socket.onAny((e, ...a) => console.log(e, a))`

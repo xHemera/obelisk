@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script de développement Team Aqua Project
+# Script de développement Obelisk
 
 set -e
 
@@ -121,7 +121,7 @@ draw_menu_shell() {
     clear
     local line=1
 
-    print_header "🌊 Team Aqua • Control Center"
+    print_header "Obelisk • Control Center"
     line=$((line + 3))
 
     echo ""
@@ -227,7 +227,7 @@ render_compact_menu() {
     if is_websockets_online; then websockets_online=1; fi
 
     clear
-    print_header "🌊 Team Aqua • Kyogre Control Center"
+    print_header "Obelisk • Control Center"
     echo ""
     echo -e "${CYAN}${BOLD}Infra${NC}"
     echo -e "${BLUE}${NC} ${BOLD}DB${NC}:        $(status_label "$db_running")"
@@ -325,7 +325,7 @@ start_services() {
     
     docker compose up --build -d
 
-    wait_for_url "http://localhost:3000" "Frontend" 180
+    wait_for_url "http://localhost:3000" "Frontend" 300
 
     print_success "Services démarrés et site accessible"
     print_info "Frontend: http://localhost:3000"
@@ -337,7 +337,7 @@ restart_services() {
     print_header "Redémarrage des services"
     docker compose restart
 
-    wait_for_url "http://localhost:3000" "Frontend" 180
+    wait_for_url "http://localhost:3000" "Frontend" 300
 
     print_success "Services redémarrés et site accessible"
 }
@@ -407,7 +407,7 @@ check_status() {
 # Accéder à la base de données
 access_db() {
     print_header "Accès PostgreSQL"
-    docker compose exec db psql -U postgres -d aqua_temp
+    docker compose exec db psql -U postgres -d obelisk
 }
 
 # Tester les services

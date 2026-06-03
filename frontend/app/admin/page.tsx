@@ -178,7 +178,7 @@ export default function AdminPage() {
   return (
     <AppPageShell showSidebar containerClassName="min-h-0 flex-1">
       {showNotification && notification && notifSender && (<NotificationToast onClose={() => setShowNotification(false)} msg={notification} sender={notifSender} />)}
-      <div className="flex min-h-0 w-full flex-col gap-4 lg:flex-row">
+      <div className="flex min-h-0 w-full flex-col gap-3 lg:flex-row lg:gap-4">
         <UsersManagementPanel
           users={users}
           filteredUsers={filteredUsers}

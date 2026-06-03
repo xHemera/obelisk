@@ -6,20 +6,20 @@ type GameLoadingScreenProps = {
 
 const phaseMessages: Record<string, { title: string; subtitle: string }> = {
   connecting: {
-    title: "Connexion au serveur...",
-    subtitle: "Établissement de la connexion",
+    title: "Connecting to server...",
+    subtitle: "Establishing connection",
   },
   fetching: {
-    title: "Récupération de vos données...",
-    subtitle: "Préparation de l'arène",
+    title: "Fetching your data...",
+    subtitle: "Preparing the arena",
   },
   waiting: {
-    title: "En attente de l'adversaire...",
-    subtitle: "Votre adversaire prépare son équipe",
+    title: "Waiting for opponent...",
+    subtitle: "Your opponent is preparing their team",
   },
   error: {
-    title: "Erreur de connexion",
-    subtitle: "Veuillez réessayer",
+    title: "Connection error",
+    subtitle: "Please try again",
   },
 };
 
@@ -54,7 +54,7 @@ export default function GameLoadingScreen({ phase }: GameLoadingScreenProps) {
             href="/home"
             className="mt-4 rounded-md border-2 border-[#c9a84c] bg-gradient-to-b from-[#c9a84c] to-[#a8883c] px-6 py-2 font-serif font-semibold text-[#0a0806] transition-all duration-150 hover:shadow-[0_0_14px_rgba(201,168,76,0.3)]"
           >
-            Retour à l'accueil
+            Back to home
           </a>
         )}
       </div>

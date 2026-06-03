@@ -6,17 +6,17 @@ RUN apk add --no-cache postgresql16-client
 
 WORKDIR /app
 
-COPY package.json ./
+COPY frontend/package.json frontend/bun.lock ./
 
 RUN bun install --ignore-scripts
 
-COPY prisma ./prisma
+COPY frontend/prisma ./prisma
 
 RUN bunx prisma generate
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY frontend/ .
 
-COPY . .
+COPY frontend/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { socket } from "@/socket";
 import { useRouter } from "next/navigation";
 import { handleLogout } from "@/lib/logout";
@@ -21,48 +21,57 @@ export function useGameSocket(
   const [gameState, setGameState] = useState<GameStatePayload | null>(null);
   const [playerId, setPlayerId] = useState<number | null>(null);
   const [socketConnected, setSocketConnected] = useState(socket.connected);
+  const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Connect socket and listen for game state updates
   useEffect(() => {
-    console.log("[GameSocket] mount — socket.connected:", socket.connected, "socket.id:", socket.id);
     if (!socket.connected) {
-      console.log("[GameSocket] connecting...");
       socket.connect();
     }
 
-    socket.on("connect", () => {
-      console.log("[GameSocket] connected — id:", socket.id);
+    const handleConnect = () => {
       setSocketConnected(true);
-    });
+    };
 
-    socket.on("disconnect", (reason) => {
-      console.log("[GameSocket] disconnected — reason:", reason);
+    const handleDisconnect = (reason: string) => {
       setSocketConnected(false);
-    });
+    };
 
-    socket.on("connect_error", (err) => {
-      console.error("[GameSocket] connect_error:", err.message);
-    });
+    const handleConnectError = () => {};
 
-    socket.on("gameStateUpdate", (state: GameStatePayload) => {
-      console.log("[GameSocket] gameStateUpdate received — turn:", state.turn, "phase:", state.gamePhase, "playerId:", state.playerId);
+    const handleGameState = (state: GameStatePayload) => {
       setPlayerId(state.playerId);
       setGameState(state);
-    });
+    };
+
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+    socket.on("connect_error", handleConnectError);
+    socket.on("gameStateUpdate", handleGameState);
 
     return () => {
-      console.log("[GameSocket] cleanup — removing listeners");
-      socket.off("connect");
-      socket.off("disconnect");
-      socket.off("connect_error");
-      socket.off("gameStateUpdate");
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+      socket.off("connect_error", handleConnectError);
+      socket.off("gameStateUpdate", handleGameState);
     };
   }, []);
 
-  // Emit login when pseudo is available
+  // Emit login — wait for socket to connect before emitting
   useEffect(() => {
     if (!userPseudo) return;
-    socket.emit("login", userPseudo);
+
+    if (socket.connected) {
+      socket.emit("login", userPseudo);
+    } else {
+      const onConnect = () => {
+        socket.emit("login", userPseudo);
+      };
+      socket.on("connect", onConnect);
+      return () => {
+        socket.off("connect", onConnect);
+      };
+    }
   }, [userPseudo]);
 
   // Ban and disconnect listeners
@@ -80,26 +89,30 @@ export function useGameSocket(
       }
     };
 
-    const handleDisconnect = (users: Record<string, string>) => {
+    const handleOpponentDisconnect = (users: Record<string, string>) => {
       if (!users[opponent]) {
-        setTimeout(() => {
+        disconnectTimerRef.current = setTimeout(() => {
           socket.once("online_users", (users) => {
             if (users[opponent]) return;
             socket.off("ban", handleBan);
-            socket.off("online_users", handleDisconnect);
+            socket.off("online_users", handleOpponentDisconnect);
             router.push("/home");
           });
         }, 3000);
       }
     };
 
-    socket.off("online_users", handleDisconnect);
+    socket.off("online_users", handleOpponentDisconnect);
     socket.on("ban", handleBan);
-    socket.once("online_users", handleDisconnect);
+    socket.once("online_users", handleOpponentDisconnect);
 
     return () => {
+      if (disconnectTimerRef.current) {
+        clearTimeout(disconnectTimerRef.current);
+        disconnectTimerRef.current = null;
+      }
       socket.off("ban", handleBan);
-      socket.off("online_users", handleDisconnect);
+      socket.off("online_users", handleOpponentDisconnect);
     };
   }, [userPseudo, opponent, router]);
 

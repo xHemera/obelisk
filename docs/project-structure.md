@@ -1,40 +1,50 @@
 # Structure du projet
 
 ```
-RPG/
-├── frontend/          — Next.js app (port 3000)
-│   ├── app/           — Pages + API routes
-│   │   ├── api/       — REST API (auth, user, characters, social, admin, profile, home)
-│   │   ├── home/      — Dashboard
-│   │   ├── game/      — Écran de combat PvP
-│   │   ├── characters/ — Gestion des héros
-│   │   ├── social/    — Messagerie / amis
-│   │   ├── admin/     — Panel admin
-│   │   └── not-connected/
-│   ├── components/    — Atomic design
-│   │   ├── atoms/     — Button, Input, Card, Fighter, EnemyFighter, ManaBar, etc.
-│   │   ├── molecules/ — IconField, SpellSelector, FriendRequestBanner
-│   │   └── organisms/ — TeamBuilder, CharacterViewer, PvpMatchmakingModal
-│   ├── lib/           — auth-client, auth server, prisma, redis, rateLimit
-│   ├── prisma/        — Schema + migrations
-│   └── public/        — Assets, gameResources/heroes/
+obelisk/
+├── frontend/                   — Next.js app (port 3000)
+│   ├── app/                    — Pages + API routes
+│   │   ├── (auth)/             — Login, register
+│   │   ├── (main)/             — Pages protégées
+│   │   ├── api/                — REST (auth, user, characters, social, admin, profile, home, pong)
+│   │   ├── admin/              — Panel admin
+│   │   ├── characters/         — Gestion des héros
+│   │   ├── game/               — Écran de combat PvP
+│   │   ├── home/               — Dashboard
+│   │   ├── pong/               — Mini-jeu Pong
+│   │   ├── profile/[pseudo]/   — Profil public
+│   │   ├── social/             — Messagerie / amis
+│   │   ├── policy/             — Politique de confidentialité
+│   │   └── terms/              — Conditions d'utilisation
+│   ├── components/             — Atomic design
+│   │   ├── atoms/              — Button, Input, Card, Fighter, ManaBar, etc.
+│   │   ├── backgrounds/        — BottomBar, GameArenaBackground
+│   │   ├── molecules/          — IconField, SpellSelector, FriendRequestBanner
+│   │   └── organisms/          — TeamBuilder, CharacterViewer, PvpMatchmakingModal
+│   ├── lib/                    — auth-client, auth server, prisma, redis, rateLimit, animations
+│   ├── prisma/                 — Schema + migrations (15 modèles)
+│   ├── public/gameResources/   — Sprites chibi, animations pixel, icônes
+│   ├── shared-heroes/          — Définitions de héros partagées avec l'engine
+│   ├── socket.js               — Client Socket.IO
+│   └── middleware.ts           — Middleware d'auth Next.js
 │
-├── websockets/        — Socket.IO server (port 4001)
-│   ├── server.js      — Connexions, events sociaux, matchmaking
-│   ├── matchmaking.js — Boucle de matchmaking PvP
-│   ├── matchmakingpong.js — Boucle de matchmaking Pong
-│   ├── gameManager.js — Création du GameState via l'engine
-│   └── package.json
+├── websockets/                 — Socket.IO server (port 4001)
+│   ├── server.js               — Connexions, events sociaux + jeu
+│   ├── matchmaking.js          — Boucle de matchmaking PvP
+│   ├── matchmakingpong.js      — Boucle de matchmaking Pong
+│   ├── gameManager.js          — Pont entre sockets et engine
+│   └── engine/                 — Moteur de combat (TypeScript pur)
+│       ├── GameEngine.ts       — initGame, processAction, getCurrentTurnCharacter
+│       ├── GameState/          — TurnSystem (charge-based), game loop
+│       ├── Instances/          — PlayerInstance, CharacterInstance, HeroData
+│       ├── Spells/             — 15 sorts, SpellRegistry
+│       └── Utils/              — Damage, targets, crit, lastStand
 │
-├── engine/            — Moteur de combat (TypeScript pur)
-│   ├── GameEngine.ts  — initGame, processAction, getCurrentTurnCharacter
-│   ├── GameState/     — TurnSystem (charge-based)
-│   ├── Instances/     — PlayerInstance, CharacterInstance, HeroData
-│   ├── Spells/        — 15 sorts, SpellRegistry
-│   └── Utils/         — Damage, targets, crit, lastStand
-│
-├── docs/              — Documentation
-└── docker-compose.yml — Frontend + Websocket + Redis + PostgreSQL
+├── docs/                       — 13 guides de documentation
+├── docker-compose.yml          — PostgreSQL, Redis, Frontend, Websockets
+├── dev.sh                      — Script de développement
+├── package.json                — Déps racine (Redis, Socket.IO, Next.js)
+└── tsconfig.json               — Configuration TypeScript
 ```
 
 ## Frontend — fichiers clés

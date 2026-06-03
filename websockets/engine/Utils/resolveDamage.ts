@@ -1,6 +1,46 @@
 import { CharacterInstance, ModEntry } from "../Instances/CharacterInstance";
 import { applyCrit, rollCrit } from "./crit";
 
+export type DamageSource = "basic" | "skill" | "poison";
+
+export type SpellEventType = "heal" | "buff_attack" | "buff_defense" | "buff_crit" | "invisible" | "invulnerability" | "buff_haste" | "buff_other";
+
+export type SpellEvent = {
+	type: SpellEventType;
+	targetUid: string;
+	value?: number;
+};
+
+export type DamageEvent = {
+	targetUid: string;
+	attackerUid: string;
+	damage: number;
+	isCrit: boolean;
+	lethal: boolean;
+	isAoE: boolean;
+	source: DamageSource;
+};
+
+const damageEvents: DamageEvent[] = [];
+const spellEvents: SpellEvent[] = [];
+
+export function clearDamageEvents(): void {
+	damageEvents.length = 0;
+	spellEvents.length = 0;
+}
+
+export function getDamageEvents(): DamageEvent[] {
+	return [...damageEvents];
+}
+
+export function getSpellEvents(): SpellEvent[] {
+	return [...spellEvents];
+}
+
+export function pushSpellEvent(event: SpellEvent): void {
+	spellEvents.push(event);
+}
+
 function applyAndTick(mods: ModEntry[], raw: number): { result: number; mods: ModEntry[] } {
 	const totalMod = mods.reduce((acc, { value }) => acc + value, 0);
 	const result   = raw * (1 + totalMod / 100); // selon ta convention
@@ -23,42 +63,68 @@ function applyResistance(damage: number, baseRes: number, resMods: ModEntry[]): 
     };
 }
 
-export function resolvePhyDamage(
+export type DamageType = "phy" | "mag";
+
+function resolveDamage(
+    type: DamageType,
     raw: number,
     idUser: CharacterInstance,
     idTarget: CharacterInstance,
-    resOverride?: number  // optionnel, remplace phyRes si fourni
+    resOverride?: number,
+    isAoE: boolean = false,
+    source: DamageSource = "skill",
 ): number {
-    const { result: afterUser,   mods: newPhyMod    } = applyAndTick(idUser.phyMod, raw);
-    const baseRes = resOverride ?? idTarget.phyRes;
-    const { result: afterTarget, mods: newPhyResMod } = applyResistance(afterUser, baseRes, idTarget.phyResMod);
+    const [userMod, targetBaseRes, targetResMod]: [ModEntry[], number, ModEntry[]] = type === "phy"
+        ? [idUser.phyMod, idTarget.phyRes, idTarget.phyResMod]
+        : [idUser.magMod, idTarget.magRes, idTarget.magResMod];
 
-    idUser.phyMod      = newPhyMod;
-    idTarget.phyResMod = newPhyResMod;
+    const { result: afterUser,   mods: newMod    } = applyAndTick(userMod, raw);
+    const baseRes = resOverride ?? targetBaseRes;
+    const { result: afterTarget, mods: newResMod } = applyResistance(afterUser, baseRes, targetResMod);
+
+    if (type === "phy") {
+        idUser.phyMod      = newMod;
+        idTarget.phyResMod = newResMod;
+    } else {
+        idUser.magMod      = newMod;
+        idTarget.magResMod = newResMod;
+    }
 
     const isCrit   = rollCrit(idUser, idTarget);
     const finalDmg = isCrit ? applyCrit(afterTarget, idUser) : afterTarget;
+    const rounded  = Math.round(finalDmg);
 
-    return finalDmg;
+    damageEvents.push({
+        targetUid: idTarget.uid,
+        attackerUid: idUser.uid,
+        damage: rounded,
+        isCrit,
+        lethal: idTarget.currentHp - rounded <= 0,
+        isAoE,
+        source,
+    });
+
+    return rounded;
 }
 
-export function resolveMagDamage(
-    raw: number,
-    idUser: CharacterInstance,
-    idTarget: CharacterInstance,
-    resOverride?: number
-): number {
-    const { result: afterUser,   mods: newMagMod    } = applyAndTick(idUser.magMod, raw);
-    const baseRes = resOverride ?? idTarget.magRes;
-    const { result: afterTarget, mods: newMagResMod } = applyResistance(afterUser, baseRes, idTarget.magResMod);
+export const resolvePhyDamage = (raw: number, idUser: CharacterInstance, idTarget: CharacterInstance, resOverride?: number, isAoE?: boolean, source?: DamageSource): number =>
+    resolveDamage("phy", raw, idUser, idTarget, resOverride, isAoE, source);
 
-    idUser.magMod      = newMagMod;
-    idTarget.magResMod = newMagResMod;
+export const resolveMagDamage = (raw: number, idUser: CharacterInstance, idTarget: CharacterInstance, resOverride?: number, isAoE?: boolean, source?: DamageSource): number =>
+    resolveDamage("mag", raw, idUser, idTarget, resOverride, isAoE, source);
 
-    const isCrit   = rollCrit(idUser, idTarget);
-    const finalDmg = isCrit ? applyCrit(afterTarget, idUser) : afterTarget;
-
-    return finalDmg;
+export function applyPoisonDamage(target: CharacterInstance, damage: number, attackerUid: string): void {
+	const isLethal = target.currentHp - damage <= 0;
+	damageEvents.push({
+		targetUid: target.uid,
+		attackerUid,
+		damage: Math.round(damage),
+		isCrit: false,
+		lethal: isLethal,
+		isAoE: false,
+		source: "poison",
+	});
+	applyDamage(target, damage);
 }
 
 export function applyDamage(target: CharacterInstance, damage: number): void {
@@ -86,22 +152,23 @@ export function applyDamage(target: CharacterInstance, damage: number): void {
 }
 
 function checkLastStand(character: CharacterInstance): void {
-  if (character.lastStandUsed || !character.lastStandUsable) return;
+	if (character.lastStandUsed || !character.lastStandUsable) return;
 
-  character.lastStandUsable = false;
-  const spell = character.spells.get("s3");
-  if (!spell) return;
+	const spell = character.spells.get("s3");
+	if (!spell) return;
 
-  const skillLevel   = character.character.skills.find(s => s.id === "s3")?.level ?? 1;
-  const [hpThreshold, shieldPercent] = spell.scaling[skillLevel - 1];
+	character.lastStandUsable = false;
 
-  const hpPercent = (character.currentHp / character.character.stats.hp) * 100;
+	const skillLevel   = character.character.skills.find(s => s.id === "s3")?.level ?? 1;
+	const [hpThreshold, shieldPercent] = spell.scaling[skillLevel - 1];
 
-  if (hpPercent < hpThreshold) {
-    character.shieldHp      = Math.floor(character.character.stats.hp * shieldPercent / 100);
-    character.lastStandUsed = true;
-  }
-  if (character.currentHp <= 0) {
-	character.currentHp = 1;
-  }
+	const hpPercent = (character.currentHp / character.character.stats.hp) * 100;
+
+	if (hpPercent < hpThreshold) {
+		character.shieldHp      = Math.floor(character.character.stats.hp * shieldPercent / 100);
+		character.lastStandUsed = true;
+	}
+	if (character.currentHp <= 0) {
+		character.currentHp = 1;
+	}
 }

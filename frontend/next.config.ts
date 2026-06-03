@@ -1,14 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "archives.bulbagarden.net",
-      },
-    ],
-  },
+  transpilePackages: [
+    "@prisma/client",
+    "@prisma/adapter-pg",
+    "pg",
+  ],
 };
 
 export default nextConfig;

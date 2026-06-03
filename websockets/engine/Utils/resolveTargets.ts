@@ -9,7 +9,6 @@ export function findCharacter(state: GameState, uid: string): CharacterInstance 
     .find(c => c.uid === uid);
 }
 
-
 export function resolveTargets(
   state:    GameState,
   user:     CharacterInstance,

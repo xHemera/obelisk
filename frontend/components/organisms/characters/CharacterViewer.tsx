@@ -64,14 +64,37 @@ export default function CharacterViewer({
         {/* Toggle Button */}
         <button
           onClick={() => setShowDetailsPanel(!showDetailsPanel)}
-          className="absolute right-0 top-1/2 z-30 -translate-y-1/2 rounded-l border border-[#c9a227]/30 bg-[#0c0a0f]/95 px-2 py-3 text-[#c9a227] transition-all hover:bg-[#1e1a24] hover:border-[#c9a227]/50"
+          className="absolute right-0 top-1/2 z-30 -translate-y-1/2 rounded-l border border-[#c9a227]/30 bg-[#0c0a0f]/95 px-2 py-3 text-[#c9a227] transition-all hover:bg-[#1e1a24] hover:border-[#c9a227]/50 max-lg:z-50"
           title={showDetailsPanel ? "Hide details" : "Show details"}
         >
           <i className={`fa-solid ${showDetailsPanel ? "fa-chevron-right" : "fa-chevron-left"} text-sm`} />
         </button>
 
-        {/* Details Panel with Slide Animation */}
-        <div className={`transition-all duration-300 overflow-y-auto ${showDetailsPanel ? "w-[420px]" : "w-0"}`}>
+        {/* Mobile: right-side drawer */}
+        <div className={`fixed top-0 right-0 bottom-0 z-40 w-full max-w-md overflow-y-auto border-l border-[#c9a227]/30 bg-[#15131d] shadow-2xl transition-transform duration-300 lg:hidden ${
+          showDetailsPanel ? "translate-x-0" : "translate-x-full"
+        }`}>
+          <div className="![&>div]:w-full">
+            <CharacterDetailsPanel
+              selectedCharacter={selectedCharacter}
+              selectedSkill={selectedSkill}
+              resources={resources}
+              maxSkillLevel={maxSkillLevel}
+              onToggleSkill={(skill) => setSelectedSkill(selectedSkill?.id === skill.id ? null : skill)}
+              onUpgradeSkill={onUpgradeSkill}
+              onPlusOneSkill={onPlusOneSkill}
+              canUpgradeSkill={canUpgradeSkill}
+            />
+          </div>
+        </div>
+
+        {/* Mobile backdrop */}
+        {showDetailsPanel && (
+          <div className="fixed inset-0 z-30 bg-black/50 lg:hidden" onClick={() => setShowDetailsPanel(false)} />
+        )}
+
+        {/* Details Panel for desktop */}
+        <div className={`hidden lg:block transition-all duration-300 overflow-y-auto ${showDetailsPanel ? "w-[420px]" : "w-0"}`}>
           <CharacterDetailsPanel
             selectedCharacter={selectedCharacter}
             selectedSkill={selectedSkill}
