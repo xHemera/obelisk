@@ -543,15 +543,6 @@ export default function PongPage() {
       context.fillStyle = "white";
       context.font = "30px Arial";
       context.fillText(`XP: ${xp.current}`, boardWidth - 150, 50);
-      
-      // Display countdown if ball not started
-      if (!b.started && countdown > 0) {
-        context.fillStyle = "rgba(255, 255, 255, 0.8)";
-        context.font = "bold 80px Arial";
-        context.textAlign = "center";
-        context.fillText(countdown.toString(), boardWidth / 2, boardHeight / 2);
-        context.textAlign = "left";
-      }
 
       paddleCollision(b, p1, true);
       paddleCollision(b, p2, false);
