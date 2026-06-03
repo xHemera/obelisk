@@ -8,4 +8,9 @@ ln -sf /app/node_modules/.prisma /app/node_modules/@prisma/.prisma
 
 rm -rf /app/.next/dev
 
-exec bun run dev -- --hostname 0.0.0.0
+if [ "$NODE_ENV" = "production" ]; then
+  bun run build
+  exec bun ./server.js
+else
+  exec bun run dev -- --hostname 0.0.0.0
+fi

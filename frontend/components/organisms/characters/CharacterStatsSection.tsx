@@ -1,4 +1,4 @@
-import type { CharacterBaseStats, CharacterStats } from "./types";
+import type { CharacterStats } from "./types";
 import StatRow from "@/components/atoms/characters/StatRow";
 
 type StatDefinition = {
@@ -12,7 +12,7 @@ type CharacterStatsSectionProps = {
   title: string;
   titleClassName: string;
   stats: CharacterStats;
-  baseStats: CharacterBaseStats;
+  baseStats: CharacterStats;
   definitions: readonly StatDefinition[];
 };
 

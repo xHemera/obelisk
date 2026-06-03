@@ -1,6 +1,6 @@
 # Styling — Tailwind CSS v4
 
-On vise un thème JRPG sombre / fantasy médiévale. Inspirations : Final Fantasy, Dragon Quest, Persona, MMORPG mobiles.
+On vise un thème JRPG sombre / fantasy médiévale.Inspirations : Final Fantasy, Dragon Quest, Honkai Star Rail MMORPG mobiles.
 
 ## Palette utilisée dans le code
 

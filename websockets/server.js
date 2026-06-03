@@ -1,9 +1,9 @@
-import { createServer } from "http";
+import https from "https";
+import fs from "fs";
 import { Server } from "socket.io";
 import express from "express";
 import { createClient } from 'redis';
 import { processAction, getCurrentTurnCharacter } from "./engine/GameEngine.ts";
-import { initGame } from "./engine/GameState/initGameState.ts";
 import "./matchmaking.js";
 import "./matchmakingpong.js";
 import { createGameInstance, broadcastGameState } from "./gameManager.js";
@@ -22,10 +22,6 @@ await redis.connect();
 
 // Game engine store: roomId -> { gameState, players: [pseudo1, pseudo2], playerConns: [socket1, socket2], teamData }
 const gameRooms = new Map();
-
-function cleanDisconnectedRoomSockets(room) {
-  room.playerConns = room.playerConns.filter((socket) => socket.connected);
-}
 
 function removeSocketFromOtherGameRooms(socket, currentRoomId) {
   for (const [roomId, room] of gameRooms) {
@@ -46,8 +42,13 @@ const hostname = "0.0.0.0";
 const port = Number(process.env.PORT || 4001);
 
 const app = express();
-const httpServer = createServer(app);
-export const io = new Server(httpServer, {
+const certPath = process.env.CERT_PATH || "./certs";
+const httpsOptions = {
+  key: fs.readFileSync(`${certPath}/key.pem`),
+  cert: fs.readFileSync(`${certPath}/cert.pem`),
+};
+const httpsServer = https.createServer(httpsOptions, app);
+export const io = new Server(httpsServer, {
   cors: {
     origin: "*"
   },
@@ -563,11 +564,11 @@ io.on("connection", (socket) => {
 export { gameRooms };
 
 //errors check and set the listening port
-httpServer
+httpsServer
   .once("error", (err) => {
     console.error(err);
     process.exit(1);
   })
   .listen(port, hostname, () => {
-    console.log(`> Ready on http://${hostname}:${port}`);
+    console.log(`> Ready on https://${hostname}:${port}`);
   });
