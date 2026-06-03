@@ -382,8 +382,15 @@ export default function PongPage() {
           const randomAngle = (Math.random() * Math.PI / 3) - Math.PI / 6; // -30° to +30°
           const randomDirection = Math.random() < 0.5 ? 1 : -1; // Left or right
           const speed = 5;
-          const speedX = randomDirection * speed * Math.cos(randomAngle);
-          const speedY = speed * Math.sin(randomAngle);
+          let speedX = randomDirection * speed * Math.cos(randomAngle);
+          let speedY = speed * Math.sin(randomAngle);
+          
+          // Éviter que la balle aille trop à l'horizontale
+          const minVerticalSpeed = 2.5;
+          if (Math.abs(speedY) < minVerticalSpeed) {
+            speedY = (speedY >= 0 ? 1 : -1) * minVerticalSpeed;
+            speedX = Math.sign(speedX) * Math.sqrt(speed * speed - speedY * speedY);
+          }
           
           console.log("[Pong] Player 1 launching ball with angle:", randomAngle, "direction:", randomDirection);
           
