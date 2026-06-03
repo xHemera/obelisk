@@ -19,7 +19,10 @@ export default function FloatingDamage({ damage, isCrit, lethal, delay = 0, onCo
           className="absolute inset-0 rounded-xl"
           style={{
             background: "radial-gradient(circle, rgba(200,0,0,0.35) 0%, rgba(200,0,0,0) 70%)",
-            animation: "lethalFlash 1.2s ease-out forwards",
+            animationName: "lethalFlash",
+            animationDuration: "1.2s",
+            animationTimingFunction: "ease-out",
+            animationFillMode: "forwards",
             animationDelay: `${delay}ms`,
           }}
         />
@@ -43,7 +46,10 @@ export default function FloatingDamage({ damage, isCrit, lethal, delay = 0, onCo
               : isLethal
               ? "0 0 20px rgba(255,0,0,0.6), 0 0 40px rgba(255,0,0,0.3)"
               : "0 3px 8px rgba(0,0,0,0.7)",
-            animation: isCrit ? "critDmg 1.4s ease-out forwards" : "dmgPop 1.2s ease-out forwards",
+            animationName: isCrit ? "critDmg" : "dmgPop",
+            animationDuration: isCrit ? "1.4s" : "1.2s",
+            animationTimingFunction: "ease-out",
+            animationFillMode: "forwards",
             animationDelay: `${delay}ms`,
           }}
           onAnimationEnd={(e) => {
@@ -60,7 +66,10 @@ export default function FloatingDamage({ damage, isCrit, lethal, delay = 0, onCo
               fontSize: "1.5rem",
               WebkitTextStroke: "1px rgba(0,0,0,0.85)",
               textShadow: "0 0 15px rgba(255,0,0,0.5)",
-              animation: "skullPop 1.2s ease-out forwards",
+              animationName: "skullPop",
+              animationDuration: "1.2s",
+              animationTimingFunction: "ease-out",
+              animationFillMode: "forwards",
               animationDelay: `${delay}ms`,
             }}
           >

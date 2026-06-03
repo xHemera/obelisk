@@ -62,6 +62,7 @@ export type GameStatePayload = {
   turn: number;
   gamePhase: string;
   winnerId: number | null;
+  playerId: number;
   activePlayerOwner: number;
   turnQueue: TurnQueueEntry[];
   players: PlayerState[];

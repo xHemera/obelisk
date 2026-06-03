@@ -60,16 +60,16 @@ function eventsToAnims(events: DamageEvent[], startId: number): DamageAnim[] {
   }));
 }
 
-function findAnimForFighter(
+function findAnimsForFighter(
   anims: DamageAnim[],
   heroId: string,
   ownerPrefix: string,
   charState?: CharacterState | null,
-): DamageAnim | undefined {
+): DamageAnim[] {
   if (charState) {
-    return anims.find(a => a.targetUid === charState.uid);
+    return anims.filter(a => a.targetUid === charState.uid);
   }
-  return anims.find(
+  return anims.filter(
     a => a.targetHeroId === heroId && a.targetUid.startsWith(ownerPrefix + "_"),
   );
 }
@@ -191,6 +191,7 @@ export default function Game() {
   useEffect(() => {
     if (!gameState || gameState.turn === lastEventsTurnRef.current) return;
     lastEventsTurnRef.current = gameState.turn;
+    console.log(`[GamePage] processing turn ${gameState.turn}: ${gameState.damageEvents?.length ?? 0} damageEvents, ${gameState.spellEvents?.length ?? 0} spellEvents`);
     if (gameState.damageEvents?.length) {
       const newAnims = eventsToAnims(gameState.damageEvents, animIdRef.current);
       animIdRef.current += gameState.damageEvents.length;
@@ -233,6 +234,14 @@ export default function Game() {
   }, []);
 
   const isAnimating = damageAnims.length > 0 || turnTransitioning;
+  const animLogRef = useRef<{ t: boolean; d: number } | null>(null);
+  useEffect(() => {
+    const prev = animLogRef.current;
+    if (!prev || prev.t !== turnTransitioning || prev.d !== damageAnims.length) {
+      console.log(`[GamePage] isAnimating=${isAnimating} (turnTransitioning=${turnTransitioning}, damageAnims=${damageAnims.length})`);
+      animLogRef.current = { t: turnTransitioning, d: damageAnims.length };
+    }
+  });
 
   // Team selection mapping — string[] → hero definitions
   const [teamSelected, setTeamSelected] = useState<Array<(typeof CHARACTERS)[number] | null> | null>(null);
@@ -289,28 +298,45 @@ export default function Game() {
   }, [redirectCountdown, rewards, handleReturnHome]);
 
   // Save match history + fetch rewards
+  const userPseudoRef = useRef(userPseudo);
+  const teamRef = useRef(team);
+  const opponentRef = useRef(opponent);
+  const oppTeamRef = useRef(oppTeam);
+  const isWinnerRef = useRef(isWinner);
+  useEffect(() => { userPseudoRef.current = userPseudo; }, [userPseudo]);
+  useEffect(() => { teamRef.current = team; }, [team]);
+  useEffect(() => { opponentRef.current = opponent; }, [opponent]);
+  useEffect(() => { oppTeamRef.current = oppTeam; }, [oppTeam]);
+  useEffect(() => { isWinnerRef.current = isWinner; }, [isWinner]);
+
   useEffect(() => {
     if (!isGameOver || rewardFetchedRef.current) return;
     rewardFetchedRef.current = true;
     setIsRewarding(true);
+
+    const pseudo = userPseudoRef.current;
+    const teamVal = teamRef.current;
+    const opp = opponentRef.current;
+    const oppT = oppTeamRef.current;
+    const win = isWinnerRef.current;
 
     const finish = async () => {
       await fetch("/api/game", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          pseudo: userPseudo,
-          team,
-          oppName: opponent,
-          oppTeam,
-          winner: isWinner,
+          pseudo,
+          team: teamVal,
+          oppName: opp,
+          oppTeam: oppT,
+          winner: win,
         }),
       });
 
       const res = await fetch("/api/game/reward", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: userPseudo, isWinner, team }),
+        body: JSON.stringify({ name: pseudo, isWinner: win, team: teamVal }),
       });
 
       if (res.ok) {
@@ -324,7 +350,6 @@ export default function Game() {
   }, [isGameOver, router]);
 
   // Loading states
-  console.log("[GamePage] render check — dataPhase:", dataPhase, "teamSelected:", !!teamSelected, "oppTeam:", oppTeam, "gameState:", !!gameState);
   if (dataPhase === "error") {
     return <GameLoadingScreen phase="error" />;
   }
@@ -332,7 +357,6 @@ export default function Game() {
     return <GameLoadingScreen phase={dataPhase} />;
   }
   if (!teamSelected || !oppTeam) {
-    console.log("[GamePage] blocked — teamSelected or oppTeam missing. teamSelected:", teamSelected, "oppTeam:", oppTeam);
     return (
       <div className="flex w-full justify-center px-4">
         <div className="rounded border border-[#3c3650] bg-[#0f0e13] p-4 text-[#cfc8e6]">
@@ -392,8 +416,9 @@ export default function Game() {
                 const heroId = character.identity.id;
                 const charState = findCharByHeroId(oppCharacters, heroId);
                 const dead = !charState;
-                const anim = findAnimForFighter(damageAnims, heroId, opponent, charState);
-                const pixs = pixelAnims.filter(p => p.uid === (anim?.targetUid ?? charState?.uid));
+                const targetUid = charState?.uid;
+                const anims = findAnimsForFighter(damageAnims, heroId, opponent, charState);
+                const pixs = pixelAnims.filter(p => anims.some(a => a.targetUid === p.uid) || p.uid === targetUid);
                 return (
                   <div key={heroId} className="relative w-full">
                     <div className={`transition-opacity duration-300 ${dead ? "opacity-30 pointer-events-none" : "opacity-90"}`}>
@@ -414,15 +439,16 @@ export default function Game() {
                         onComplete={() => removePixelAnim(p.id)}
                       />
                     ))}
-                    {anim && (
+                    {anims.map((anim, ai) => (
                       <FloatingDamage
+                        key={anim.id}
                         damage={anim.damage}
                         isCrit={anim.isCrit}
                         lethal={anim.lethal}
-                        delay={250}
+                        delay={250 + ai * 300}
                         onComplete={() => removeAnim(anim.id)}
                       />
-                    )}
+                    ))}
                   </div>
                 );
               })}
@@ -436,8 +462,9 @@ export default function Game() {
                   ? findCharByHeroId(myCharacters, heroId)
                   : undefined;
                 const dead = !charState;
-                const anim = heroId ? findAnimForFighter(damageAnims, heroId, userPseudo, charState) : undefined;
-                const pixs = pixelAnims.filter(p => p.uid === (anim?.targetUid ?? charState?.uid));
+                const targetUid = charState?.uid;
+                const anims = heroId ? findAnimsForFighter(damageAnims, heroId, userPseudo, charState) : [];
+                const pixs = pixelAnims.filter(p => anims.some(a => a.targetUid === p.uid) || p.uid === targetUid);
                 return (
                   <div key={heroId ?? `own-slot-${index}`}>
                     {character ? (
@@ -463,15 +490,16 @@ export default function Game() {
                             onComplete={() => removePixelAnim(p.id)}
                           />
                         ))}
-                        {anim && (
+                        {anims.map((anim, ai) => (
                           <FloatingDamage
+                            key={anim.id}
                             damage={anim.damage}
                             isCrit={anim.isCrit}
                             lethal={anim.lethal}
-                            delay={250}
+                            delay={250 + ai * 300}
                             onComplete={() => removeAnim(anim.id)}
                           />
-                        )}
+                        ))}
                       </div>
                     ) : (
                       <div className="flex aspect-square items-center justify-center rounded-2xl border border-dashed border-gray-700 bg-[#0f0e13] text-sm text-gray-500">

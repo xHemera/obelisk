@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { CHARACTERS } from "@/public/gameResources/heroes";
 import { spells, type GameAction } from "./index";
 import type { CharacterState } from "./types";
@@ -8,6 +8,7 @@ import type { CharacterState } from "./types";
 type PendingAction = {
   type: "basic" | "skill";
   skillId?: string;
+  characterUid: string;
 };
 
 type UseTargetingReturn = {
@@ -56,34 +57,48 @@ export function useTargeting(
   const [confirmForfeit, setConfirmForfeit] = useState(false);
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
   const [validTargetUids, setValidTargetUids] = useState<Set<string>>(new Set());
+  const myCharactersRef = useRef(myCharacters);
+  const oppCharactersRef = useRef(oppCharacters);
+  const activeCharacterUidRef = useRef(activeCharacterUid);
+  const targetingModeRef = useRef(targetingMode);
+  const pendingActionRef = useRef(pendingAction);
+  useEffect(() => { myCharactersRef.current = myCharacters; }, [myCharacters]);
+  useEffect(() => { oppCharactersRef.current = oppCharacters; }, [oppCharacters]);
+  useEffect(() => { activeCharacterUidRef.current = activeCharacterUid; }, [activeCharacterUid]);
+  useEffect(() => { targetingModeRef.current = targetingMode; }, [targetingMode]);
+  useEffect(() => { pendingActionRef.current = pendingAction; }, [pendingAction]);
 
   const handleCastSpell = useCallback((type: "basic" | "skill", skillId?: string) => {
     const targeting = type === "basic" ? "single" : getSkillTargeting(skillId, activeHeroDef);
-    if (!targeting || !activeCharacterUid) return;
+    if (!targeting) return;
+    const uid = activeCharacterUidRef.current;
+    if (!uid) return;
 
-    // For AOE/self/teamAoe — submit immediately without targeting
     if (targeting === "aoe" || targeting === "self" || targeting === "teamAoe") {
       const action: GameAction = {
         type,
         skillId: type === "skill" ? skillId : undefined,
-        userUid: activeCharacterUid,
-        targetUids: targeting === "self" ? [activeCharacterUid] : [],
+        userUid: uid,
+        targetUids: targeting === "self" ? [uid] : [],
       };
       spells.submitAction(action);
       return;
     }
 
-    // For single/teamSingle — enter targeting mode
-    const targets = getTargetsFromTargeting(targeting, activeCharacterUid, myCharacters, oppCharacters);
+    const targets = getTargetsFromTargeting(targeting, uid, myCharactersRef.current, oppCharactersRef.current);
     if (targets.length === 0) return;
 
-    setPendingAction({ type, skillId });
+    setPendingAction({ type, skillId, characterUid: uid });
     setValidTargetUids(new Set(targets));
     setTargetingMode(true);
-  }, [activeCharacterUid, activeHeroDef, myCharacters, oppCharacters]);
+  }, [activeHeroDef]);
 
   const handleTargetSelect = useCallback((targetUid: string | null) => {
-    if (!targetingMode || !pendingAction || !activeCharacterUid) return;
+    if (!targetingModeRef.current) return;
+    const current = pendingActionRef.current;
+    if (!current) return;
+    const uid = activeCharacterUidRef.current;
+    if (!uid || current.characterUid !== uid) return;
 
     if (targetUid === null) {
       setTargetingMode(false);
@@ -93,26 +108,27 @@ export function useTargeting(
     }
 
     const action: GameAction = {
-      type: pendingAction.type,
-      skillId: pendingAction.skillId,
-      userUid: activeCharacterUid,
+      type: current.type,
+      skillId: current.skillId,
+      userUid: uid,
       targetUids: [targetUid],
     };
     spells.submitAction(action);
     setTargetingMode(false);
     setPendingAction(null);
     setValidTargetUids(new Set());
-  }, [targetingMode, pendingAction, activeCharacterUid]);
+  }, []);
 
   const handleSkipTurn = useCallback(() => {
-    if (!activeCharacterUid) return;
+    const uid = activeCharacterUidRef.current;
+    if (!uid) return;
     const action: GameAction = {
       type: "skip",
-      userUid: activeCharacterUid,
+      userUid: uid,
       targetUids: [],
     };
     spells.submitAction(action);
-  }, [activeCharacterUid]);
+  }, []);
 
   // Cancel targeting on Escape
   useEffect(() => {
