@@ -6,6 +6,7 @@ frontend/.bun/
 websockets/.bun/
 **/.bun/
 **/.pnpm-store/
+/frontend/prisma/migrations
 
 # Build outputs
 frontend/.next/

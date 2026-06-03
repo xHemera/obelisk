@@ -2,7 +2,7 @@ import { createClient } from 'redis';
 import { io } from "./server.js"
 
 export const redis = createClient({
-    url: "redis://aqua-redis:6379"
+    url: "redis://obelisk-redis:6379"
 });
 
 redis.on('error', (err) => console.log('Redis Client Error', err));

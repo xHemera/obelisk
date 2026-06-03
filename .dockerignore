@@ -1,13 +1,15 @@
 # Node
-node_modules
+**/node_modules
+**/.bun
 npm-debug.log
 yarn-error.log
-.bun
+
+
 
 # Build
 dist
 build
-.next
+**/.next
 out
 
 # Environment
@@ -37,3 +39,4 @@ Thumbs.db
 # Locks
 package-lock.json
 yarn.lock
+**/tsconfig.tsbuildinfo

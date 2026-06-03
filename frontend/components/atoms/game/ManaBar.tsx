@@ -18,7 +18,7 @@ export default function ManaBar({ currentMana, className = "", maxMana }: ManaBa
     <div className={`inline-flex flex-col items-center ${className}`}>
       <div className="relative flex flex-col items-center">
         {/* frame */}
-        <div className="relative flex h-48 w-7 items-end overflow-hidden rounded-full border-2 border-[#2a2d42] bg-[#0c0d14] shadow-[inset_0_0_12px_rgba(0,0,0,0.6),0_0_8px_rgba(107,111,158,0.15)]">
+        <div className="relative flex h-24 w-5 items-end overflow-hidden rounded-full border-2 border-[#2a2d42] bg-[#0c0d14] shadow-[inset_0_0_12px_rgba(0,0,0,0.6),0_0_8px_rgba(107,111,158,0.15)] sm:h-48 sm:w-7">
           {/* liquid fill */}
           <div
             className="absolute bottom-0 w-full animate-pulse-glow transition-all duration-300 ease-out"

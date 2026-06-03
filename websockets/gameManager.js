@@ -47,6 +47,7 @@ export function createGameInstance(roomId, p1Data, p2Data) {
     turn: 0,
     turnQueue: [],
     gamePhase: "draft",
+    damageEvents: [],
   };
 
   const result = initGame(gameState);
@@ -82,6 +83,8 @@ export function broadcastGameState(roomId) {
     gamePhase: state.gamePhase,
     winnerId: state.winnerId ?? null,
     activePlayerOwner: currentOwner,
+    damageEvents: state.damageEvents ?? [],
+    spellEvents: state.spellEvents ?? [],
     turnQueue: state.turnQueue.map(e => ({
       characterUid: e.characterUid,
       playerOwner: e.playerOwner,
@@ -103,6 +106,12 @@ export function broadcastGameState(roomId) {
         invul: c.invul,
         taunted: c.taunted,
         poison: [...c.poison],
+        phyMod: c.phyMod.map(e => ({ ...e })),
+        magMod: c.magMod.map(e => ({ ...e })),
+        phyResMod: c.phyResMod.map(e => ({ ...e })),
+        magResMod: c.magResMod.map(e => ({ ...e })),
+        critChanceMod: c.critChanceMod.map(e => ({ ...e })),
+        critDamageMod: c.critDamageMod.map(e => ({ ...e })),
         lastStandUsable: c.lastStandUsable,
         lastStandUsed: c.lastStandUsed,
       })),

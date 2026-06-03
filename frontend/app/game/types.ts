@@ -3,6 +3,11 @@ export type PlayerState = {
   characters: CharacterState[];
 };
 
+export type ModEntry = {
+  value: number;
+  turn: number;
+};
+
 export type CharacterState = {
   uid: string;
   currentHp: number;
@@ -17,6 +22,12 @@ export type CharacterState = {
   invul: number;
   taunted: number;
   poison: { value: number; turn: number }[];
+  phyMod: ModEntry[];
+  magMod: ModEntry[];
+  phyResMod: ModEntry[];
+  magResMod: ModEntry[];
+  critChanceMod: ModEntry[];
+  critDamageMod: ModEntry[];
   lastStandUsable: boolean;
   lastStandUsed: boolean;
 };
@@ -27,12 +38,33 @@ export type TurnQueueEntry = {
   charge: number;
 };
 
+export type DamageSource = "basic" | "skill" | "poison";
+
+export type DamageEvent = {
+  targetUid: string;
+  attackerUid: string;
+  damage: number;
+  isCrit: boolean;
+  lethal: boolean;
+  isAoE: boolean;
+  source: DamageSource;
+};
+
+export type SpellEventType = "heal" | "buff_attack" | "buff_defense" | "buff_crit" | "invisible" | "invulnerability" | "buff_haste" | "buff_other";
+
+export type SpellEvent = {
+  type: SpellEventType;
+  targetUid: string;
+  value?: number;
+};
+
 export type GameStatePayload = {
   turn: number;
   gamePhase: string;
   winnerId: number | null;
   activePlayerOwner: number;
-  playerId: number;
   turnQueue: TurnQueueEntry[];
   players: PlayerState[];
+  damageEvents: DamageEvent[];
+  spellEvents: SpellEvent[];
 };

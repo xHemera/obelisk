@@ -1,10 +1,10 @@
 services:
   db:
     image: postgres:16-alpine
-    container_name: aqua-db-temp
+    container_name: obelisk-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: aqua_temp
+      POSTGRES_DB: obelisk
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -12,7 +12,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d aqua_temp"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d obelisk"]
       interval: 3s
       timeout: 2s
       retries: 5
@@ -20,7 +20,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: aqua-redis
+    container_name: obelisk-redis
     restart: unless-stopped
     ports:
       - "6380:6379"
@@ -34,23 +34,15 @@ services:
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: aqua-frontend
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    container_name: obelisk-frontend
     restart: unless-stopped
     working_dir: /app
-    command: >
-      sh -c "
-      bun install --ignore-scripts &&
-      bunx prisma generate &&
-      bunx prisma migrate deploy --config prisma/prisma.config.ts &&
-      bun run dev -- --hostname 0.0.0.0
-      "
     ports:
       - "3000:3000"
     volumes:
       - ./frontend:/app
-      - ./websockets/engine/heroes:/app/shared-heroes
       - frontend_bun_cache:/home/bun/.bun/install/cache
     environment:
       NODE_ENV: production
@@ -70,9 +62,9 @@ services:
 
   websockets:
     build:
-      context: ./websockets
-      dockerfile: Dockerfile
-    container_name: aqua-websockets
+      context: .
+      dockerfile: ./websockets/Dockerfile
+    container_name: obelisk-websockets
     restart: unless-stopped
     working_dir: /app
     stdin_open: true
@@ -86,10 +78,11 @@ services:
       - "4001:4001"
     volumes:
       - ./websockets:/app
+      - ./packages:/packages
       - backend_bun_cache:/home/bun/.bun/install/cache
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/aqua_temp
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/obelisk
       PORT: 4001
     depends_on:
       db:
@@ -99,9 +92,6 @@ services:
 
 volumes:
   postgres_data:
-  frontend_node_modules:
   frontend_bun_cache:
-  backend_node_modules:
   backend_bun_cache:
-  game_engine_node_modules:
-  game_engine_bun_cache:
+

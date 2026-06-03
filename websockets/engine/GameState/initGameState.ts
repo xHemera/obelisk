@@ -68,6 +68,7 @@ export function initGameState(teamA: Team, teamB: Team): GameState {
     turn:         0,
     turnQueue:    [],
     gamePhase:    "battle",
+    damageEvents: [],
   };
 
   return initGame(draft);

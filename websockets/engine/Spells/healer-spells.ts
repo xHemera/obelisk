@@ -1,5 +1,6 @@
 import { CharacterInstance } from "../Instances/CharacterInstance";
 import { Spell } from "./Spell";
+import { pushSpellEvent } from "../Utils/resolveDamage";
 
 export class HealingLight extends Spell {
 	constructor(scaling: number[][]) {
@@ -16,6 +17,7 @@ export class HealingLight extends Spell {
 	
 		const raw = idUser.character.stats.magicalDamage * healMultiplier + flatHeal;
 		idTargets[0].currentHp = Math.min(idTargets[0].character.stats.hp, idTargets[0].currentHp + raw);
+		pushSpellEvent({ type: "heal", targetUid: idTargets[0].uid, value: Math.round(raw) });
 	}
 }
 
@@ -39,6 +41,8 @@ export class Sanctuary extends Spell {
 	
 			target.phyResMod.push({ value: defenseBonus, turn: duration });
     		target.magResMod.push({ value: defenseBonus, turn: duration });
+			pushSpellEvent({ type: "heal", targetUid: target.uid, value: Math.round(raw) });
+			pushSpellEvent({ type: "buff_defense", targetUid: target.uid });
 		});
 	}
 }
@@ -58,6 +62,7 @@ export class DivineProtection extends Spell {
 	
 		idTargets.forEach(target => {
 			target.invul += duration;
+			pushSpellEvent({ type: "invulnerability", targetUid: target.uid });
 		})
 	}
 }

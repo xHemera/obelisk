@@ -1,5 +1,6 @@
 {
   "packageManager": "bun@1.2.5",
+  "workspaces": ["packages/*"],
   "devDependencies": {
     "@types/node": "^25.9.1",
     "@types/react": "^19.2.14",
@@ -7,9 +8,5 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
-  "dependencies": {
-    "redis": "^5.12.1",
-    "socket.io": "^4.8.3",
-    "socket.io-client": "^4.8.3"
-  }
+  "dependencies": {}
 }

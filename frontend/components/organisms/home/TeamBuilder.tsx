@@ -43,7 +43,7 @@ export function TeamBuilder({
   const teamPowerLabel = `${teamSlots.filter(Boolean).length}/3`;
 
   return (
-    <div className="flex-1 overflow-hidden rounded-xl border border-[#c9a227]/25 bg-gradient-to-br from-[#120f17]/80 to-[#0f0c14]/60 p-5 backdrop-blur-xs">
+    <div className="flex-1 overflow-hidden rounded-xl border border-[#c9a227]/25 bg-gradient-to-br from-[#120f17]/80 to-[#0f0c14]/60 p-3 sm:p-5 backdrop-blur-xs">
       <div className="mb-4 flex items-center justify-between border-b border-[#c9a227]/20 pb-4">
         <div className="flex flex-col gap-1">
           <h2
@@ -63,13 +63,13 @@ export function TeamBuilder({
 
       <div className="space-y-4">
         {/* Active Team */}
-        <div className="rounded-lg border border-[#c9a227]/25 bg-[#0a0810]/50 p-4">
-          <div className="mb-3 text-center">
+        <div className="rounded-lg border border-[#c9a227]/25 bg-[#0a0810]/50 p-2 sm:p-4">
+          <div className="mb-2 text-center sm:mb-3">
             <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#c9b48a]">
               ⚔️ Active Team
             </div>
           </div>
-          <div className="flex justify-center gap-3">
+          <div className="flex justify-center gap-1 sm:gap-3">
             {teamSlots.map((slotCharacterId, index) => {
               const selectedCharacter = getTeamCharacter(slotCharacterId);
               const isSlotHovered = hoveredSlotIndex === index;
@@ -79,7 +79,7 @@ export function TeamBuilder({
                   ref={(element) => {
                     slotRefs.current[index] = element;
                   }}
-                  className={`group team-slot-item relative w-[110px] overflow-hidden rounded-lg border-2 transition-all duration-200 ${
+                  className={`group team-slot-item relative w-[76px] sm:w-[110px] overflow-hidden rounded-lg border-2 transition-all duration-200 ${
                     isSlotHovered ? "border-[#c9a227] shadow-[0_0_16px_rgba(201,162,39,0.5)]" : "border-[#6b5a84]/70"
                   } ${selectedCharacter ? "bg-[#0f0c14]" : "bg-[#120f17]/50"}`}
                 >
@@ -128,13 +128,13 @@ export function TeamBuilder({
         </div>
 
         {/* Roster Selection */}
-        <div className="rounded-lg border border-[#c9a227]/25 bg-[#0a0810]/50 p-4">
-          <div className="mb-4 text-center">
+        <div className="rounded-lg border border-[#c9a227]/25 bg-[#0a0810]/50 p-2 sm:p-4">
+          <div className="mb-2 text-center sm:mb-4">
             <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#c9b48a]">
               📜 Available Champions
             </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="flex flex-wrap justify-center gap-1 sm:gap-3">
             {roster.map((character) => {
               const inTeam = isCharacterInTeam(character.id);
               return (
@@ -151,7 +151,7 @@ export function TeamBuilder({
                     const freeSlot = teamSlots.findIndex((slot) => slot === null);
                     onTeamSlotChange(freeSlot === -1 ? 0 : freeSlot, character.id);
                   }}
-                  className={`group team-slot-item w-[90px] overflow-hidden rounded-lg border-2 text-left transition-all duration-200 ${
+                  className={`group team-slot-item w-[68px] sm:w-[90px] overflow-hidden rounded-lg border-2 text-left transition-all duration-200 ${
                     inTeam
                       ? "border-[#c9a227] shadow-[0_0_12px_rgba(201,162,39,0.4)]"
                       : "border-[#433556]/60 hover:border-[#7a6599]/80"

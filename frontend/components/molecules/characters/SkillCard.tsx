@@ -13,6 +13,7 @@ type SkillCardProps = {
   onToggleDetails: (skill: CharacterSkill) => void;
   onUpgrade: (skillId: string) => Promise<boolean>;
   onPlusOne: (skillId: string) => Promise<boolean>;
+  characterName?: string;
 };
 
 const CHARGE_STEPS = 10;
@@ -29,6 +30,7 @@ export default function SkillCard({
   onToggleDetails,
   onUpgrade,
   onPlusOne,
+  characterName,
 }: SkillCardProps) {
   const [chargeProgress, setChargeProgress] = useState(0);
   const holdDelayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -39,7 +41,7 @@ export default function SkillCard({
   const skillType = getSkillType(skill, maxSkillLevel);
   const config = SKILL_TYPE_CONFIG[skillType];
   const isMaxLevel = skill.level >= maxSkillLevel;
-  const resolved = resolveSkillDescription(skill.description, stats, skill);
+  const resolved = resolveSkillDescription(skill.description, stats, skill, characterName);
   const visibleChargeProgress = canUpgrade && !isMaxLevel ? chargeProgress : 0;
   const ruby = "/gameResources/items/ruby.webp";
 
