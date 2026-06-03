@@ -65,6 +65,7 @@ export default function Home() {
 
   const [pvpOpen, setPvpOpen] = useState(false);
   const [pongOpen, setPongOpen] = useState(false);
+  const [rulesOpen, setRulesOpen] = useState(false);
   const [minePopups, setMinePopups] = useState<MinePopup[]>([]);
   const minePopupIdRef = useRef(0);
 
@@ -484,6 +485,7 @@ export default function Home() {
                 icon="fa-flame"
                 accentClassName="bg-gradient-to-br from-[#5c2f2f]/20 via-[#c75d4d]/15 to-transparent"
                 value="Farm XP"
+                content={<div onClick={(e) => { e.stopPropagation(); setRulesOpen(true); }} className="px-2 py-0.5 bg-[#c9a227] text-black text-xs font-bold rounded hover:bg-[#e6c55a] transition-colors cursor-pointer inline-block">Rules</div>}
                 onClick={handleStartPong}
               />
 
@@ -547,6 +549,51 @@ export default function Home() {
           </div>
         );
       })()}
+
+      {/* Rules Modal */}
+      {rulesOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4" onClick={() => setRulesOpen(false)}>
+          <div className="rounded-2xl border border-[#c9a227]/30 bg-[#242033] p-8 max-w-md w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white">Pong Rules</h2>
+              <button
+                onClick={() => setRulesOpen(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="text-white text-sm space-y-4">
+              <div>
+                <h3 className="font-bold text-[#c9a227] mb-2">Game Start</h3>
+                <p>A 3-second countdown begins before the match starts to let both players prepare.</p>
+              </div>
+              <div>
+                <h3 className="font-bold text-[#c9a227] mb-2">Objective</h3>
+                <p>Use your paddle to hit the ball back and forth. Every time you or your opponent hit the ball, you score some points.</p>
+              </div>
+              <div>
+                <h3 className="font-bold text-[#c9a227] mb-2">Controls</h3>
+                <p>Move your paddle up with W and down with S to hit the ball. First player to miss the ball ends the match.</p>
+              </div>
+              <div>
+                <h3 className="font-bold text-[#c9a227] mb-2">Experience Rewards</h3>
+                <p>Each time you hit the ball with your paddle, all your characters gain XP.</p>
+              </div>
+              <div>
+                <h3 className="font-bold text-[#c9a227] mb-2">Ball Physics</h3>
+                <p>The ball bounces off paddles and walls. The longer a rally lasts, the faster the ball moves.</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setRulesOpen(false)}
+              className="text-gray-400 hover:text-white transition-colors absolute top-4 right-4"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
 
       <PvpMatchmakingModal
         open={pvpOpen}
