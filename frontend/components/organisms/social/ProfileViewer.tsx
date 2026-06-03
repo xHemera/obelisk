@@ -420,7 +420,7 @@ export default function ProfileViewerModal({
               className={friend ? "border-red-500/70 bg-red-900/20 text-red-200" : undefined}
               onClick={() => !friend ? sendFriendRequest() : setOpenRemove(true)}
             >
-              <i className="fa-solid fa-user-minus text-lg" />
+              <i className={`fa-solid ${friend ? "fa-user-minus" : "fa-user-plus"} text-lg`} />
             </IconButton>}
 
             <Validate
