@@ -31,7 +31,7 @@ export const mage = {
     critDamage: 180,
 
     hp: 980,
-    mp: 380,
+    mp: 100,
 
     physicalResistance: 7,
     magicalResistance: 16,

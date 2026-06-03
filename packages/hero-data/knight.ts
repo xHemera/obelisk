@@ -31,7 +31,7 @@ export const knight = {
     critDamage: 155,
 
     hp: 2180,
-    mp: 120,
+    mp: 100,
 
     physicalResistance: 20,
     magicalResistance: 12,
