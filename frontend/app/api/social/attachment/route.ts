@@ -37,7 +37,7 @@ export async function POST(req: Request)
                 name: `${Date.now()}-${file.name}`,
                 sizeLabel: toSizeLabel(file.size),
                 type: file.type,
-                previewUrl: `/images/${url}`
+                previewUrl: `/api/uploads/${url}`
             }
         });
         return Response.json({id: a.id, url: a.previewUrl}, {status: 201});

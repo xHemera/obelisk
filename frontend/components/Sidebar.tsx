@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { DEFAULT_PROFILE_ICON } from "@/lib/profile-icons";
 import Button from "@/components/atoms/Button";
@@ -62,12 +62,19 @@ const AdminCrownIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const NAV_ITEMS = [
+type NavItem = {
+  href: string;
+  label: string;
+  icon?: string;
+  iconNode?: ReactNode;
+};
+
+const NAV_ITEMS: NavItem[] = [
   { href: "/home", icon: "fa-solid fa-house", label: "Home" },
   { href: "/characters", icon: "fa-solid fa-users", label: "Heroes" },
   { href: "/social", icon: "fa-solid fa-comments", label: "Social" },
   { href: "/admin", label: "Council", iconNode: <AdminCrownIcon className="h-5 w-5" /> },
-] as const;
+];
 
 export default function Sidebar() {
   const pathname = usePathname();

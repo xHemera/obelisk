@@ -15,7 +15,6 @@ frontend/.next/
 
 # Env files
 .env
-.env.*
 
 # OS / editor
 .DS_Store
@@ -23,3 +22,7 @@ frontend/.next/
 
 
 package-lock.json
+certs/
+
+key.pem
+cert.pem

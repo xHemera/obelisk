@@ -5,12 +5,13 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_DB: obelisk
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./certs:/app/certs:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d obelisk"]
       interval: 3s
@@ -41,9 +42,11 @@ services:
     working_dir: /app
     ports:
       - "3000:3000"
+      - "3443:3443"
     volumes:
       - ./frontend:/app
       - frontend_bun_cache:/home/bun/.bun/install/cache
+      - ./certs:/app/certs:ro
     environment:
       NODE_ENV: production
       BETTER_AUTH_URL: $BETTER_AUTH_URL
@@ -52,6 +55,8 @@ services:
       DATABASE_URL: $DATABASE_URL
       API_KEY: $API_KEY
       NEXT_PUBLIC_SOCKET: $NEXT_PUBLIC_SOCKET
+      NODE_TLS_REJECT_UNAUTHORIZED: "0"
+      NODE_EXTRA_CA_CERTS: /certs/ca.crt
     depends_on:
       db:
         condition: service_healthy
@@ -80,6 +85,7 @@ services:
       - ./websockets:/app
       - ./packages:/packages
       - backend_bun_cache:/home/bun/.bun/install/cache
+      - ./certs:/app/certs:ro
     environment:
       NODE_ENV: production
       DATABASE_URL: postgresql://postgres:postgres@db:5432/obelisk

@@ -1,9 +1,10 @@
 import prisma from "@/lib/prisma";
 import { headers } from "next/headers";
+import { NextRequest } from "next/server";
 import { rateLimit } from "@/lib/rateLimit";
 import { redis } from "@/lib/redis";
 
-export async function GET(req: Report)
+export async function GET(req: Request)
 {
     const h = await headers();
     const ip = h

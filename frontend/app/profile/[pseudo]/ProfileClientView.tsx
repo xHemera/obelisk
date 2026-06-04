@@ -161,7 +161,7 @@ export default function ProfileClientView({
     }
 
     const data = await response.json();
-    const imageUrl = `/profiles/${data.name}`;
+    const imageUrl = `/api/uploads/profiles/${data.name}`;
 
     const profileUpdateResponse = await fetch("/api/profile", {
       method: "PATCH",

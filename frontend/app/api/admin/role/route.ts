@@ -89,12 +89,11 @@ export async function POST(req: Request)
             }
         }
     }
-    catch (e) {
-        if (e)
-            return e;
-        return Response.json({error: "Internal server error"}, {status: 500});
+    catch (e: unknown) {
+        const message = e instanceof Error ? e.message : "Internal server error";
+        return Response.json({ error: message }, { status: 500 });
     }
-    return Response.json({status: 200});
+    return Response.json({ status: 200 });
 }
 
 export async function PATCH(req: Request)
@@ -134,10 +133,9 @@ export async function PATCH(req: Request)
         }
         return Response.json({success: true}, {status: 200})
     }
-    catch (error)
+    catch (error: unknown)
     {
-        if (error)
-            return error;
-        return Response.json({error: "Internal server error"}, {status: 500})
+        const message = error instanceof Error ? error.message : "Internal server error";
+        return Response.json({ error: message }, { status: 500 });
     }
 }
