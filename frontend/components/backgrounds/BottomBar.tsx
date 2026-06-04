@@ -109,7 +109,6 @@ export default function BottomBar({
   ) : (
     <div className="flex w-full justify-end">
       <div className="flex flex-col items-end gap-2">
-        {manaBar}
         {forfeitBtn}
         {userInfo}
       </div>
