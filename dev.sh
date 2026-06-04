@@ -40,11 +40,11 @@ is_service_running() {
 }
 
 is_frontend_online() {
-    curl -fsS --max-time 2 http://localhost:3000 >/dev/null 2>&1
+    curl -fsSk --max-time 2 https://localhost:3443 >/dev/null 2>&1
 }
 
 is_websockets_online() {
-    curl -sS --max-time 2 http://localhost:4001 >/dev/null 2>&1
+    curl -sSk --max-time 2 https://localhost:4001 >/dev/null 2>&1
 }
 
 status_label() {
@@ -75,8 +75,8 @@ render_live_status() {
     echo -e "  Websockets container  $(status_label "$websockets_running")"
     echo ""
     echo -e "${CYAN}Endpoints${NC}"
-    echo -e "  http://localhost:3000         $(status_label "$frontend_online")"
-    echo -e "  http://localhost:4001         $(status_label "$websockets_online")"
+    echo -e "  https://localhost:3443        $(status_label "$frontend_online")"
+    echo -e "  https://localhost:4001        $(status_label "$websockets_online")"
 }
 
 collect_status_snapshot() {
@@ -205,8 +205,8 @@ update_menu_status_rows() {
     write_at_line "$DB_STATUS_LINE" "  DB container          $(status_label "$db_running")"
     write_at_line "$FRONTEND_STATUS_LINE" "  Frontend container    $(status_label "$frontend_running")"
     write_at_line "$WEBSOCKETS_STATUS_LINE" "  Websockets container  $(status_label "$websockets_running")"
-    write_at_line "$FRONTEND_URL_LINE" "  http://localhost:3000         $(status_label "$frontend_online")"
-    write_at_line "$WEBSOCKETS_URL_LINE" "  http://localhost:4001         $(status_label "$websockets_online")"
+    write_at_line "$FRONTEND_URL_LINE" "  https://localhost:3443        $(status_label "$frontend_online")"
+    write_at_line "$WEBSOCKETS_URL_LINE" "  https://localhost:4001        $(status_label "$websockets_online")"
 }
 
 update_menu_prompt_line() {
@@ -280,7 +280,7 @@ wait_for_url() {
     local spin_index=0
 
     print_info "Attente de disponibilité: $label ($url)"
-    while ! curl -fsS --max-time 2 "$url" >/dev/null 2>&1; do
+    while ! curl -sSk --max-time 2 "$url" >/dev/null 2>&1; do
         elapsed=$((elapsed + interval_seconds))
         if [ "$elapsed" -ge "$timeout_seconds" ]; then
             print_error "$label indisponible après ${timeout_seconds}s"
@@ -330,10 +330,11 @@ start_services() {
     docker compose up --build -d
 
     wait_for_url "https://localhost:3443" "Frontend" 300
+    wait_for_url "https://localhost:4001" "Websockets" 300
 
     print_success "Services démarrés et site accessible"
     print_info "Frontend: https://localhost:3443"
-    print_info "websockets: wss://localhost:4001/health"
+    print_info "Websockets: wss://localhost:4001"
 }
 
 # Redémarrer les services
@@ -342,6 +343,7 @@ restart_services() {
     docker compose restart
 
     wait_for_url "https://localhost:3443" "Frontend" 300
+    wait_for_url "https://localhost:4001" "Websockets" 300
 
     print_success "Services redémarrés et site accessible"
 }
@@ -392,19 +394,18 @@ check_status() {
     docker compose ps
     echo ""
 
-    # Tester les endpoints
-    print_info "Test du websockets..."
-    if curl -fsS http://localhost:4001/health > /dev/null 2>&1; then
-        print_success "websockets: OK"
-    else
-        print_error "websockets: KO"
-    fi
-
     print_info "Test du frontend..."
     if is_frontend_online; then
         print_success "Frontend: OK"
     else
         print_error "Frontend: KO"
+    fi
+
+    print_info "Test des websockets..."
+    if is_websockets_online; then
+        print_success "Websockets: OK"
+    else
+        print_error "Websockets: KO"
     fi
 }
 
@@ -419,11 +420,11 @@ test_services() {
     print_header "Test des services"
 
     echo "websockets Health:"
-    curl -fsS http://localhost:4001/health | jq '.' 2>/dev/null || curl -fsS http://localhost:4001/health
+    curl -fsS https://localhost:4001/health | jq '.' 2>/dev/null || echo "JSON parse error"
 
     echo ""
     echo "Utilisateurs (premiers 3):"
-    curl -fsS http://localhost:4001/api/users | jq '.[0:3]' 2>/dev/null || curl -fsS http://localhost:4001/api/users
+    curl -fsS https://localhost:4001/api/users | jq '.[0:3]' 2>/dev/null || echo "JSON parse error"
 }
 
 # Boucle principale
