@@ -2,7 +2,7 @@
 set -e
 
 bun install --ignore-scripts
-bunx prisma migrate dev --name init --url "$DATABASE_URL"
+bunx prisma db push
 
 ln -sf /app/node_modules/.prisma /app/node_modules/@prisma/.prisma
 

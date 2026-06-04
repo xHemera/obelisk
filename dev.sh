@@ -322,14 +322,18 @@ start_services() {
     # Créer les dossiers nécessaires s'ils n'existent pas
     mkdir -p frontend/public/images
     mkdir -p frontend/public/profiles
+    mkdir -p certs
+
+    cd certs/ && openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365 \
+  -subj "/CN=localhost" && cd ..
     
     docker compose up --build -d
 
-    wait_for_url "http://localhost:3000" "Frontend" 300
+    wait_for_url "https://localhost:3443" "Frontend" 300
 
     print_success "Services démarrés et site accessible"
-    print_info "Frontend: http://localhost:3000"
-    print_info "websockets: http://localhost:4001/health"
+    print_info "Frontend: https://localhost:3443"
+    print_info "websockets: wss://localhost:4001/health"
 }
 
 # Redémarrer les services
@@ -337,7 +341,7 @@ restart_services() {
     print_header "Redémarrage des services"
     docker compose restart
 
-    wait_for_url "http://localhost:3000" "Frontend" 300
+    wait_for_url "https://localhost:3443" "Frontend" 300
 
     print_success "Services redémarrés et site accessible"
 }
