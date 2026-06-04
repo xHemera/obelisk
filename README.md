@@ -8,7 +8,7 @@ Built with a Next.js frontend, a pure-TypeScript combat engine, a Socket.IO real
 
 ## Roles
 
-### Tobesnar -> Project Owner / Project Manage
+### Tobesnar -> Project Owner / Project Manage
 
 Frontend React et TailwindCSS. Responsive et Character/Game Design.
 
