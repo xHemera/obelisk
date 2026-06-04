@@ -1,8 +1,17 @@
-# Obelisk
+This project has been created as part of the 42 curriculum by mgarsaul, cfleuret, tobesnar ans tlize
+
+# Obelisk description
 
 A full-stack web-based **turn-based PvP Tabletop RPG simulator** with a dark fantasy theme. Assemble a team of 3 heroes, queue for battle, and fight other players in real-time tactical combat.
 
 Built with a Next.js frontend, a pure-TypeScript combat engine, a Socket.IO real-time layer, and PostgreSQL + Redis for persistence and matchmaking.
+
+## Roles
+
+tobesnar -> Project Owner / Project Manager
+Tlize -> Developer (game engine)
+Cfleuret -> Project Manager / Technical lead
+Mgarsaul -> Developer (frontend)
 
 ## Features
 
@@ -106,6 +115,10 @@ obelisk/
 └── dev.sh                      # Development helper script
 ```
 
+## AI
+
+AI was used to help us during our project with differents tasks
+
 ## Getting Started
 
 **Prerequisites**: Docker + Docker Compose
@@ -121,7 +134,7 @@ cd obelisk
 docker compose up --build -d
 ```
 
-Open **http://localhost:3000**
+Open **https://localhost:3443** or **https://YourIpAdress:3443**
 
 > WebSocket server runs on `http://localhost:4001` (used for real-time game state, chat, matchmaking)
 

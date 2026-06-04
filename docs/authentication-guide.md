@@ -6,7 +6,7 @@ Better Auth gère tout : inscription, connexion, session, refresh token.
 
 `.env.local` :
 ```
-BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_URL=https://localhost:3443
 BETTER_AUTH_SECRET=une-cle-de-32-caracteres-minimum
 ```
 
