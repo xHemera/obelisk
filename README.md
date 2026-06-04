@@ -182,3 +182,57 @@ Detailed documentation is available in `docs/`:
 | [Development Workflow](docs/development-workflow.md) | Setup, debugging, common tasks                           |
 
 # list of modules
+
+
+## 1. Web
+### Major : a framework for both frontend and backend : NextJS
+modern approch, used by newer industry and easier client-side/server-side rendering.
+
+### Major : basic chat
+chat to communicate with other players, play with them, share attachements, friend system to duel them and profile system to express yourself !
+
+### Major : a public API (more info in api-reference.md)
+to link the website with the database, and permit the user to communicate with the website
+
+### Major : websocket
+dynamic actions for the users
+
+### Minor : frontend framework : React
+dynamic website, reusable components (sidebar for example)
+
+### Minor : backend framework : express
+server to handle sockets
+
+### Minor : ORM 
+use of prisma to use the database without pure SQL
+
+### Minor : server-side rendering
+improve the performances
+
+### Minor : reusable components
+to not multiply code lines in the project
+
+
+
+## 3. User management
+### Major : standard user management and authentification
+update users informations : profile, avatar, etc... to express yourself !!
+
+### Major : advanced permissions system
+Role system for admins and moderators to handle and manage the community
+
+
+
+## 6. Gaming and user experience
+### Major : web based-game (PvP)
+pong, to gain XP for the characteres, matchmaking, online etc...
+
+### Major : second game
+Charge-based turn system where faster heroes act more frequently. Choose from basic attacks, 15 unique hero spells, or skip with matchmaking and a user history
+
+### Minor : gamification system
+achievements, badges, XP and rewards persistent, visual feedback, clear rules and progression mechanics
+
+
+
+# TOTAL : 22 POINTS
