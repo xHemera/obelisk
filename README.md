@@ -6,31 +6,33 @@ A full-stack web-based **turn-based PvP RPG simulator** with a dark fantasy them
 
 Built with a Next.js frontend, a pure-TypeScript combat engine, a Socket.IO real-time layer, and PostgreSQL + Redis for persistence and matchmaking.
 
-## Roles
+# Roles
 
-# Tobesnar -> Project Owner / Project Manage
+### Tobesnar -> Project Owner / Project Manage
 Frontend React et TailwindCSS. Responsive et Character/Game Design.
 
-# Tlize -> Developer (game engine)
+### Tlize -> Developer (game engine)
+GameEngine dev. Website logo creator (graphic design is my passion)
 
-# Cfleuret -> Project Manager / Technical lead
+### Cfleuret -> Project Manager / Technical lead
+Main backend developer, made the social part
 
-# Mgarsaul -> Developer (frontend)
+### Mgarsaul -> Developer (frontend)
 Frontend React. Pong game. Helped with API connections.
 
 
-## Project Management
+# Project Management
 
-# Organization
-placeholder a remplir
+## Organization
+task distribution between group members (Roles).
 
-# Tool used for project management
+## Tool used for project management
 Github, Trello
 
-# Communication channels used
+## Communication channels used
 Discord
 
-## Tech Stack
+# Tech Stack
 
 | Category            | Technology                                        |
 | ------------------- | ------------------------------------------------- |
@@ -42,12 +44,12 @@ Discord
 | **Package Manager** | Bun 1.2.5                                         |
 | **Orchestration**   | Docker Compose                                    |
 
-## Database Schema
+# Database Schema
 
 ![alt text](/frontend/public/database/database.png)
 
 
-## Features
+# Features
 
 - **Turn-Based PvP Combat** — Charge-based turn system where faster heroes act more frequently. Choose from basic attacks, 15 unique hero spells, or skip. (tlize)
 - **5 Playable Heroes** — Knight (tank), Mage (burst), Healer (support), Archer (physical DPS), Assassin (execute). Each with 3 unique skills scaling up to level (tobesnar) 10.
@@ -62,9 +64,9 @@ Discord
 - **Dark JRPG/Fantasy Theme** — Inspired by Final Fantasy and Dragon Quest, with chibi sprites and a cohesive dark purple/beige palette. (tobesnar)
 
 
-### RESOURCES
+# RESOURCES
 
-# Architecture
+## Architecture
 
 ```
 ┌────────────────────────────────────────────────────────┐
@@ -94,7 +96,7 @@ Discord
 └────────────────────────────────────────────────────────┘
 ```
 
-# Data Flow (PvP Match)
+## Data Flow (PvP Match)
 
 1. Player queues via `POST /api/home` → Redis `players_queue`
 2. `matchmaking.js` daemon pops 2 players, assigns a room
@@ -104,7 +106,7 @@ Discord
 6. Players send `"gameAction"` → `processAction()` → broadcast updated state
 7. When all enemies are defeated → rewards distributed, match saved
 
-# Project Structure
+## Project Structure
 
 ```text
 obelisk/
@@ -140,11 +142,11 @@ obelisk/
 └── dev.sh                      # Development helper script
 ```
 
-# AI
+## AI
 
 AI was used to help us during our project with differents tasks
 
-## Getting Started (INSTRUCTIONS)
+# Getting Started (INSTRUCTIONS)
 
 **Prerequisites**: Docker + Docker Compose
 
@@ -180,3 +182,59 @@ Detailed documentation is available in `docs/`:
 | [Styling Guide](docs/styling-guide.md)               | Tailwind CSS theming, dark fantasy palette               |
 | [Deployment Guide](docs/deployment.md)               | Production setup, environment config                     |
 | [Development Workflow](docs/development-workflow.md) | Setup, debugging, common tasks                           |
+
+# list of modules
+
+
+## 1. Web
+### Major : A framework for both frontend and backend : NextJS
+Modern approch, used by newer industry and easier client-side/server-side rendering. (tobesnar, mgarsaul, cfleuret)
+
+### Major : Basic chat
+Chat to communicate with other players, play with them, share attachements, friend system to duel them and profile system to express yourself ! (mgarsaul, cfleuret)
+
+### Major : A public API (more info in api-reference.md)
+To link the website with the database, and permit the user to communicate with the website (tobesnar, cfleuret, mgarsaul)
+
+### Major : Websocket
+Dynamic actions for the users (tobesnar, cfleuret, mgarsaul)
+
+### Minor : Frontend framework : React
+Dynamic website, reusable components (sidebar for example) (tobesnar, mgarsaul)
+
+### Minor : Backend framework : express
+Server to handle sockets (cfleuret)
+
+### Minor : ORM 
+Use of prisma to use the database without pure SQL (cfleuret)
+
+### Minor : Server-side rendering
+Improve the performances (tobesnar, cfleuret, mgarsaul)
+
+### Minor : Reusable components
+To not multiply code lines in the project (tobesnar)
+
+
+
+## 3. User management
+### Major : Standard user management and authentification
+Update users informations : profile, avatar, etc... to express yourself !! (cfleuret, mgarsaul)
+
+### Major : Advanced permissions system
+Role system for admins and moderators to handle and manage the community (cfleuret)
+
+
+
+## 6. Gaming and user experience
+### Major : Web based-game (PvP)
+Pong, to gain XP for the characteres, matchmaking, online etc... (mgarsaul)
+
+### Major : Second game
+Charge-based turn system where faster heroes act more frequently. Choose from basic attacks, 15 unique hero spells, or skip with matchmaking and a user history (tlize, tobesnar)
+
+### Minor : Gamification system
+Achievements, badges, XP and rewards persistent, visual feedback, clear rules and progression mechanics (cfleuret, magarsaul)
+
+
+
+# TOTAL : 22 POINTS
