@@ -17,9 +17,83 @@ const httpsOptions = {
   cert: fs.readFileSync(`${certPath}/cert.pem`),
 };
 
+const WS_TARGET = {
+  hostname: process.env.WS_TARGET_HOST || "obelisk-websockets",
+  port: Number(process.env.WS_TARGET_PORT || 4001),
+};
+
+function proxyToBackend(req, res) {
+  const proxyReq = https.request(
+    {
+      hostname: WS_TARGET.hostname,
+      port: WS_TARGET.port,
+      path: req.url,
+      method: req.method,
+      rejectUnauthorized: false,
+      headers: {
+        ...req.headers,
+        "x-forwarded-for": req.socket.remoteAddress,
+        "x-forwarded-proto": "https",
+      },
+    },
+    (proxyRes) => {
+      res.writeHead(proxyRes.statusCode, proxyRes.headers);
+      proxyRes.pipe(res);
+    },
+  );
+
+  proxyReq.on("error", (err) => {
+    console.error("[Proxy] HTTP error:", err.message);
+    if (!res.headersSent) {
+      res.writeHead(502, { "Content-Type": "text/plain" });
+    }
+    res.end("Bad Gateway");
+  });
+
+  req.pipe(proxyReq);
+}
+
+function proxyWsUpgrade(req, socket, head) {
+  const proxyReq = https.request({
+    hostname: WS_TARGET.hostname,
+    port: WS_TARGET.port,
+    path: req.url,
+    method: "GET",
+    rejectUnauthorized: false,
+    headers: req.headers,
+  });
+
+  proxyReq.on("upgrade", (_proxyRes, proxySocket) => {
+    if (head && head.length > 0) {
+      proxySocket.write(head);
+    }
+    proxySocket.pipe(socket);
+    socket.pipe(proxySocket);
+    proxySocket.on("error", () => socket.destroy());
+    socket.on("error", () => proxySocket.destroy());
+  });
+
+  proxyReq.on("error", (err) => {
+    console.error("[Proxy] WebSocket error:", err.message);
+    socket.destroy();
+  });
+
+  proxyReq.end();
+}
+
 app.prepare().then(() => {
   const httpsServer = https.createServer(httpsOptions, (req, res) => {
+    if (req.url.startsWith("/socket.io/")) {
+      return proxyToBackend(req, res);
+    }
     handle(req, res, parse(req.url, true));
+  });
+
+  httpsServer.on("upgrade", (req, socket, head) => {
+    if (req.url.startsWith("/socket.io/")) {
+      return proxyWsUpgrade(req, socket, head);
+    }
+    socket.destroy();
   });
 
   httpsServer.listen(httpsPort, hostname, () => {
