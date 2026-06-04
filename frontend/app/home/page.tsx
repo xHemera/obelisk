@@ -487,7 +487,13 @@ export default function Home() {
                 icon="fa-flame"
                 accentClassName="bg-gradient-to-br from-[#5c2f2f]/20 via-[#c75d4d]/15 to-transparent"
                 value="Farm XP"
-                content={<div onClick={(e) => { e.stopPropagation(); setRulesOpen(true); }} className="px-2 py-0.5 bg-[#c9a227] text-black text-xs font-bold rounded hover:bg-[#e6c55a] transition-colors cursor-pointer inline-block">Rules</div>}
+                titleAction={
+                  <div onClick={(e) => { e.stopPropagation(); setRulesOpen(true); }}
+                    className="flex h-5 w-5 items-center justify-center rounded-full bg-[#c9a227] text-xs font-bold text-black transition-colors hover:bg-[#e6c55a] cursor-pointer"
+                  >
+                    i
+                  </div>
+                }
                 onClick={handleStartPong}
               />
 

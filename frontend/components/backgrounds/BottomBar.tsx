@@ -81,13 +81,7 @@ export default function BottomBar({
   return isYourTurn ? (
     <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] gap-2 sm:gap-3 md:grid-cols-[minmax(0,7fr)_minmax(240px,280px)] md:items-stretch">
       <div className={`min-w-0 flex flex-col gap-2 transition-opacity duration-200 ${animating ? "opacity-0 pointer-events-none" : ""}`}>
-        <SpellSelector
-          hero={selectedHeroCard}
-          character={selectedCharacter}
-          activeMp={activeMp}
-          onCastSpell={handleCastSpell}
-          className="w-full"
-        />
+        <div className="flex-1" />
         <button
           type="button"
           onClick={handleSkipTurn}
@@ -95,6 +89,13 @@ export default function BottomBar({
         >
           Skip Turn
         </button>
+        <SpellSelector
+          hero={selectedHeroCard}
+          character={selectedCharacter}
+          activeMp={activeMp}
+          onCastSpell={handleCastSpell}
+          className="w-full"
+        />
       </div>
       <div className="flex flex-col items-end gap-2">
         {manaBar}

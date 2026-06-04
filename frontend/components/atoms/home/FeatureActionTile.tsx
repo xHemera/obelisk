@@ -6,6 +6,7 @@ type FeatureActionTileProps = {
   accentClassName: string;
   value?: string;
   content?: ReactNode;
+  titleAction?: ReactNode;
   onClick: () => void;
   className?: string;
 };
@@ -19,6 +20,7 @@ export default function FeatureActionTile({
   accentClassName,
   value,
   content,
+  titleAction,
   onClick,
   className,
 }: FeatureActionTileProps) {
@@ -37,12 +39,15 @@ export default function FeatureActionTile({
 
       <div className="relative z-10 flex items-start justify-between">
         <div className="flex flex-col gap-1">
-          <span
-            className="text-2xl font-black uppercase tracking-[0.14em] text-[#f5e6c8]"
-            style={{ fontFamily: "var(--font-display), serif" }}
-          >
-            {title}
-          </span>
+          <div className="flex items-center gap-2">
+            <span
+              className="text-2xl font-black uppercase tracking-[0.14em] text-[#f5e6c8]"
+              style={{ fontFamily: "var(--font-display), serif" }}
+            >
+              {title}
+            </span>
+            {titleAction ? <span className="ml-auto">{titleAction}</span> : null}
+          </div>
           <span className="text-xs font-semibold uppercase tracking-[0.08em] text-[#c9b48a]">Active Challenge</span>
         </div>
         <i className={`fa-solid ${icon} text-lg text-[#e6c55a] drop-shadow-lg`} aria-hidden="true" />
