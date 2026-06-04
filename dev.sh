@@ -40,11 +40,11 @@ is_service_running() {
 }
 
 is_frontend_online() {
-    curl -fsS --max-time 2 https://localhost:3443 >/dev/null 2>&1
+    curl -fsSk --max-time 2 https://localhost:3443 >/dev/null 2>&1
 }
 
 is_websockets_online() {
-    curl -sS --max-time 2 https://localhost:4001 >/dev/null 2>&1
+    curl -sSk --max-time 2 https://localhost:4001 >/dev/null 2>&1
 }
 
 status_label() {
@@ -280,7 +280,7 @@ wait_for_url() {
     local spin_index=0
 
     print_info "Attente de disponibilité: $label ($url)"
-    while ! curl -fsS --max-time 2 "$url" >/dev/null 2>&1; do
+    while ! curl -sSk --max-time 2 "$url" >/dev/null 2>&1; do
         elapsed=$((elapsed + interval_seconds))
         if [ "$elapsed" -ge "$timeout_seconds" ]; then
             print_error "$label indisponible après ${timeout_seconds}s"
@@ -330,10 +330,11 @@ start_services() {
     docker compose up --build -d
 
     wait_for_url "https://localhost:3443" "Frontend" 300
+    wait_for_url "https://localhost:4001" "Websockets" 300
 
     print_success "Services démarrés et site accessible"
     print_info "Frontend: https://localhost:3443"
-    print_info "websockets: wss://localhost:4001/health"
+    print_info "Websockets: wss://localhost:4001"
 }
 
 # Redémarrer les services
@@ -342,6 +343,7 @@ restart_services() {
     docker compose restart
 
     wait_for_url "https://localhost:3443" "Frontend" 300
+    wait_for_url "https://localhost:4001" "Websockets" 300
 
     print_success "Services redémarrés et site accessible"
 }
@@ -392,19 +394,18 @@ check_status() {
     docker compose ps
     echo ""
 
-    # Tester les endpoints
-    print_info "Test du websockets..."
-    if curl -fsS https://localhost:4001/health > /dev/null 2>&1; then
-        print_success "websockets: OK"
-    else
-        print_error "websockets: KO"
-    fi
-
     print_info "Test du frontend..."
     if is_frontend_online; then
         print_success "Frontend: OK"
     else
         print_error "Frontend: KO"
+    fi
+
+    print_info "Test des websockets..."
+    if is_websockets_online; then
+        print_success "Websockets: OK"
+    else
+        print_error "Websockets: KO"
     fi
 }
 
