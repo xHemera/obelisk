@@ -3,7 +3,7 @@ import fs from "fs";
 import { Server } from "socket.io";
 import express from "express";
 import { createClient } from 'redis';
-import { processAction, getCurrentTurnCharacter } from "./engine/GameEngine.ts";
+import { processAction } from "./engine/GameEngine.ts";
 import "./matchmaking.js";
 import "./matchmakingpong.js";
 import { createGameInstance, broadcastGameState } from "./gameManager.js";
@@ -61,7 +61,6 @@ io.on("connection", (socket) => {
   socket.on("login", async (user) => {
     if (typeof user !== 'string' || !user.trim())
     {
-      console.error("Invalid user in login: ", user);
       return ;
     }
     if (!socket.id) {

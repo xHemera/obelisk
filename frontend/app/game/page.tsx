@@ -42,10 +42,6 @@ function findCharByHeroId(chars: CharacterState[] | undefined, heroId: string) {
   return chars?.find(c => c.uid.split("_").at(-2) === heroId) ?? null;
 }
 
-function findCharByUid(chars: CharacterState[] | undefined, uid: string) {
-  return chars?.find(c => c.uid === uid) ?? null;
-}
-
 function eventsToAnims(events: DamageEvent[], startId: number): DamageAnim[] {
   return events.map((e, i) => ({
     id: startId + i,
