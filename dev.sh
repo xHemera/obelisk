@@ -362,6 +362,7 @@ clean_all() {
     if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
         rm -rf frontend/public/images/*
         rm -rf frontend/public/profiles/*
+        rm -rf certs/*
         docker compose down -v
         print_success "Nettoyage terminé"
     else
