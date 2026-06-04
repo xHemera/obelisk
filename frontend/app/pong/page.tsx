@@ -339,8 +339,44 @@ export default function PongPage() {
       keys.current[e.key.toLowerCase()] = false;
     };
 
+    const handleTouchStart = (e: TouchEvent) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      if (!touch) return;
+      const rect = board.getBoundingClientRect();
+      const relX = (touch.clientX - rect.left) / rect.width;
+      const relY = (touch.clientY - rect.top) / rect.height;
+
+      if (relX < 0.5) {
+        keys.current["w"] = relY < 0.5;
+        keys.current["s"] = relY >= 0.5;
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      if (!touch) return;
+      const rect = board.getBoundingClientRect();
+      const relX = (touch.clientX - rect.left) / rect.width;
+      const relY = (touch.clientY - rect.top) / rect.height;
+
+      if (relX < 0.5) {
+        keys.current["w"] = relY < 0.5;
+        keys.current["s"] = relY >= 0.5;
+      }
+    };
+
+    const handleTouchEnd = () => {
+      keys.current["w"] = false;
+      keys.current["s"] = false;
+    };
+
     window.addEventListener("keydown", keyDown);
     window.addEventListener("keyup", keyUp);
+    window.addEventListener("touchstart", handleTouchStart, { passive: false });
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    window.addEventListener("touchend", handleTouchEnd);
 
     // Boucle du jeu
     const update = () => {
@@ -555,6 +591,9 @@ export default function PongPage() {
     return () => {
       window.removeEventListener("keydown", keyDown);
       window.removeEventListener("keyup", keyUp);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
     };
   }, [opponent]);
 
@@ -568,13 +607,13 @@ export default function PongPage() {
         </div>
       ) : (
         <>
-          <div className="w-full max-w-[1500px] overflow-auto">
+          <div className="w-full max-w-[1500px] mx-auto">
             <canvas
               ref={canvasRef}
               width={boardWidth}
               height={boardHeight}
-              className="border-2 sm:border-4 border-white max-w-none"
-              style={{ maxWidth: "none", width: `${boardWidth}px`, height: `${boardHeight}px` }}
+              className="border-2 sm:border-4 border-white w-full"
+              style={{ width: "100%", height: "auto", aspectRatio: "5/3" }}
             />
           </div>
 
