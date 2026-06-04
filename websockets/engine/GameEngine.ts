@@ -1,10 +1,12 @@
 import { GameState } from "./GameState/GameState";
-import { advanceTurn, getActiveCharacter, initTurnQueue } from "./GameState/TurnSystem";
+import { advanceTurn, getActiveCharacter } from "./GameState/TurnSystem";
 import { CharacterInstance, ModEntry } from "./Instances/CharacterInstance";
-import { applyDamage, applyPoisonDamage, resolvePhyDamage, clearDamageEvents, getDamageEvents, getSpellEvents } from "./Utils/resolveDamage";
+import { applyDamage, applyPoisonDamage, resolvePhyDamage } from "./Utils/resolveDamage";
+import { EventBus } from "./Utils/EventBus";
 import { GameAction } from "./Utils/GameAction";
 import { findCharacter, resolveTargets } from "./Utils/resolveTargets";
-import { PlayerInstance } from "./Instances/PlayerInstance";
+
+const bus = new EventBus();
 
 function tickAllMods(character: CharacterInstance): void {
 	const tick = (mods: ModEntry[]) =>
@@ -12,12 +14,12 @@ function tickAllMods(character: CharacterInstance): void {
 			.map(e => ({ ...e, turn: e.turn - 1 }))
 			.filter(e => e.turn > 0);
 
-	character.phyMod		= tick(character.phyMod);
-	character.magMod		= tick(character.magMod);
-	character.phyResMod		= tick(character.phyResMod);
-	character.magResMod		= tick(character.magResMod);
-	character.critChanceMod	= tick(character.critChanceMod);
-	character.critDamageMod	= tick(character.critDamageMod);
+	character.phyMod        = tick(character.phyMod);
+	character.magMod        = tick(character.magMod);
+	character.phyResMod     = tick(character.phyResMod);
+	character.magResMod     = tick(character.magResMod);
+	character.critChanceMod = tick(character.critChanceMod);
+	character.critDamageMod = tick(character.critDamageMod);
 
 	if (character.stunned   > 0) character.stunned   -= 1;
 	if (character.invisible > 0) character.invisible -= 1;
@@ -27,12 +29,9 @@ function tickAllMods(character: CharacterInstance): void {
 
 function tickPoison(state: GameState): GameState {
 	state.players.flatMap(p => p.characters).forEach(character => {
-		const totalDamage   = character.poison.reduce((acc, { value }) => acc + value, 0);
-		if (totalDamage > 0) {
-			console.log(`[GameEngine] tickPoison — ${character.uid} takes ${totalDamage} poison damage (hp=${character.currentHp}→${Math.max(0, character.currentHp - totalDamage)})`);
-			applyPoisonDamage(character, totalDamage, "");
-		}
-		character.poison    = character.poison
+		const totalDamage = character.poison.reduce((acc, { value }) => acc + value, 0);
+		if (totalDamage > 0) applyPoisonDamage(character, totalDamage, "", bus);
+		character.poison = character.poison
 			.map(e => ({ ...e, turn: e.turn - 1 }))
 			.filter(e => e.turn > 0);
 	});
@@ -40,14 +39,10 @@ function tickPoison(state: GameState): GameState {
 }
 
 function removeDeadCharacters(state: GameState): GameState {
-	const updatedPlayers = state.players.map((player, pi) => {
-		const alive = player.characters.filter(c => c.currentHp > 0);
-		const dead = player.characters.filter(c => c.currentHp <= 0);
-		if (dead.length > 0) {
-			console.log(`[GameEngine] removeDeadCharacters — player ${pi}: ${dead.length} dead (${dead.map(c => `${c.uid} hp=${c.currentHp}`).join(", ")}), ${alive.length} alive`);
-		}
-		return { ...player, characters: alive };
-	});
+	const updatedPlayers = state.players.map(player => ({
+		...player,
+		characters: player.characters.filter(c => c.currentHp > 0),
+	}));
 
 	const aliveUids    = new Set(updatedPlayers.flatMap(p => p.characters.map(c => c.uid)));
 	const updatedQueue = state.turnQueue.filter(e => aliveUids.has(e.characterUid));
@@ -56,12 +51,10 @@ function removeDeadCharacters(state: GameState): GameState {
 }
 
 function checkWinner(state: GameState): GameState {
-	const charCounts = state.players.map(p => `${p.id}:${p.characters.length}`);
 	const loser = state.players.find(p => p.characters.length === 0);
 	if (!loser) return state;
 
 	const winner = state.players.find(p => p !== loser);
-	console.log(`[GameEngine] checkWinner — game end! remaining chars=${charCounts.join(",")} winnerId=${state.players.indexOf(winner!)}`);
 	return {
 		...state,
 		gamePhase: "end",
@@ -72,37 +65,39 @@ function checkWinner(state: GameState): GameState {
 function resolveBasicAttack(user: CharacterInstance, targets: CharacterInstance[]): void {
 	const isAoE = targets.length > 1;
 	targets.forEach(target => {
-		const raw    = user.character.stats.physicalDamage;
-		const damage = resolvePhyDamage(raw, user, target, undefined, isAoE, "basic");
-		console.log(`[GameEngine] resolveBasicAttack — user=${user.character.name}(${user.uid}) raw=${raw} target=${target.character.name}(${target.uid}) hpBefore=${target.currentHp} damage=${damage}`);
+		const damage = resolvePhyDamage(user.character.stats.physicalDamage, user, target, bus, undefined, isAoE, "basic");
 		applyDamage(target, damage);
-		console.log(`[GameEngine] resolveBasicAttack — after apply: ${target.uid} hp=${target.currentHp} shield=${target.shieldHp} invul=${target.invul}`);
 	});
 
 	user.currentMp = Math.min(
 		user.character.stats.mp,
-		user.currentMp + (user.character.stats.mp / 10)
+		user.currentMp + (user.character.stats.mp / 10),
 	);
 }
 
 function resolveSkill(skillId: string, user: CharacterInstance, targets: CharacterInstance[]): void {
 	const spell = user.spells.get(skillId);
 	if (!spell) return;
-
 	if (user.currentMp < spell.mpCost) return;
 	user.currentMp -= spell.mpCost;
+	spell.applyEffect(user, targets, bus);
+}
 
-	spell.applyEffect(user, targets);
+function flushEvents(): Pick<GameState, "damageEvents" | "spellEvents"> {
+	const result = {
+		damageEvents: bus.getDamageEvents(),
+		spellEvents:  bus.getSpellEvents(),
+	};
+	bus.clear();
+	return result;
 }
 
 export function processAction(state: GameState, action: GameAction): GameState {
-	clearDamageEvents();
+	bus.clear();
 
-	// Validate action is for the active character (turnQueue[0])
 	const activeEntry = state.turnQueue[0];
 	if (!activeEntry || action.userUid !== activeEntry.characterUid) {
-		console.warn(`[GameEngine] processAction — action.userUid=${action.userUid} does not match turnQueue[0]=${activeEntry?.characterUid ?? "none"}, rejecting`);
-		return { ...state, damageEvents: getDamageEvents(), spellEvents: getSpellEvents() };
+		return { ...state, ...flushEvents() };
 	}
 
 	state.players
@@ -111,17 +106,12 @@ export function processAction(state: GameState, action: GameAction): GameState {
 
 	const character = findCharacter(state, action.userUid);
 
-	// If character is dead/removed, auto-advance the turn (skip them)
 	if (!character) {
-		console.warn(`[GameEngine] processAction — character ${action.userUid} not found (dead?), auto-advancing`);
 		let newState = tickPoison(state);
 		newState = removeDeadCharacters(newState);
 		newState = checkWinner(newState);
-		if (newState.gamePhase === "end") {
-			return { ...newState, damageEvents: getDamageEvents(), spellEvents: getSpellEvents() };
-		}
-		newState = advanceTurn(newState);
-		return { ...newState, damageEvents: getDamageEvents(), spellEvents: getSpellEvents() };
+		if (newState.gamePhase === "end") return { ...newState, ...flushEvents() };
+		return { ...advanceTurn(newState), ...flushEvents() };
 	}
 
 	if (character.stunned > 0) {
@@ -129,26 +119,21 @@ export function processAction(state: GameState, action: GameAction): GameState {
 		let newState = tickPoison(state);
 		newState = removeDeadCharacters(newState);
 		newState = checkWinner(newState);
-		if (newState.gamePhase === "end") {
-			return { ...newState, damageEvents: getDamageEvents(), spellEvents: getSpellEvents() };
-		}
-		const advanced = advanceTurn(newState);
-		return { ...advanced, damageEvents: getDamageEvents(), spellEvents: getSpellEvents() };
+		if (newState.gamePhase === "end") return { ...newState, ...flushEvents() };
+		return { ...advanceTurn(newState), ...flushEvents() };
 	}
+
 	tickAllMods(character);
 
-	let	newState = tickPoison(state);
-		newState = removeDeadCharacters(newState);
-		newState = checkWinner(newState);
-
-	if (newState.gamePhase === "end") {
-		return { ...newState, damageEvents: getDamageEvents(), spellEvents: getSpellEvents() };
-	}
+	let newState = tickPoison(state);
+	newState = removeDeadCharacters(newState);
+	newState = checkWinner(newState);
+	if (newState.gamePhase === "end") return { ...newState, ...flushEvents() };
 
 	if (action.type === "skip") {
 		character.currentMp = Math.min(
-		character.character.stats.mp,
-		character.currentMp + (character.character.stats.mp / 10)
+			character.character.stats.mp,
+			character.currentMp + (character.character.stats.mp / 10),
 		);
 	} else {
 		const targets = resolveTargets(newState, character, action);
@@ -161,19 +146,11 @@ export function processAction(state: GameState, action: GameAction): GameState {
 		}
 	}
 
-		newState = removeDeadCharacters(newState);
-		console.log(`[GameEngine] processAction — after removeDead: players chars=${newState.players.map(p => `P${p.id}:${p.characters.length}`).join(", ")} turnQueue=${newState.turnQueue.length}`);
-		newState = checkWinner(newState);
-		console.log(`[GameEngine] processAction — after checkWinner: phase=${newState.gamePhase} winnerId=${newState.winnerId}`);
+	newState = removeDeadCharacters(newState);
+	newState = checkWinner(newState);
+	if (newState.gamePhase === "end") return { ...newState, ...flushEvents() };
 
-	if (newState.gamePhase === "end") {
-		console.log(`[GameEngine] processAction END (game over) — turn=${newState.turn} winnerId=${newState.winnerId}`);
-		return { ...newState, damageEvents: getDamageEvents(), spellEvents: getSpellEvents() };
-	}
-
-	newState = advanceTurn(newState);
-	console.log(`[GameEngine] processAction END — turn now ${newState.turn} active=${newState.turnQueue[0]?.characterUid} queue=${newState.turnQueue.map(e => `${e.characterUid}@${Math.round(e.charge)}`).join(" > ")}`);
-	return { ...newState, damageEvents: getDamageEvents(), spellEvents: getSpellEvents() };
+	return { ...advanceTurn(newState), ...flushEvents() };
 }
 
 export function getCurrentTurnCharacter(state: GameState): CharacterInstance | undefined {
