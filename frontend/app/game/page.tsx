@@ -18,7 +18,7 @@ import FloatingDamage from "@/components/atoms/game/FloatingDamage";
 import PixelAnimation from "@/components/atoms/game/PixelAnimation";
 import { getTargetAnim, getSpellAnim, preloadAllAnimations } from "@/lib/animationManager";
 import type { AnimDef } from "@/lib/animationManager";
-import type { CharacterState, DamageEvent, SpellEvent, ModEntry } from "./types";
+import type { CharacterState, DamageEvent, ModEntry } from "./types";
 
 type DamageAnim = {
   id: number;
