@@ -16,20 +16,19 @@ Frontend React et TailwindCSS. Responsive et Character/Game Design.
 ### Cfleuret -> Project Manager / Technical lead
 
 ### Mgarsaul -> Developer (frontend)
+Frontend React. Pong game. Helped with API connections.
 
-## Features
 
-- **Turn-Based PvP Combat** — Charge-based turn system where faster heroes act more frequently. Choose from basic attacks, 15 unique hero spells, or skip.
-- **5 Playable Heroes** — Knight (tank), Mage (burst), Healer (support), Archer (physical DPS), Assassin (execute). Each with 3 unique skills scaling up to level 10.
-- **Real-Time Matchmaking** — Queue for PvP, get matched, and fight live via Socket.IO.
-- **Hero Progression** — Level up individual heroes and their skills by earning XP in battle or spending rubies.
-- **Ruby Economy** — Click-to-earn rubies via the Mine button, spent on skill upgrades.
-- **Social System** — Real-time messaging, friend requests, block list, typing indicators, read receipts, and duel challenges.
-- **Pong Mini-Game** — Real-time multiplayer Pong for XP farming.
-- **Badge Progression** — Earn badges (BEGINNER → AMATEUR → EXPERT → MASTER) based on PvP wins.
-- **Admin Panel** — Manage users, assign roles (ADMIN/MODERATOR), ban/unban accounts, handle reported conversations.
-- **Pixel Animation System** — Damage numbers, spell effects, and status icons rendered on the battlefield.
-- **Dark JRPG/Fantasy Theme** — Inspired by Final Fantasy and Dragon Quest, with chibi sprites and a cohesive dark purple/beige palette.
+## Project Management
+
+# Organization
+placeholder a remplir
+
+# Tool used for project management
+Github, Trello
+
+# Communication channels used
+Discord
 
 ## Tech Stack
 
@@ -43,7 +42,30 @@ Frontend React et TailwindCSS. Responsive et Character/Game Design.
 | **Package Manager** | Bun 1.2.5                                         |
 | **Orchestration**   | Docker Compose                                    |
 
-## Architecture
+## Database Schema
+
+![alt text](/frontend/public/database/database.png)
+
+
+### Features
+
+- **Turn-Based PvP Combat** — Charge-based turn system where faster heroes act more frequently. Choose from basic attacks, 15 unique hero spells, or skip.
+- **5 Playable Heroes** — Knight (tank), Mage (burst), Healer (support), Archer (physical DPS), Assassin (execute). Each with 3 unique skills scaling up to level 10.
+- **Real-Time Matchmaking** — Queue for PvP, get matched, and fight live via Socket.IO.
+- **Hero Progression** — Level up individual heroes and their skills by earning XP in battle or spending rubies.
+- **Ruby Economy** — Click-to-earn rubies via the Mine button, spent on skill upgrades.
+- **Social System** — Real-time messaging, friend requests, block list, typing indicators, read receipts, and duel challenges.
+- **Pong Mini-Game** — Real-time multiplayer Pong for XP farming.
+- **Badge Progression** — Earn badges (BEGINNER → AMATEUR → EXPERT → MASTER) based on PvP wins.
+- **Admin Panel** — Manage users, assign roles (ADMIN/MODERATOR), ban/unban accounts, handle reported conversations.
+- **Pixel Animation System** — Damage numbers, spell effects, and status icons rendered on the battlefield.
+- **Dark JRPG/Fantasy Theme** — Inspired by Final Fantasy and Dragon Quest, with chibi sprites and a cohesive dark purple/beige palette.
+
+
+
+## RESOURCES
+
+# Architecture
 
 ```
 ┌────────────────────────────────────────────────────────┐
@@ -73,7 +95,7 @@ Frontend React et TailwindCSS. Responsive et Character/Game Design.
 └────────────────────────────────────────────────────────┘
 ```
 
-### Data Flow (PvP Match)
+# Data Flow (PvP Match)
 
 1. Player queues via `POST /api/home` → Redis `players_queue`
 2. `matchmaking.js` daemon pops 2 players, assigns a room
@@ -83,7 +105,7 @@ Frontend React et TailwindCSS. Responsive et Character/Game Design.
 6. Players send `"gameAction"` → `processAction()` → broadcast updated state
 7. When all enemies are defeated → rewards distributed, match saved
 
-## Project Structure
+# Project Structure
 
 ```text
 obelisk/
@@ -119,11 +141,11 @@ obelisk/
 └── dev.sh                      # Development helper script
 ```
 
-## AI
+# AI
 
 AI was used to help us during our project with differents tasks
 
-## Getting Started
+## Getting Started (INSTRUCTIONS)
 
 **Prerequisites**: Docker + Docker Compose
 
