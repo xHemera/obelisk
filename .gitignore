@@ -24,3 +24,6 @@ frontend/.next/
 
 package-lock.json
 certs/
+
+key.pem
+cert.pem
