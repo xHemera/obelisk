@@ -394,7 +394,7 @@ check_status() {
 
     # Tester les endpoints
     print_info "Test du websockets..."
-    if curl -fsS http://localhost:4001/health > /dev/null 2>&1; then
+    if curl -fsS wss://localhost:4001/health > /dev/null 2>&1; then
         print_success "websockets: OK"
     else
         print_error "websockets: KO"
@@ -419,11 +419,11 @@ test_services() {
     print_header "Test des services"
 
     echo "websockets Health:"
-    curl -fsS http://localhost:4001/health | jq '.' 2>/dev/null || curl -fsS http://localhost:4001/health
+    curl -fsS wss://localhost:4001/health | jq '.' 2>/dev/null || curl -fsS https://localhost:4001/health
 
     echo ""
     echo "Utilisateurs (premiers 3):"
-    curl -fsS http://localhost:4001/api/users | jq '.[0:3]' 2>/dev/null || curl -fsS http://localhost:4001/api/users
+    curl -fsS wss://localhost:4001/api/users | jq '.[0:3]' 2>/dev/null || curl -fsS https://localhost:4001/api/users
 }
 
 # Boucle principale
