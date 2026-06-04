@@ -99,4 +99,3 @@ volumes:
   postgres_data:
   frontend_bun_cache:
   backend_bun_cache:
-

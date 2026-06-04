@@ -4,10 +4,10 @@
 
 ```yml
 services:
-  web:         Next.js, port 3000
-  db:          PostgreSQL
-  redis:       Redis
-  websocket:   Socket.IO, port 4001
+  web: Next.js, port 3000
+  db: PostgreSQL
+  redis: Redis
+  websocket: Socket.IO, port 4001
 ```
 
 `docker compose up --build -d` pour tout lancer.
@@ -29,7 +29,7 @@ services:
 
 - Build : `bun run build`
 - Déploiement : Docker, Vercel, Railway
-- Variables : `BETTER_AUTH_URL`, `BETTER_AUTH_SECRET`, `DATABASE_URL`, `NEXT_PUBLIC_SOCKET_URL`
+- Variables : `BETTER_AUTH_URL`, `BETTER_AUTH_SECRET`, `DATABASE_URL`
 
 ### WebSocket
 

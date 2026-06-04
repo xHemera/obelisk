@@ -69,6 +69,23 @@ io.on("connection", (socket) => {
     }
 
     console.log("[Pong Server] User login:", { user, socketId: socket.id });
+
+    // Disconnect old socket if user already has one
+    const existingSocketId = await redis.hGet("online_users", user);
+    if (existingSocketId && existingSocketId !== socket.id) {
+      console.log("[Pong Server] User already connected with different socket, disconnecting old:", { user, oldSocketId: existingSocketId, newSocketId: socket.id });
+      const oldSocket = io.sockets.sockets.get(existingSocketId);
+      if (oldSocket) {
+        oldSocket.disconnect(true);
+      }
+      // Also remove from inGamePlayers if matched
+      const oldOpponent = await redis.hGet("inGamePlayers", user);
+      if (oldOpponent) {
+        await redis.hDel("inGamePlayers", user, oldOpponent);
+        console.log("[Pong Server] Cleaned up inGamePlayers for reconnecting user:", { user, oldOpponent });
+      }
+    }
+
     await redis.hSet("online_users", user, socket.id);
     const users = await redis.hGetAll("online_users");
     console.log("[Pong Server] Online users after login:", users);

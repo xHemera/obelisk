@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { authClient } from "@/lib/auth-client";
-import { socket } from "@/socket";
+import { socket, ensureLoggedIn, clearCurrentUser } from "@/socket";
 
 export default function PongPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -54,6 +54,7 @@ export default function PongPage() {
   // Touches
   const keys = useRef<{ [key: string]: boolean }>({});
   const matchEndedRef = useRef(false);
+  const forceDisconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
    useEffect(() => {
     const getUserData = async () => {
@@ -100,30 +101,10 @@ export default function PongPage() {
     
     console.log("[Pong] Initializing socket for user:", userPseudo, "Socket connected:", socket.connected);
     
-    const connectHandler = () => {
-      console.log("[Pong] Socket connected event fired, sending login");
-      socket.emit("login", userPseudo);
-    };
+    ensureLoggedIn(userPseudo);
     
-    const onlineUsersHandler = (users: any) => {
-      console.log("[Pong] Online users received from server:", users);
-    };
-    
-    // If already connected, emit immediately. Otherwise wait for connect event
-    if (socket.connected) {
-      console.log("[Pong] Socket already connected, emitting login immediately");
-      socket.emit("login", userPseudo);
-    } else {
-      console.log("[Pong] Socket not connected, connecting...");
-      socket.connect();
-      socket.once("connect", connectHandler);
-    }
-    
-    socket.on("online_users", onlineUsersHandler);
-
     return () => {
-      socket.off("connect", connectHandler);
-      socket.off("online_users", onlineUsersHandler);
+      clearCurrentUser();
     };
   }, [userPseudo]);
 
@@ -169,9 +150,10 @@ export default function PongPage() {
     };
 
     const handleForceDisconnect = (data: { reason: string }) => {
-      console.log("[Pong] Received forceDisconnect event:", data);
       setError("Your opponent disconnected. Returning to home...");
-      setTimeout(() => {
+      if (forceDisconnectTimerRef.current) clearTimeout(forceDisconnectTimerRef.current);
+      forceDisconnectTimerRef.current = setTimeout(() => {
+        clearCurrentUser();
         socket.disconnect();
         router.push("home");
       }, 2000);
@@ -192,6 +174,10 @@ export default function PongPage() {
       socket.off("ballLaunch", handleBallLaunch);
       socket.off("matchEnd", handleMatchEnd);
       socket.off("forceDisconnect", handleForceDisconnect);
+      if (forceDisconnectTimerRef.current) {
+        clearTimeout(forceDisconnectTimerRef.current);
+        forceDisconnectTimerRef.current = null;
+      }
     };
   }, [userPseudo, opponent])
 
@@ -234,29 +220,12 @@ export default function PongPage() {
           : "Impossible de charger l'utilisateur";
         throw new Error(errorMessage);
       }
+    clearCurrentUser();
     socket.emit("isdisconnecting");
     socket.disconnect();
     await authClient.signOut();
     router.push("/");
   };
-
-  // Charger le username
-  useEffect(() => {
-    const getUserData = async () => {
-      const { data } = await authClient.getSession();
-      if (data && data.user.name) {
-        setUserPseudo(data.user.name);
-      }
-    };
-
-    const timeoutId = window.setTimeout(() => {
-      void getUserData();
-    }, 0);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, []);
 
   // Fonction pour récolter l'XP
   const handleCollectXp = async () => {
@@ -339,8 +308,44 @@ export default function PongPage() {
       keys.current[e.key.toLowerCase()] = false;
     };
 
+    const handleTouchStart = (e: TouchEvent) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      if (!touch) return;
+      const rect = board.getBoundingClientRect();
+      const relX = (touch.clientX - rect.left) / rect.width;
+      const relY = (touch.clientY - rect.top) / rect.height;
+
+      if (relX < 0.5) {
+        keys.current["w"] = relY < 0.5;
+        keys.current["s"] = relY >= 0.5;
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      if (!touch) return;
+      const rect = board.getBoundingClientRect();
+      const relX = (touch.clientX - rect.left) / rect.width;
+      const relY = (touch.clientY - rect.top) / rect.height;
+
+      if (relX < 0.5) {
+        keys.current["w"] = relY < 0.5;
+        keys.current["s"] = relY >= 0.5;
+      }
+    };
+
+    const handleTouchEnd = () => {
+      keys.current["w"] = false;
+      keys.current["s"] = false;
+    };
+
     window.addEventListener("keydown", keyDown);
     window.addEventListener("keyup", keyUp);
+    window.addEventListener("touchstart", handleTouchStart, { passive: false });
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    window.addEventListener("touchend", handleTouchEnd);
 
     // Boucle du jeu
     const update = () => {
@@ -555,6 +560,9 @@ export default function PongPage() {
     return () => {
       window.removeEventListener("keydown", keyDown);
       window.removeEventListener("keyup", keyUp);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
     };
   }, [opponent]);
 
@@ -568,13 +576,12 @@ export default function PongPage() {
         </div>
       ) : (
         <>
-          <div className="w-full max-w-[1500px] overflow-auto">
+          <div className="relative w-full max-w-[1500px] mx-auto" style={{ aspectRatio: `${boardWidth}/${boardHeight}` }}>
             <canvas
               ref={canvasRef}
               width={boardWidth}
               height={boardHeight}
-              className="border-2 sm:border-4 border-white max-w-none"
-              style={{ maxWidth: "none", width: `${boardWidth}px`, height: `${boardHeight}px` }}
+              className="absolute inset-0 w-full h-full border-2 sm:border-4 border-white"
             />
           </div>
 
@@ -597,7 +604,7 @@ export default function PongPage() {
                 <button
                   className="px-6 py-2 bg-black text-white rounded"
                   onClick={() => {
-                    // Disconnect socket and navigate
+                    clearCurrentUser();
                     socket.emit("isdisconnecting");
                     socket.disconnect();
                     router.push("home");
