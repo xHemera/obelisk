@@ -81,7 +81,14 @@ io.on("connection", (socket) => {
       // Also remove from inGamePlayers if matched
       const oldOpponent = await redis.hGet("inGamePlayers", user);
       if (oldOpponent) {
-        await redis.hDel("inGamePlayers", user, oldOpponent);
+        let opponentName = oldOpponent;
+        try {
+          const parsed = JSON.parse(oldOpponent);
+          opponentName = parsed.opp;
+        } catch {
+          // Plain string format — use as-is
+        }
+        await redis.hDel("inGamePlayers", user, opponentName);
         console.log("[Pong Server] Cleaned up inGamePlayers for reconnecting user:", { user, oldOpponent });
       }
     }
@@ -553,19 +560,23 @@ io.on("connection", (socket) => {
     {
       io.emit("cancel", {user: fieldToDelete});
       
-      // Remove from inGamePlayers if in a Pong game and notify opponent
+      // Remove from inGamePlayers if in a game and notify opponent
       const opponent = await redis.hGet("inGamePlayers", fieldToDelete);
       if (opponent) {
-        // Get opponent's socket ID
-        const opponentSock = await redis.hGet("online_users", opponent);
+        // Handle both JSON format (matchmaking.js: {opp, roomId}) and plain string (matchmakingpong.js)
+        let opponentName = opponent;
+        try {
+          const parsed = JSON.parse(opponent);
+          opponentName = parsed.opp;
+        } catch {
+          // Plain string format — use as-is
+        }
+        const opponentSock = await redis.hGet("online_users", opponentName);
         if (opponentSock) {
           console.log("[Pong Server] Player disconnected during match, forcing opponent to leave:", { player: fieldToDelete, opponent, opponentSocket: opponentSock });
-          // Force the opponent to disconnect and return to home
           io.to(opponentSock).emit("forceDisconnect", { reason: "opponent_disconnected" });
         }
-        
-        // Remove both players from inGamePlayers
-        await redis.hDel("inGamePlayers", fieldToDelete, opponent);
+        await redis.hDel("inGamePlayers", fieldToDelete, opponentName);
         console.log("[Pong Server] Removed both players from inGamePlayers on disconnect:", { fieldToDelete, opponent });
       }
     }
