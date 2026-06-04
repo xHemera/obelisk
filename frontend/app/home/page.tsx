@@ -11,7 +11,7 @@ import { MineSection } from "@/components/organisms/home/MineSection";
 import { TeamBuilder } from "@/components/organisms/home/TeamBuilder";
 import { CHARACTERS } from "@/public/gameResources/heroes";
 import Sidebar from "@/components/Sidebar";
-import {socket} from "../../socket"
+import {socket, ensureLoggedIn} from "../../socket"
 import { handleLogout } from "@/lib/logout";
 import NotificationToast from "@/components/organisms/home/NotificationToast";
 import Footer from "@/components/Footer";
@@ -104,17 +104,8 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (!userPseudo || socket.connected) return;
-
-    const timeoutId = window.setTimeout(() => {
-      socket.connect();
-      socket.emit("login", userPseudo);
-    }, 0);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-      socket.off("online_users");
-    };
+    if (!userPseudo) return;
+    ensureLoggedIn(userPseudo);
   }, [userPseudo]);
 
   useEffect(() => {
@@ -189,19 +180,28 @@ export default function Home() {
   useEffect(() => {
   if (!userPseudo) return;
 
-    socket.on("matchFound", () => {
+    const handleMatchFound = () => {
       router.push("/game");
-    });
+    };
 
-    socket.on("matchFoundPong", () => {
+    const handleMatchFoundPong = () => {
       router.push("/pong");
-    });
+    };
 
-
-    socket.on("ban", (banned) => {
+    const handleBan = (banned: string) => {
       if (banned === userPseudo)
         handleLogoutLocal();
-    });
+    };
+
+    socket.on("matchFound", handleMatchFound);
+    socket.on("matchFoundPong", handleMatchFoundPong);
+    socket.on("ban", handleBan);
+
+    return () => {
+      socket.off("matchFound", handleMatchFound);
+      socket.off("matchFoundPong", handleMatchFoundPong);
+      socket.off("ban", handleBan);
+    };
   }, [userPseudo])
 
   const handleLogoutLocal = () => {
@@ -272,6 +272,8 @@ export default function Home() {
       return ;
     }
     setPongOpen(true);
+    // Wait for socket to be connected and logged in before entering queue
+    await ensureLoggedIn(userPseudo);
     const res = await fetch("/api/pong", {
       method: "POST",
       headers: {

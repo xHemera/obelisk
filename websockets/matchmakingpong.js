@@ -27,7 +27,6 @@ async function matchmaking()
                 const p1 = await redis.lPop("pong_queue");
                 const p2 = await redis.lPop("pong_queue");
 
-                const test = await redis.hGetAll("online_users");
                 const receiverSockP1 = await redis.hGet("online_users", p1);
                 const receiverSockP2 = await redis.hGet("online_users", p2);
 
@@ -45,7 +44,6 @@ async function matchmaking()
                 const matchKey = [p1, p2].sort().join(":");
                 const matchFinishedKey = `pong:finished:${matchKey}`;
                 await redis.del(matchFinishedKey);
-                console.log("[Pong Matchmaking] Cleaned up match flag for rematch:", matchKey);
                 
                 const users = await redis.hGetAll("inGamePlayers");
                 console.log(users);
