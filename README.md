@@ -1,6 +1,6 @@
-This project has been created as part of the 42 curriculum by mgarsaul, cfleuret, tobesnar ans tlize
+This project has been created as part of the 42 curriculum by mgarsaul, cfleuret, tobesnar and tlize
 
-# Obelisk description
+# What is Obelisk
 
 A full-stack web-based **turn-based PvP RPG simulator** with a dark fantasy theme. Assemble a team of 3 heroes, queue for battle, and fight other players in real-time tactical combat.
 
