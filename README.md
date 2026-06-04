@@ -6,7 +6,7 @@ A full-stack web-based **turn-based PvP RPG simulator** with a dark fantasy them
 
 Built with a Next.js frontend, a pure-TypeScript combat engine, a Socket.IO real-time layer, and PostgreSQL + Redis for persistence and matchmaking.
 
-## Roles
+# Roles
 
 ### Tobesnar -> Project Owner / Project Manage
 Frontend React et TailwindCSS. Responsive et Character/Game Design.
@@ -187,53 +187,53 @@ Detailed documentation is available in `docs/`:
 
 
 ## 1. Web
-### Major : a framework for both frontend and backend : NextJS
-modern approch, used by newer industry and easier client-side/server-side rendering. (tobesnar, mgarsaul, cfleuret)
+### Major : A framework for both frontend and backend : NextJS
+Modern approch, used by newer industry and easier client-side/server-side rendering. (tobesnar, mgarsaul, cfleuret)
 
-### Major : basic chat
-chat to communicate with other players, play with them, share attachements, friend system to duel them and profile system to express yourself ! (mgarsaul, cfleuret)
+### Major : Basic chat
+Chat to communicate with other players, play with them, share attachements, friend system to duel them and profile system to express yourself ! (mgarsaul, cfleuret)
 
-### Major : a public API (more info in api-reference.md)
-to link the website with the database, and permit the user to communicate with the website (tobesnar, cfleuret, mgarsaul)
+### Major : A public API (more info in api-reference.md)
+To link the website with the database, and permit the user to communicate with the website (tobesnar, cfleuret, mgarsaul)
 
-### Major : websocket
-dynamic actions for the users (tobesnar, cfleuret, mgarsaul)
+### Major : Websocket
+Dynamic actions for the users (tobesnar, cfleuret, mgarsaul)
 
-### Minor : frontend framework : React
-dynamic website, reusable components (sidebar for example) (tobesnar, mgarsaul)
+### Minor : Frontend framework : React
+Dynamic website, reusable components (sidebar for example) (tobesnar, mgarsaul)
 
-### Minor : backend framework : express
-server to handle sockets (cfleuret)
+### Minor : Backend framework : express
+Server to handle sockets (cfleuret)
 
 ### Minor : ORM 
-use of prisma to use the database without pure SQL (cfleuret)
+Use of prisma to use the database without pure SQL (cfleuret)
 
-### Minor : server-side rendering
-improve the performances (tobesnar, cfleuret, mgarsaul)
+### Minor : Server-side rendering
+Improve the performances (tobesnar, cfleuret, mgarsaul)
 
-### Minor : reusable components
-to not multiply code lines in the project (tobesnar)
+### Minor : Reusable components
+To not multiply code lines in the project (tobesnar)
 
 
 
 ## 3. User management
-### Major : standard user management and authentification
-update users informations : profile, avatar, etc... to express yourself !! (cfleuret, mgarsaul)
+### Major : Standard user management and authentification
+Update users informations : profile, avatar, etc... to express yourself !! (cfleuret, mgarsaul)
 
-### Major : advanced permissions system
+### Major : Advanced permissions system
 Role system for admins and moderators to handle and manage the community (cfleuret)
 
 
 
 ## 6. Gaming and user experience
-### Major : web based-game (PvP)
-pong, to gain XP for the characteres, matchmaking, online etc... (mgarsaul)
+### Major : Web based-game (PvP)
+Pong, to gain XP for the characteres, matchmaking, online etc... (mgarsaul)
 
-### Major : second game
+### Major : Second game
 Charge-based turn system where faster heroes act more frequently. Choose from basic attacks, 15 unique hero spells, or skip with matchmaking and a user history (tlize, tobesnar)
 
-### Minor : gamification system
-achievements, badges, XP and rewards persistent, visual feedback, clear rules and progression mechanics (cfleuret, magarsaul)
+### Minor : Gamification system
+Achievements, badges, XP and rewards persistent, visual feedback, clear rules and progression mechanics (cfleuret, magarsaul)
 
 
 
