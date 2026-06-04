@@ -40,11 +40,11 @@ is_service_running() {
 }
 
 is_frontend_online() {
-    curl -fsS --max-time 2 http://localhost:3000 >/dev/null 2>&1
+    curl -fsS --max-time 2 https://localhost:3443 >/dev/null 2>&1
 }
 
 is_websockets_online() {
-    curl -sS --max-time 2 http://localhost:4001 >/dev/null 2>&1
+    curl -sS --max-time 2 https://localhost:4001 >/dev/null 2>&1
 }
 
 status_label() {
@@ -75,8 +75,8 @@ render_live_status() {
     echo -e "  Websockets container  $(status_label "$websockets_running")"
     echo ""
     echo -e "${CYAN}Endpoints${NC}"
-    echo -e "  http://localhost:3000         $(status_label "$frontend_online")"
-    echo -e "  http://localhost:4001         $(status_label "$websockets_online")"
+    echo -e "  https://localhost:3443        $(status_label "$frontend_online")"
+    echo -e "  https://localhost:4001        $(status_label "$websockets_online")"
 }
 
 collect_status_snapshot() {
@@ -205,8 +205,8 @@ update_menu_status_rows() {
     write_at_line "$DB_STATUS_LINE" "  DB container          $(status_label "$db_running")"
     write_at_line "$FRONTEND_STATUS_LINE" "  Frontend container    $(status_label "$frontend_running")"
     write_at_line "$WEBSOCKETS_STATUS_LINE" "  Websockets container  $(status_label "$websockets_running")"
-    write_at_line "$FRONTEND_URL_LINE" "  http://localhost:3000         $(status_label "$frontend_online")"
-    write_at_line "$WEBSOCKETS_URL_LINE" "  http://localhost:4001         $(status_label "$websockets_online")"
+    write_at_line "$FRONTEND_URL_LINE" "  https://localhost:3443        $(status_label "$frontend_online")"
+    write_at_line "$WEBSOCKETS_URL_LINE" "  https://localhost:4001        $(status_label "$websockets_online")"
 }
 
 update_menu_prompt_line() {
@@ -394,7 +394,7 @@ check_status() {
 
     # Tester les endpoints
     print_info "Test du websockets..."
-    if curl -fsS wss://localhost:4001/health > /dev/null 2>&1; then
+    if curl -fsS https://localhost:4001/health > /dev/null 2>&1; then
         print_success "websockets: OK"
     else
         print_error "websockets: KO"
@@ -419,11 +419,11 @@ test_services() {
     print_header "Test des services"
 
     echo "websockets Health:"
-    curl -fsS wss://localhost:4001/health | jq '.' 2>/dev/null || curl -fsS https://localhost:4001/health
+    curl -fsS https://localhost:4001/health | jq '.' 2>/dev/null || echo "JSON parse error"
 
     echo ""
     echo "Utilisateurs (premiers 3):"
-    curl -fsS wss://localhost:4001/api/users | jq '.[0:3]' 2>/dev/null || curl -fsS https://localhost:4001/api/users
+    curl -fsS https://localhost:4001/api/users | jq '.[0:3]' 2>/dev/null || echo "JSON parse error"
 }
 
 # Boucle principale
