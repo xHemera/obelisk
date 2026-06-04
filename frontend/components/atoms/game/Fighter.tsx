@@ -157,7 +157,7 @@ export default function Fighter({
   return (
     <>
       <div
-        className={`flex w-full flex-col items-center gap-1 rounded-xl transition-all duration-200 ${targetRing} ${onClick ? "cursor-pointer" : ""}`}
+        className={`relative flex w-full flex-col items-center gap-1 rounded-xl transition-all duration-200 ${targetRing} ${onClick ? "cursor-pointer" : ""}`}
         onClick={onClick}
         role={onClick ? "button" : undefined}
         tabIndex={onClick ? 0 : undefined}
@@ -172,8 +172,12 @@ export default function Fighter({
           </>
         ) : (
           <>
-            {renderHpBar()}
-            {renderEffects()}
+            <div className="relative flex w-full flex-col items-center">
+              {renderHpBar()}
+              <div className="absolute left-1/2 bottom-full z-10 mb-1 -translate-x-1/2">
+                {renderEffects()}
+              </div>
+            </div>
             {renderName()}
             {renderChibi()}
           </>

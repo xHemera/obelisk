@@ -390,8 +390,7 @@ export default function Game() {
     targetingMode && !!uid && validTargetUids.has(uid);
 
   return (
-    <div
-      className="relative flex min-h-screen w-full flex-col overflow-hidden px-4 py-4 text-[16px] leading-7 text-[#f5e6c8]"
+    <div className="relative text-[16px] leading-7 text-[#f5e6c8]"
       style={{ fontFamily: "Inter, system-ui, sans-serif" }}
     >
       <GameArenaBackground />
@@ -403,7 +402,7 @@ export default function Game() {
       />
 
       {/* Arena */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-2 py-2 sm:px-4 sm:py-6">
+      <div className="pointer-events-none fixed inset-0 flex items-center justify-center px-2 py-2 sm:px-4 sm:py-6">
         <div className="w-full max-w-4xl -translate-y-16 rounded-3xl sm:-translate-y-20">
           <div className="flex flex-col gap-3 sm:gap-5">
             {/* Enemy team */}
@@ -511,7 +510,7 @@ export default function Game() {
       </div>
 
       {/* Opponent info */}
-      <div className="flex flex-col items-end gap-1 pr-2 sm:pr-0">
+      <div className="fixed right-4 top-4 flex flex-col items-end gap-1 pr-2 sm:pr-0">
         <div className="flex items-start justify-end gap-4">
           <ProfileInfo account={{ pseudo: opponent, profilePhoto: oppAvatar }} />
         </div>
@@ -520,22 +519,23 @@ export default function Game() {
         </p>
       </div>
 
-      <div className="mt-auto" />
-
-      <BottomBar
-        isYourTurn={isYourTurn}
-        activeMp={activeMp}
-        confirmForfeit={confirmForfeit}
-        setConfirmForfeit={setConfirmForfeit}
-        selectedHeroCard={selectedHeroCard}
-        selectedCharacter={selectedCharacter}
-        handleCastSpell={handleCastSpell}
-        handleSkipTurn={handleSkipTurn}
-        userPseudo={userPseudo}
-        userAvatar={userAvatar}
-        activeMaxMp={activeMaxMp}
-        animating={isAnimating}
-      />
+      {/* Bottom bar - anchored to bottom */}
+      <div className="fixed bottom-0 left-0 right-0 z-10 px-4">
+        <BottomBar
+          isYourTurn={isYourTurn}
+          activeMp={activeMp}
+          confirmForfeit={confirmForfeit}
+          setConfirmForfeit={setConfirmForfeit}
+          selectedHeroCard={selectedHeroCard}
+          selectedCharacter={selectedCharacter}
+          handleCastSpell={handleCastSpell}
+          handleSkipTurn={handleSkipTurn}
+          userPseudo={userPseudo}
+          userAvatar={userAvatar}
+          activeMaxMp={activeMaxMp}
+          animating={isAnimating}
+        />
+      </div>
 
       {/* Game Over overlay */}
       {isGameOver && (
