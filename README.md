@@ -62,9 +62,9 @@ Discord
 - **Dark JRPG/Fantasy Theme** — Inspired by Final Fantasy and Dragon Quest, with chibi sprites and a cohesive dark purple/beige palette. (tobesnar)
 
 
-### RESOURCES
+# RESOURCES
 
-# Architecture
+## Architecture
 
 ```
 ┌────────────────────────────────────────────────────────┐
@@ -94,7 +94,7 @@ Discord
 └────────────────────────────────────────────────────────┘
 ```
 
-# Data Flow (PvP Match)
+## Data Flow (PvP Match)
 
 1. Player queues via `POST /api/home` → Redis `players_queue`
 2. `matchmaking.js` daemon pops 2 players, assigns a room
@@ -104,7 +104,7 @@ Discord
 6. Players send `"gameAction"` → `processAction()` → broadcast updated state
 7. When all enemies are defeated → rewards distributed, match saved
 
-# Project Structure
+## Project Structure
 
 ```text
 obelisk/
@@ -140,11 +140,11 @@ obelisk/
 └── dev.sh                      # Development helper script
 ```
 
-# AI
+## AI
 
 AI was used to help us during our project with differents tasks
 
-## Getting Started (INSTRUCTIONS)
+# Getting Started (INSTRUCTIONS)
 
 **Prerequisites**: Docker + Docker Compose
 
@@ -181,4 +181,4 @@ Detailed documentation is available in `docs/`:
 | [Deployment Guide](docs/deployment.md)               | Production setup, environment config                     |
 | [Development Workflow](docs/development-workflow.md) | Setup, debugging, common tasks                           |
 
-## list of modules
+# list of modules
