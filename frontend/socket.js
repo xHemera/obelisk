@@ -2,7 +2,10 @@
 
 import { io } from "socket.io-client";
 
-const url = process.env.NEXT_PUBLIC_SOCKET || (typeof window !== "undefined" ? window.location.origin : "https://localhost:3443");
+const url =
+  typeof window !== "undefined"
+    ? window.location.origin
+    : "https://localhost:3443";
 
 export const socket = io(url.trim(), {
   autoConnect: false,
