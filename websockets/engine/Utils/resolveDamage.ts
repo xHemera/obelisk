@@ -1,5 +1,6 @@
 import { CharacterInstance, ModEntry } from "../Instances/CharacterInstance";
 import { applyCrit, rollCrit } from "./crit";
+import { EventBus } from "./EventBus";
 
 export type DamageSource = "basic" | "skill" | "poison";
 
@@ -20,26 +21,6 @@ export type DamageEvent = {
 	isAoE: boolean;
 	source: DamageSource;
 };
-
-const damageEvents: DamageEvent[] = [];
-const spellEvents: SpellEvent[] = [];
-
-export function clearDamageEvents(): void {
-	damageEvents.length = 0;
-	spellEvents.length = 0;
-}
-
-export function getDamageEvents(): DamageEvent[] {
-	return [...damageEvents];
-}
-
-export function getSpellEvents(): SpellEvent[] {
-	return [...spellEvents];
-}
-
-export function pushSpellEvent(event: SpellEvent): void {
-	spellEvents.push(event);
-}
 
 function applyAndTick(mods: ModEntry[], raw: number): { result: number; mods: ModEntry[] } {
 	const totalMod = mods.reduce((acc, { value }) => acc + value, 0);
@@ -70,6 +51,7 @@ function resolveDamage(
     raw: number,
     idUser: CharacterInstance,
     idTarget: CharacterInstance,
+	bus: EventBus,
     resOverride?: number,
     isAoE: boolean = false,
     source: DamageSource = "skill",
@@ -94,7 +76,7 @@ function resolveDamage(
     const finalDmg = isCrit ? applyCrit(afterTarget, idUser) : afterTarget;
     const rounded  = Math.round(finalDmg);
 
-    damageEvents.push({
+    bus.pushDamage({        // ← au lieu de damageEvents.push(...)
         targetUid: idTarget.uid,
         attackerUid: idUser.uid,
         damage: rounded,
@@ -103,28 +85,49 @@ function resolveDamage(
         isAoE,
         source,
     });
-
     return rounded;
 }
 
-export const resolvePhyDamage = (raw: number, idUser: CharacterInstance, idTarget: CharacterInstance, resOverride?: number, isAoE?: boolean, source?: DamageSource): number =>
-    resolveDamage("phy", raw, idUser, idTarget, resOverride, isAoE, source);
+export function resolvePhyDamage(
+    raw: number,
+    idUser: CharacterInstance,
+    idTarget: CharacterInstance,
+    bus: EventBus,
+    resOverride?: number,
+    isAoE?: boolean,
+    source?: DamageSource,
+): number {
+    return resolveDamage("phy", raw, idUser, idTarget, bus, resOverride, isAoE, source);
+}
 
-export const resolveMagDamage = (raw: number, idUser: CharacterInstance, idTarget: CharacterInstance, resOverride?: number, isAoE?: boolean, source?: DamageSource): number =>
-    resolveDamage("mag", raw, idUser, idTarget, resOverride, isAoE, source);
+export function resolveMagDamage(
+    raw: number,
+    idUser: CharacterInstance,
+    idTarget: CharacterInstance,
+    bus: EventBus,
+    resOverride?: number,
+    isAoE?: boolean,
+    source?: DamageSource,
+): number {
+    return resolveDamage("mag", raw, idUser, idTarget, bus, resOverride, isAoE, source);
+}
 
-export function applyPoisonDamage(target: CharacterInstance, damage: number, attackerUid: string): void {
-	const isLethal = target.currentHp - damage <= 0;
-	damageEvents.push({
-		targetUid: target.uid,
-		attackerUid,
-		damage: Math.round(damage),
-		isCrit: false,
-		lethal: isLethal,
-		isAoE: false,
-		source: "poison",
-	});
-	applyDamage(target, damage);
+export function applyPoisonDamage(
+    target: CharacterInstance,
+    damage: number,
+    attackerUid: string,
+    bus: EventBus,
+): void {
+    bus.pushDamage({
+        targetUid: target.uid,
+        attackerUid,
+        damage: Math.round(damage),
+        isCrit: false,
+        lethal: target.currentHp - damage <= 0,
+        isAoE: false,
+        source: "poison",
+    });
+    applyDamage(target, damage);
 }
 
 export function applyDamage(target: CharacterInstance, damage: number): void {
