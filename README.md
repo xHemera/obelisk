@@ -12,6 +12,7 @@ Built with a Next.js frontend, a pure-TypeScript combat engine, a Socket.IO real
 Frontend React et TailwindCSS. Responsive et Character/Game Design.
 
 ### Tlize -> Developer (game engine)
+GameEngine dev. Website logo creator (graphic design is my passion)
 
 ### Cfleuret -> Project Manager / Technical lead
 
