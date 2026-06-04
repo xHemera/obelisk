@@ -12,5 +12,5 @@ if [ "$NODE_ENV" = "production" ]; then
   bun run build
   exec bun ./server.js
 else
-  exec bun run dev -- --hostname 0.0.0.0
+  exec bun start -- --hostname 0.0.0.0
 fi
