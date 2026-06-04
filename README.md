@@ -8,14 +8,14 @@ Built with a Next.js frontend, a pure-TypeScript combat engine, a Socket.IO real
 
 ## Roles
 
-### Tobesnar -> Project Owner / Project Manage
+# Tobesnar -> Project Owner / Project Manage
 Frontend React et TailwindCSS. Responsive et Character/Game Design.
 
-### Tlize -> Developer (game engine)
+# Tlize -> Developer (game engine)
 
-### Cfleuret -> Project Manager / Technical lead
+# Cfleuret -> Project Manager / Technical lead
 
-### Mgarsaul -> Developer (frontend)
+# Mgarsaul -> Developer (frontend)
 Frontend React. Pong game. Helped with API connections.
 
 
@@ -47,23 +47,22 @@ Discord
 ![alt text](/frontend/public/database/database.png)
 
 
-### Features
+## Features
 
-- **Turn-Based PvP Combat** — Charge-based turn system where faster heroes act more frequently. Choose from basic attacks, 15 unique hero spells, or skip.
-- **5 Playable Heroes** — Knight (tank), Mage (burst), Healer (support), Archer (physical DPS), Assassin (execute). Each with 3 unique skills scaling up to level 10.
-- **Real-Time Matchmaking** — Queue for PvP, get matched, and fight live via Socket.IO.
-- **Hero Progression** — Level up individual heroes and their skills by earning XP in battle or spending rubies.
-- **Ruby Economy** — Click-to-earn rubies via the Mine button, spent on skill upgrades.
-- **Social System** — Real-time messaging, friend requests, block list, typing indicators, read receipts, and duel challenges.
-- **Pong Mini-Game** — Real-time multiplayer Pong for XP farming.
-- **Badge Progression** — Earn badges (BEGINNER → AMATEUR → EXPERT → MASTER) based on PvP wins.
-- **Admin Panel** — Manage users, assign roles (ADMIN/MODERATOR), ban/unban accounts, handle reported conversations.
-- **Pixel Animation System** — Damage numbers, spell effects, and status icons rendered on the battlefield.
-- **Dark JRPG/Fantasy Theme** — Inspired by Final Fantasy and Dragon Quest, with chibi sprites and a cohesive dark purple/beige palette.
+- **Turn-Based PvP Combat** — Charge-based turn system where faster heroes act more frequently. Choose from basic attacks, 15 unique hero spells, or skip. (tlize)
+- **5 Playable Heroes** — Knight (tank), Mage (burst), Healer (support), Archer (physical DPS), Assassin (execute). Each with 3 unique skills scaling up to level (tobesnar) 10.
+- **Real-Time Matchmaking** — Queue for PvP, get matched, and fight live via Socket.IO. (cfleuret)
+- **Hero Progression** — Level up individual heroes and their skills by earning XP in battle or spending rubies. (tobesnar, tlize, mgarsaul, cfleuret)
+- **Ruby Economy** — Click-to-earn rubies via the Mine button, spent on skill upgrades. (tobesnar)
+- **Social System** — Real-time messaging, friend requests, block list, typing indicators, read receipts, and duel challenges. (cfleuret, mgarsaul)
+- **Pong Mini-Game** — Real-time multiplayer Pong for XP farming. (mgarsaul)
+- **Badge Progression** — Earn badges (BEGINNER → AMATEUR → EXPERT → MASTER) based on PvP wins. (cfleuret, mgarsaul)
+- **Admin Panel** — Manage users, assign roles (ADMIN/MODERATOR), ban/unban accounts, handle reported conversations. (tobesnar, cfleuret, mgarsaul)
+- **Pixel Animation System** — Damage numbers, spell effects, and status icons rendered on the battlefield. (tobesnar)
+- **Dark JRPG/Fantasy Theme** — Inspired by Final Fantasy and Dragon Quest, with chibi sprites and a cohesive dark purple/beige palette. (tobesnar)
 
 
-
-## RESOURCES
+### RESOURCES
 
 # Architecture
 
