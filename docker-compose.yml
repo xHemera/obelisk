@@ -54,7 +54,6 @@ services:
       BETTER_AUTH_DATABASE_URL: $BETTER_AUTH_DATABASE_URL
       DATABASE_URL: $DATABASE_URL
       API_KEY: $API_KEY
-      NEXT_PUBLIC_SOCKET: $NEXT_PUBLIC_SOCKET
       NODE_TLS_REJECT_UNAUTHORIZED: "0"
       NODE_EXTRA_CA_CERTS: /certs/ca.crt
     depends_on:
@@ -100,4 +99,3 @@ volumes:
   postgres_data:
   frontend_bun_cache:
   backend_bun_cache:
-
