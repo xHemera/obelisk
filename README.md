@@ -8,29 +8,29 @@ Built with a Next.js frontend, a pure-TypeScript combat engine, a Socket.IO real
 
 ## Roles
 
-# Tobesnar -> Project Owner / Project Manage
+### Tobesnar -> Project Owner / Project Manage
 Frontend React et TailwindCSS. Responsive et Character/Game Design.
 
-# Tlize -> Developer (game engine)
+### Tlize -> Developer (game engine)
 
-# Cfleuret -> Project Manager / Technical lead
+### Cfleuret -> Project Manager / Technical lead
 
-# Mgarsaul -> Developer (frontend)
+### Mgarsaul -> Developer (frontend)
 Frontend React. Pong game. Helped with API connections.
 
 
-## Project Management
+# Project Management
 
-# Organization
+## Organization
 placeholder a remplir
 
-# Tool used for project management
+## Tool used for project management
 Github, Trello
 
-# Communication channels used
+## Communication channels used
 Discord
 
-## Tech Stack
+# Tech Stack
 
 | Category            | Technology                                        |
 | ------------------- | ------------------------------------------------- |
@@ -42,12 +42,12 @@ Discord
 | **Package Manager** | Bun 1.2.5                                         |
 | **Orchestration**   | Docker Compose                                    |
 
-## Database Schema
+# Database Schema
 
 ![alt text](/frontend/public/database/database.png)
 
 
-## Features
+# Features
 
 - **Turn-Based PvP Combat** — Charge-based turn system where faster heroes act more frequently. Choose from basic attacks, 15 unique hero spells, or skip. (tlize)
 - **5 Playable Heroes** — Knight (tank), Mage (burst), Healer (support), Archer (physical DPS), Assassin (execute). Each with 3 unique skills scaling up to level (tobesnar) 10.
@@ -180,3 +180,5 @@ Detailed documentation is available in `docs/`:
 | [Styling Guide](docs/styling-guide.md)               | Tailwind CSS theming, dark fantasy palette               |
 | [Deployment Guide](docs/deployment.md)               | Production setup, environment config                     |
 | [Development Workflow](docs/development-workflow.md) | Setup, debugging, common tasks                           |
+
+## list of modules
