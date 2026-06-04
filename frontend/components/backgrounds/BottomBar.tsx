@@ -6,8 +6,6 @@ import ProfileInfo from "@/components/atoms/game/ProfileInfo";
 import ManaBar from "@/components/atoms/game/ManaBar";
 import type { CharacterData } from "@/components/organisms/characters/types";
 import { CHARACTERS } from "@/public/gameResources/heroes";
-import { useRouter } from "next/navigation";
-
 type BottomBarProps = {
   isYourTurn: boolean;
   activeMp: number;
@@ -37,13 +35,11 @@ export default function BottomBar({
   activeMaxMp,
   animating = false,
 }: BottomBarProps) {
-  const router = useRouter();
-
   const forfeitBtn = confirmForfeit ? (
     <div className="flex gap-2">
       <button
         type="button"
-        onClick={() => { spells.forfeit(); setConfirmForfeit(false); router.push("/home"); }}
+        onClick={() => { spells.forfeit(); setConfirmForfeit(false); }}
         className="group relative w-auto overflow-hidden rounded-md border-2 border-red-700 bg-gradient-to-b from-[#2a0a0a] to-[#1a0505] px-3 py-1.5 font-serif text-xs font-semibold tracking-wide text-red-300 transition-all duration-150 hover:border-red-500 hover:text-red-100 hover:shadow-[0_0_14px_rgba(200,0,0,0.2)] sm:px-4 sm:py-2 sm:text-sm"
       >
         <span className="relative z-10">Confirm forfeit?</span>

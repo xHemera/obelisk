@@ -2,16 +2,20 @@ This project has been created as part of the 42 curriculum by mgarsaul, cfleuret
 
 # Obelisk description
 
-A full-stack web-based **turn-based PvP Tabletop RPG simulator** with a dark fantasy theme. Assemble a team of 3 heroes, queue for battle, and fight other players in real-time tactical combat.
+A full-stack web-based **turn-based PvP RPG simulator** with a dark fantasy theme. Assemble a team of 3 heroes, queue for battle, and fight other players in real-time tactical combat.
 
 Built with a Next.js frontend, a pure-TypeScript combat engine, a Socket.IO real-time layer, and PostgreSQL + Redis for persistence and matchmaking.
 
 ## Roles
 
-tobesnar -> Project Owner / Project Manager
-Tlize -> Developer (game engine)
-Cfleuret -> Project Manager / Technical lead
-Mgarsaul -> Developer (frontend)
+### Tobesnar -> Project Owner / Project Manage
+Frontend React et TailwindCSS. Responsive et Character/Game Design.
+
+### Tlize -> Developer (game engine)
+
+### Cfleuret -> Project Manager / Technical lead
+
+### Mgarsaul -> Developer (frontend)
 
 ## Features
 
@@ -29,15 +33,15 @@ Mgarsaul -> Developer (frontend)
 
 ## Tech Stack
 
-| Category | Technology |
-|----------|-----------|
-| **Frontend** | Next.js 16, React 19, TypeScript, Tailwind CSS v4 |
-| **Authentication** | Better Auth 1.4 |
-| **Database** | PostgreSQL 16 + Prisma ORM 7 |
-| **Cache & Queue** | Redis 7 |
-| **Real-Time** | Socket.IO 4.8 |
-| **Package Manager** | Bun 1.2.5 |
-| **Orchestration** | Docker Compose |
+| Category            | Technology                                        |
+| ------------------- | ------------------------------------------------- |
+| **Frontend**        | Next.js 16, React 19, TypeScript, Tailwind CSS v4 |
+| **Authentication**  | Better Auth 1.4                                   |
+| **Database**        | PostgreSQL 16 + Prisma ORM 7                      |
+| **Cache & Queue**   | Redis 7                                           |
+| **Real-Time**       | Socket.IO 4.8                                     |
+| **Package Manager** | Bun 1.2.5                                         |
+| **Orchestration**   | Docker Compose                                    |
 
 ## Architecture
 
@@ -142,16 +146,16 @@ Open **https://localhost:3443** or **https://YourIpAdress:3443**
 
 Detailed documentation is available in `docs/`:
 
-| Guide | Description |
-|-------|-------------|
-| [Game Features](docs/game-features.md) | Heroes, spells, combat mechanics, progression |
-| [Engine Guide](docs/engine-guide.md) | Combat engine architecture, turn system, damage formulas |
-| [WebSocket Guide](docs/websocket-guide.md) | All socket events (game, chat, friends, admin) |
-| [API Reference](docs/api-reference.md) | REST endpoints, request/response formats |
-| [Database Guide](docs/database-guide.md) | Prisma schema, models, migrations |
-| [Frontend Overview](docs/frontend-overview.md) | Architecture, components, hooks |
-| [Authentication Guide](docs/authentication-guide.md) | Better Auth setup, protected routes |
-| [Components Guide](docs/components-guide.md) | Atomic design component library |
-| [Styling Guide](docs/styling-guide.md) | Tailwind CSS theming, dark fantasy palette |
-| [Deployment Guide](docs/deployment.md) | Production setup, environment config |
-| [Development Workflow](docs/development-workflow.md) | Setup, debugging, common tasks |
+| Guide                                                | Description                                              |
+| ---------------------------------------------------- | -------------------------------------------------------- |
+| [Game Features](docs/game-features.md)               | Heroes, spells, combat mechanics, progression            |
+| [Engine Guide](docs/engine-guide.md)                 | Combat engine architecture, turn system, damage formulas |
+| [WebSocket Guide](docs/websocket-guide.md)           | All socket events (game, chat, friends, admin)           |
+| [API Reference](docs/api-reference.md)               | REST endpoints, request/response formats                 |
+| [Database Guide](docs/database-guide.md)             | Prisma schema, models, migrations                        |
+| [Frontend Overview](docs/frontend-overview.md)       | Architecture, components, hooks                          |
+| [Authentication Guide](docs/authentication-guide.md) | Better Auth setup, protected routes                      |
+| [Components Guide](docs/components-guide.md)         | Atomic design component library                          |
+| [Styling Guide](docs/styling-guide.md)               | Tailwind CSS theming, dark fantasy palette               |
+| [Deployment Guide](docs/deployment.md)               | Production setup, environment config                     |
+| [Development Workflow](docs/development-workflow.md) | Setup, debugging, common tasks                           |

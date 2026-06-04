@@ -63,7 +63,8 @@ export function useTurnInfo(
 
     // Skip if already handled for this turn (prevents double animation
     // when the same gameState is broadcast multiple times).
-    if (gameState.turn === lastTransitionTurnRef.current && !needsTimerRestart) {
+    // Still allow end-game updates (forfeit can end the game mid-turn at turn 0).
+    if (gameState.turn === lastTransitionTurnRef.current && !needsTimerRestart && gameState.gamePhase !== "end") {
       return;
     }
 
