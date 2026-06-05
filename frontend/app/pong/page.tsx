@@ -60,7 +60,6 @@ export default function PongPage() {
     const getUserData = async () => {
       const { data } = await authClient.getSession();
       if (data && data.user.name) {
-        console.log("[Pong] Got user pseudo:", data.user.name);
         setUserPseudo(data.user.name);
       }
       else
@@ -70,7 +69,6 @@ export default function PongPage() {
       }
 
       try {
-        console.log("[Pong] Fetching opponent for:", data.user.name);
         const res = await fetch(`/api/pong?pseudo=${data.user.name}`, { method: "GET" });
         if (!res.ok) {
           console.error("Failed to fetch opponent:", res.status);
@@ -82,11 +80,9 @@ export default function PongPage() {
             return;
           }
           const odata = await retryRes.json();
-          console.log("[Pong] Found opponent on retry:", odata.name);
           setOpponent(odata.name);
         } else {
           const odata = await res.json();
-          console.log("[Pong] Found opponent:", odata.name);
           setOpponent(odata.name);
         }
       } catch (err) {
@@ -97,10 +93,7 @@ export default function PongPage() {
   }, []);
 
   useEffect(() => {
-    if (!userPseudo) return;
-    
-    console.log("[Pong] Initializing socket for user:", userPseudo, "Socket connected:", socket.connected);
-    
+    if (!userPseudo) return;    
     ensureLoggedIn(userPseudo);
     
     return () => {
@@ -110,39 +103,29 @@ export default function PongPage() {
 
   useEffect(() => {
     if (!userPseudo || !opponent) {
-      console.log("[Pong] Waiting for userPseudo and opponent:", { userPseudo, opponent });
       return;
     }
-    
-    console.log("[Pong] Setting up socket listeners for", userPseudo, "vs", opponent);
-    
+        
     // Determine if this player is Player 1 (alphabetically first)
-    isPlayer1.current = userPseudo < opponent;
-    console.log("[Pong] Is Player 1 (ball initiator):", isPlayer1.current);
-    
+    isPlayer1.current = userPseudo < opponent;    
     const handleBan = (banned: string) => {
-      console.log("[Pong] Received ban event for:", banned);
       if (banned === userPseudo)
         handleLogout();
     };
     
     const handlePongUpdate = (data: { y: number }) => {
-      console.log("[Pong] Received pong update on client:", data);
       player2.current.y = data.y;
     };
     
     const handleBallLaunch = (data: { speedX: number; speedY: number }) => {
-      console.log("[Pong] Received ball launch data:", data);
       const b = ball.current;
       b.started = true;
       // Mirror effect: invert speedX for Player 2
       b.speedX = -data.speedX;
       b.speedY = data.speedY;
-      console.log("[Pong] Applied mirrored ball speed:", { speedX: b.speedX, speedY: b.speedY });
     };
     
     const handleMatchEnd = (data: { winner: string }) => {
-      console.log("[Pong] Match ended, received winner:", data.winner);
       if (data.winner === "left" || data.winner === "right") {
         setWinner(data.winner);
         ball.current.started = false;
@@ -165,10 +148,7 @@ export default function PongPage() {
     socket.on("matchEnd", handleMatchEnd);
     socket.on("forceDisconnect", handleForceDisconnect);
     
-    console.log("[Pong] Socket listeners registered, socket connected:", socket.connected);
-    
     return () => {
-      console.log("[Pong] Cleaning up socket listeners");
       socket.off("ban", handleBan);
       socket.off("pong", handlePongUpdate);
       socket.off("ballLaunch", handleBallLaunch);
@@ -185,7 +165,6 @@ export default function PongPage() {
   useEffect(() => {
     if (!opponent) return;
     
-    console.log("[Pong] Opponent found, starting countdown");
     matchEndedRef.current = false; // Reset match ended flag for new match
     countdownRef.current = 3;
     setCountdown(3);
@@ -198,7 +177,6 @@ export default function PongPage() {
       setCountdown(newCountdown);
       
       if (elapsed >= 3) {
-        console.log("[Pong] Countdown finished, clearing interval");
         clearInterval(interval);
       }
     }, 100);
@@ -264,7 +242,6 @@ export default function PongPage() {
       if (!userPseudo || xp.current === 0) return;
 
       try {
-        console.log("[Pong] Auto-collecting XP:", xp.current);
         const response = await fetch("/api/characters/reward-xp", {
           method: "POST",
           headers: {
@@ -279,7 +256,6 @@ export default function PongPage() {
           return;
         }
 
-        console.log("[Pong] XP collected successfully:", xp.current);
         setXpCollected(true);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
@@ -361,7 +337,6 @@ export default function PongPage() {
       if (keys.current["w"] && p1.y > 0) {
         p1.y -= p1.speed;
         if (socket.connected && opponent) {
-          console.log("[Pong Client] Emitting W move:", { opponent, y: p1.y, socketConnected: socket.connected });
           socket.emit("pong_info", {
             opponent,
             y: p1.y,
@@ -372,7 +347,6 @@ export default function PongPage() {
       if (keys.current["s"] && p1.y + p1.height < boardHeight) {
         p1.y += p1.speed;
         if (socket.connected && opponent) {
-          console.log("[Pong Client] Emitting S move:", { opponent, y: p1.y, socketConnected: socket.connected });
           socket.emit("pong_info", {
             opponent,
             y: p1.y,
@@ -395,10 +369,7 @@ export default function PongPage() {
           if (Math.abs(speedY) < minVerticalSpeed) {
             speedY = (speedY >= 0 ? 1 : -1) * minVerticalSpeed;
             speedX = Math.sign(speedX) * Math.sqrt(speed * speed - speedY * speedY);
-          }
-          
-          console.log("[Pong] Player 1 launching ball with angle:", randomAngle, "direction:", randomDirection);
-          
+          }          
           // Apply to local ball
           b.started = true;
           b.speedX = speedX;
@@ -494,7 +465,6 @@ export default function PongPage() {
         // Send matchEnd event to opponent (only once)
         if (!matchEndedRef.current && socket.connected && opponent) {
           matchEndedRef.current = true;
-          console.log("[Pong] Sending matchEnd to opponent: left wins");
           socket.emit("matchEnd", { opponent, winner: "left" });
         }
       }

@@ -693,12 +693,6 @@ export default function Game() {
           </div>
         </div>
       )}
-
-      <InfoModal
-        open={isInfoModalOpen && !isGameOver}
-        isYourTurn={isYourTurn}
-        onClose={() => setIsInfoModalOpen(false)}
-      />
     </div>
   );
 }

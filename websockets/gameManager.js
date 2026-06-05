@@ -27,8 +27,6 @@ function makeCharacterInstances(pseudo, playerId, characters, levels, skillsLeve
 }
 
 export function createGameInstance(roomId, p1Data, p2Data) {
-  console.log(`[GameServer] createGameInstance — P0=${p1Data.pseudo} chars=${JSON.stringify(p1Data.characters)} P1=${p2Data.pseudo} chars=${JSON.stringify(p2Data.characters)}`);
-
   const p1 = new PlayerInstance(0);
   const p2 = new PlayerInstance(1);
 
@@ -56,7 +54,6 @@ export function createGameInstance(roomId, p1Data, p2Data) {
     const heroId = e.characterUid.split("_").at(-2);
     return `P${e.playerOwner}:${heroId}@${e.charge}`;
   });
-  console.log(`[GameServer]   → turnQueue order: ${summary.join(" > ")}`);
 
   return result;
 }
@@ -64,7 +61,6 @@ export function createGameInstance(roomId, p1Data, p2Data) {
 export function broadcastGameState(roomId) {
   const room = gameRooms.get(roomId);
   if (!room?.gameState) {
-    console.log(`[GameServer] broadcastGameState skipped — room ${roomId} has no gameState`);
     return;
   }
 
@@ -74,9 +70,6 @@ export function broadcastGameState(roomId) {
 
   const activeUid = state.turnQueue[0]?.characterUid ?? "none";
   const charCounts = state.players.map(p => `P${p.id}:${p.characters.length}`).join(" ");
-  console.log(
-    `[GameServer] broadcastGameState room=${roomId} turn=${state.turn} phase=${state.gamePhase} activePlayer=${currentOwner} activeChar=${activeUid} chars=[${charCounts}]`
-  );
 
   const payload = {
     turn: state.turn,
@@ -119,7 +112,6 @@ export function broadcastGameState(roomId) {
   };
 
   room.playerConns?.forEach((sock, i) => {
-    console.log(`[GameServer]   → emit gameStateUpdate to player ${i} (playerId=${i} activePlayerOwner=${currentOwner})`);
     sock?.emit("gameStateUpdate", { ...payload, playerId: i });
   });
 }
