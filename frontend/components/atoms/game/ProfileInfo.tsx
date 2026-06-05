@@ -39,17 +39,9 @@ export default function ProfileInfo({ account, className = "" }: ProfileInfoProp
 
   return (
     <>
-      <button
-        type="button"
-        onClick={handleOpenProfile}
+      <div
         className={`group relative overflow-hidden rounded-md border-2 border-[#2a1f14] bg-gradient-to-b from-[#14100a] to-[#0f0a06] px-2 py-1.5 transition-all duration-150 hover:border-[#c9a84c] hover:shadow-[0_0_14px_rgba(201,168,76,0.12)] sm:px-3 sm:py-2 ${className}`}
       >
-        {/* hover glow */}
-        <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
-          <div className="absolute inset-0 bg-gradient-to-t from-[#c9a84c]/5 to-transparent" />
-          <div className="absolute -top-6 left-1/2 h-10 w-20 -translate-x-1/2 rounded-full bg-[#c9a84c]/10 blur-lg" />
-        </div>
-
         <div className="relative z-10 flex items-center gap-2 sm:gap-3">
           <span className="font-serif text-sm font-semibold tracking-wide text-[#c9b896] transition-colors duration-150 group-hover:text-[#e8dcc8] sm:text-lg">
             {pseudo}
@@ -72,14 +64,7 @@ export default function ProfileInfo({ account, className = "" }: ProfileInfoProp
             )}
           </span>
         </div>
-      </button>
-
-      <ProfileViewerModal
-        open={isProfileModalOpen}
-        onClose={handleCloseProfile}
-        pseudo={pseudo}
-        avatarUrl={profilePhoto}
-      />
+      </div>
     </>
   );
 }
