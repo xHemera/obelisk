@@ -1,8 +1,10 @@
 #!/bin/sh
 set -e
 
+bun install --ignore-scripts
 bunx prisma db push
-bun run build
+bunx prisma generate
+bunx next build
 
 exec bun ./server.js
 
