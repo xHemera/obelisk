@@ -575,8 +575,6 @@ export default function PongPage() {
                   className="px-6 py-2 bg-black text-white rounded"
                   onClick={() => {
                     clearCurrentUser();
-                    socket.emit("isdisconnecting");
-                    socket.disconnect();
                     router.push("home");
                   }}
                 >
