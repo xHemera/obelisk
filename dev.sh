@@ -324,8 +324,13 @@ start_services() {
     mkdir -p frontend/public/profiles
     mkdir -p certs
 
-    cd certs/ && openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365 \
-  -subj "/CN=localhost" && cd ..
+    if [ -z "$( ls -A 'certs/' )" ]; then
+        echo "Empty"
+        cd certs/ && openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365 \
+        -subj "/CN=localhost" && cd ..
+    else
+        echo "Not Empty"
+    fi
     
     docker compose up --build -d
 

@@ -18,7 +18,6 @@ export function useGameData() {
   const [opponent, setOpponent] = useState("");
   const [roomId, setRoomId] = useState(0);
   const [loadingPhase, setLoadingPhase] = useState<LoadingPhase>("connecting");
-
   useEffect(() => {
     let cancelled = false;
 
