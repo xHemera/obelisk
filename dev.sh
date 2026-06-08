@@ -336,7 +336,7 @@ start_services() {
 
     print_success "Services démarrés et site accessible"
     print_info "Frontend: https://localhost:3443"
-    print_info "Websockets: wss://localhost:4001"
+    print_info "Websockets: https://localhost:4001"
 }
 
 # Redémarrer les services

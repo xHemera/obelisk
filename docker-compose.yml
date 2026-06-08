@@ -55,7 +55,7 @@ services:
       DATABASE_URL: $DATABASE_URL
       API_KEY: $API_KEY
       NODE_TLS_REJECT_UNAUTHORIZED: "0"
-      NODE_EXTRA_CA_CERTS: /certs/ca.crt
+      
     depends_on:
       db:
         condition: service_healthy
