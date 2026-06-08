@@ -122,6 +122,9 @@ export function useTargeting(
   const handleSkipTurn = useCallback(() => {
     const uid = activeCharacterUidRef.current;
     if (!uid) return;
+    setTargetingMode(false);
+    setPendingAction(null);
+    setValidTargetUids(new Set());
     const action: GameAction = {
       type: "skip",
       userUid: uid,
