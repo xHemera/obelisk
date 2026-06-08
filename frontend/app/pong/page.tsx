@@ -447,7 +447,6 @@ export default function PongPage() {
         // Send matchEnd event to opponent (only once)
         if (!matchEndedRef.current && socket.connected && opponent) {
           matchEndedRef.current = true;
-          console.log("[Pong] Sending matchEnd to opponent: right wins");
           socket.emit("matchEnd", { opponent, winner: "right" });
         }
       }

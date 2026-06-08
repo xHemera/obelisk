@@ -103,16 +103,6 @@ export default function LoginPage() {
     socket.connect();
     socket.emit("isconnecting");
     socket.emit("login", pseudo);
-
-    const onOnlineUsers = (users: unknown) => {
-      console.log("Users from Redis:", users);
-    };
-
-    socket.on("online_users", onOnlineUsers);
-
-    return () => {
-      socket.off("online_users", onOnlineUsers);
-    };
   }, [pseudo]);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {

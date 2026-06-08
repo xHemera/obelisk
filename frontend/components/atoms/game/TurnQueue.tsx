@@ -38,9 +38,6 @@ export default function TurnQueue({ turnQueue, isYourTurn, userPseudo }: TurnQue
     if (uid && uid !== activeUidRef.current) {
       activeUidRef.current = uid;
       const name = activeEntry?.character?.identity.name ?? "?";
-      console.log(
-        `[GameClient] TurnQueue active=${name} owner=P${activeEntry?.playerOwner} ${isYourTurn ? "(you)" : "(opp)"}`
-      );
     }
   });
 

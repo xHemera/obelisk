@@ -132,7 +132,6 @@ export function applyPoisonDamage(
 
 export function applyDamage(target: CharacterInstance, damage: number): void {
 	if (target.invul > 0) {
-		console.log(`[applyDamage] ${target.uid} INVUL(${target.invul}) — damage blocked`);
 		return;
 	}
 	let originalDamage = damage;
@@ -140,18 +139,14 @@ export function applyDamage(target: CharacterInstance, damage: number): void {
         const absorbed  = Math.min(target.shieldHp, damage);
         target.shieldHp -= absorbed;
         damage          -= absorbed;
-		console.log(`[applyDamage] ${target.uid} shield absorbed ${absorbed}, remaining damage=${damage}`);
     }
 	if (target.overHp > 0) {
 		const absorbed = Math.min(target.overHp, damage);
 		target.overHp -= absorbed;
 		damage        -= absorbed;
 	}
-	const hpBefore = target.currentHp;
 	target.currentHp = Math.max(0, target.currentHp - damage);
-	console.log(`[applyDamage] ${target.uid} hp ${hpBefore} -> ${target.currentHp} (damage=${originalDamage}, net=${damage})`);
 	checkLastStand(target);
-	console.log(`[applyDamage] ${target.uid} after checkLastStand: hp=${target.currentHp} shield=${target.shieldHp} lastStandUsable=${target.lastStandUsable} lastStandUsed=${target.lastStandUsed}`);
 }
 
 function checkLastStand(character: CharacterInstance): void {

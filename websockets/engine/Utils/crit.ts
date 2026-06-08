@@ -1,5 +1,4 @@
 import { CharacterInstance } from "../Instances/CharacterInstance";
-import {io} from "../../server.js"
 
 export function rollCrit(character: CharacterInstance, target:CharacterInstance): boolean {
 	const crit: boolean = Math.random() * 100 < character.critChance;

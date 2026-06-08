@@ -88,10 +88,6 @@ export default function CharactersPage() {
     const timeoutId = window.setTimeout(() => {
       socket.connect();
       socket.emit("login", userPseudo);
-
-      socket.on("online_users", (users) => {
-        console.log("Users from Redis:", users);
-      });
     }, 0);
 
     return () => {

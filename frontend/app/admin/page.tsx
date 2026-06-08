@@ -96,13 +96,6 @@ export default function AdminPage() {
 
     socket.connect();
     socket.emit("login", userPseudo);
-
-    socket.on("online_users", (users) => {
-      console.log("Users from Redis:", users);
-    });
-    return () => {
-      socket.off("online_users");
-    };
   }, []);
 
   useEffect(() => {

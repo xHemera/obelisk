@@ -187,7 +187,6 @@ export default function Game() {
   useEffect(() => {
     if (!gameState || gameState.turn === lastEventsTurnRef.current) return;
     lastEventsTurnRef.current = gameState.turn;
-    console.log(`[GamePage] processing turn ${gameState.turn}: ${gameState.damageEvents?.length ?? 0} damageEvents, ${gameState.spellEvents?.length ?? 0} spellEvents`);
     if (gameState.damageEvents?.length) {
       const newAnims = eventsToAnims(gameState.damageEvents, animIdRef.current);
       animIdRef.current += gameState.damageEvents.length;
@@ -234,7 +233,6 @@ export default function Game() {
   useEffect(() => {
     const prev = animLogRef.current;
     if (!prev || prev.t !== turnTransitioning || prev.d !== damageAnims.length) {
-      console.log(`[GamePage] isAnimating=${isAnimating} (turnTransitioning=${turnTransitioning}, damageAnims=${damageAnims.length})`);
       animLogRef.current = { t: turnTransitioning, d: damageAnims.length };
     }
   });
