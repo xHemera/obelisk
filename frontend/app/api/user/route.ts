@@ -21,6 +21,10 @@ export async function GET(req: Request)
     }
 
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const {searchParams} = new URL(req.url);
         const pseudo = searchParams.get("pseudo");
         if (!pseudo)
@@ -91,6 +95,10 @@ export async function POST(req: Request)
     }
 
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const data = await req.json();
         const { name, email, password } = data;
         await authClient.signUp.email({
@@ -121,6 +129,10 @@ export async function PUT(req: Request)
     }
 
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const reqData = await req.json();
         const { email, password } = reqData;
         const { data } = await authClient.signIn.email({

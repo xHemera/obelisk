@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { headers } from "next/headers";
 import { rateLimit } from "@/lib/rateLimit";
 import { redis } from "@/lib/redis";
+import { auth } from "@/lib/auth";
 
 //get reported conversations
 export async function GET()
@@ -20,6 +21,10 @@ export async function GET()
     }
 
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const reports = await prisma.reported_Conv.findMany({
             select: {
                 id: true,
@@ -77,8 +82,12 @@ export async function DELETE(req: Request)
         const {searchParams} = new URL(req.url);
         const reporter = searchParams.get("reporter");
         const reported = searchParams.get("reported");
+        const session = await auth.api.getSession({ headers: await headers() });
         if (!reporter || !reported)
             return Response.json({error: "Internal server error"}, {status: 500});
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
 
         await prisma.reported_Conv.deleteMany({
             where: {
@@ -86,7 +95,7 @@ export async function DELETE(req: Request)
                 reporter: reporter,
             },
         });
-        return Response.json({essage: "OK"}, {status: 200});
+        return Response.json({message: "OK"}, {status: 200});
     }
     catch {
         return Response.json({error: "Internal server error"}, {status: 500});

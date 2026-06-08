@@ -72,12 +72,6 @@ export function useTurnInfo(
       lastTransitionTurnRef.current = gameState.turn;
     }
 
-    console.log(
-      `[useTurnInfo] turn=${gameState.turn} phase=${newPhase} activePlayerOwner=${gameState.activePlayerOwner} ` +
-      `hasEvents=${hasEvents} newUid=${newUid} prevPhase=${delayedTurnState.phase}` +
-      (needsTimerRestart ? " (timer restarted after Fast Refresh)" : "")
-    );
-
     if (gameState.gamePhase === "end") {
       if (turnTimerRef.current) clearTimeout(turnTimerRef.current);
       setTurnTransitioning(false);

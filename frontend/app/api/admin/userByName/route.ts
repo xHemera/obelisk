@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 import { rateLimit } from "@/lib/rateLimit";
 import { redis } from "@/lib/redis";
+import { auth } from "@/lib/auth";
 
 export async function GET(req: Request)
 {
@@ -25,6 +26,10 @@ export async function GET(req: Request)
         const reported = searchParams.get("reported");
         if (!reporter || !reported)
             return Response.json({error: "Internal server error"}, {status: 500});
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
 
         const results: Record<string, string> = {};
         const user1 = await prisma.user.findFirst({

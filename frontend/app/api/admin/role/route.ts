@@ -3,6 +3,8 @@ import { authClient } from "@/lib/auth-client";
 import { rateLimit } from "@/lib/rateLimit";
 import { redis } from "@/lib/redis";
 import { CHARACTERS } from "@/public/gameResources/heroes";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
 
 export async function POST(req: Request)
 {
@@ -113,6 +115,10 @@ export async function PATCH(req: Request)
     const { user, isModo } = body;
 
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         if (!isModo)
         {
             await prisma.user.update({

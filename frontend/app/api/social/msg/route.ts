@@ -1,4 +1,5 @@
 'use server'
+import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { rateLimit } from "@/lib/rateLimit";
 import { redis } from "@/lib/redis";
@@ -20,6 +21,10 @@ export async function GET(req: Request)
     }
 
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const {searchParams} = new URL(req.url);
         const user = searchParams.get("user");
         const otherUser = searchParams.get("otherUser");
@@ -82,6 +87,10 @@ export async function POST(req: Request)
     }
 
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const data = await req.json();
         const {sender, receiver, msg, draftIds} = data;
 

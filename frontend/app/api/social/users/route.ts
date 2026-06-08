@@ -1,4 +1,5 @@
 'use server'
+import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { rateLimit } from "@/lib/rateLimit";
 import { redis } from "@/lib/redis";
@@ -20,6 +21,10 @@ export async function GET()
     }
 
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const users = await prisma.user.findMany({
             select: {
                 id: true,

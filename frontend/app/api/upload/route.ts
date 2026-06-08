@@ -1,3 +1,4 @@
+import { auth } from "@/lib/auth";
 import { rateLimit } from "@/lib/rateLimit";
 import { redis } from "@/lib/redis";
 import { writeFile } from "fs/promises";
@@ -20,6 +21,10 @@ export async function POST(req: Request)
     }
 
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const formData = await req.formData();
         const files = formData.getAll("file");
         const type = formData.get("type") as string | null;

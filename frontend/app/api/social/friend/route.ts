@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { headers } from "next/headers";
 import { rateLimit } from "@/lib/rateLimit";
 import { redis } from "@/lib/redis";
+import { auth } from "@/lib/auth";
 
 export async function GET(req: Request)
 {
@@ -19,6 +20,10 @@ export async function GET(req: Request)
     }
 
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const {searchParams} = new URL(req.url);
         const currentUser = searchParams.get("currentUser");
         const otherUser = searchParams.get("otherUser");
@@ -67,6 +72,10 @@ export async function POST (req: Request)
     }
 
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const data = await req.json();
         const {currentUser, otherUser} = data;
 
@@ -141,6 +150,10 @@ export async function PATCH(req: Request)
     }
 
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const data = await req.json();
         const {currentUser, otherUser} = data;
 
@@ -187,6 +200,10 @@ export async function DELETE(req: Request)
     }
 
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const {searchParams} = new URL(req.url);
         const currentUser = searchParams.get("currentUser");
         const otherUser = searchParams.get("otherUser");

@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { rateLimit } from "@/lib/rateLimit";
 import { redis } from "@/lib/redis";
 import prisma from "@/lib/prisma";
+import { auth } from "@/lib/auth";
 
 export async function GET(req: Request)
 {
@@ -19,6 +20,10 @@ export async function GET(req: Request)
     }
 
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const {searchParams} = new URL(req.url);
         const currentUser = searchParams.get("currentUser");
         if (!currentUser)
@@ -57,6 +62,10 @@ export async function POST(req: Request)
     }
 
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const data = await req.json();
         const {userPseudo} = data;
         await redis.rPush("players_queue", userPseudo);
@@ -83,6 +92,10 @@ export async function PUT(req: Request)
         return Response.json({error: "Too many request"}, {status: 429});
     }
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const data = await req.json();
         const { userPseudo, char } = data;
         const user = await prisma.user.findFirst({
@@ -125,6 +138,10 @@ export async function DELETE(req: Request)
         return Response.json({error: "Too many request"}, {status: 429});
     }
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const {searchParams} = new URL(req.url);
         const userPseudo = searchParams.get("userPseudo");
         if (!userPseudo)
