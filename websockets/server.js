@@ -91,6 +91,7 @@ io.on("connection", (socket) => {
 
     await redis.hSet("online_users", user, socket.id);
     const users = await redis.hGetAll("online_users");
+    console.log(users);
     io.emit("online_users", users);
   });
 
@@ -534,6 +535,7 @@ io.on("connection", (socket) => {
     if (fieldToDelete)
       await redis.hDel("online_users", fieldToDelete);
     const users = await redis.hGetAll("online_users");
+    console.log(users);
     io.emit("online_users", users);
   });
 });

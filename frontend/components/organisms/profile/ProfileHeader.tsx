@@ -107,7 +107,7 @@ export function ProfileHeader({
               {/* Victory badges */}
               {victoryBadges.map((victoryBadge) => {
                 const isUnlocked = totalWins >= victoryBadge.threshold;
-                if (!isUnlocked)
+                if (!isUnlocked && isOwnProfile)
                   return (
                     <span
                       key={victoryBadge.label}

@@ -137,7 +137,6 @@ export default function PongPage() {
       if (forceDisconnectTimerRef.current) clearTimeout(forceDisconnectTimerRef.current);
       forceDisconnectTimerRef.current = setTimeout(() => {
         clearCurrentUser();
-        socket.disconnect();
         router.push("home");
       }, 2000);
     };
