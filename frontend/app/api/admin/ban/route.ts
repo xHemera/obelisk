@@ -24,7 +24,7 @@ export async function PUT(req: Request)
         const session = await auth.api.getSession({ headers: await headers() });
         const data = await req.json();
         const {username} = data;
-        if (!session || !session.user || session.user.name !== username) {
+        if (!session || !session.user) {
             return Response.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -61,7 +61,7 @@ export async function PATCH(req: Request)
         const data = await req.json();
         const {username} = data;
         const session = await auth.api.getSession({ headers: await headers() });
-        if (!session || !session.user || session.user.name !== username) {
+        if (!session || !session.user) {
             return Response.json({ error: "Unauthorized" }, { status: 401 });
         }
 
