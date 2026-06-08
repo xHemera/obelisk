@@ -119,6 +119,7 @@ io.on("connection", (socket) => {
 
   //tells that there is a friend request waiting
   socket.on("friend_request", async ({user, oUser}) => {
+    if (!oUser) return ;
     const receiverSock = await redis.hGet("online_users", oUser);
     if (receiverSock)
     {
@@ -128,6 +129,7 @@ io.on("connection", (socket) => {
 
   //tells that the friend request has been accepted
   socket.on("friend_added", async ({user, friend}) => {
+    if (!friend) return ;
     const receiverSock = await redis.hGet("online_users", friend);
     if (receiverSock)
     {
@@ -138,6 +140,7 @@ io.on("connection", (socket) => {
 
   //tells that the friend request has been refused
   socket.on("friend_denied", async ({user, friend}) => {
+    if (!friend) return ;
     const receiverSock = await redis.hGet("online_users", friend);
     if (receiverSock)
     {
