@@ -82,6 +82,10 @@ export async function GET(request: Request) {
       return Response.json({error: "Too many request"}, {status: 429});
   }
   try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session || !session.user) {
+        return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
 

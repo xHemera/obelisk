@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { headers } from "next/headers";
 import { rateLimit } from "@/lib/rateLimit";
 import { redis } from "@/lib/redis";
+import { auth } from "@/lib/auth";
 
 //ban users
 export async function PUT(req: Request)
@@ -20,8 +21,12 @@ export async function PUT(req: Request)
     }
 
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
         const data = await req.json();
         const {username} = data;
+        if (!session || !session.user || session.user.name !== username) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
 
         await prisma.user.updateMany({
             where: { name: username,
@@ -55,6 +60,10 @@ export async function PATCH(req: Request)
     try {
         const data = await req.json();
         const {username} = data;
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user || session.user.name !== username) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
 
         await prisma.user.updateMany({
             where: { name: username },

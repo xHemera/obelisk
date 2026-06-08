@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { rateLimit } from "@/lib/rateLimit";
 import { redis } from "@/lib/redis";
 import { randomInt } from "crypto";
+import { auth } from "@/lib/auth";
 
 export async function GET(req: Request)
 {
@@ -20,6 +21,10 @@ export async function GET(req: Request)
     }
 
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const {searchParams} = new URL(req.url);
         const currentUser = searchParams.get("currentUser");
         const otherUser = searchParams.get("otherUser");
@@ -67,6 +72,10 @@ export async function POST(req: Request)
         return Response.json({error: "Too many request"}, {status: 429});
     }
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const data = await req.json();
         const { currentUser, opponent } = data;
         const roomId = randomInt(0, 1000);

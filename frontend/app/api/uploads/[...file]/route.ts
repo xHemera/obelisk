@@ -1,4 +1,6 @@
+import { auth } from "@/lib/auth";
 import fs from "fs";
+import { headers } from "next/headers";
 import path from "path";
 
 const mimeTypes: Record<string, string> = {
@@ -16,6 +18,10 @@ const mimeTypes: Record<string, string> = {
 
 export async function GET(req: Request, context: any) {
   try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session || !session.user) {
+        return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
     // Next may provide params as a Promise in the context; await if necessary
     const resolvedParams = context?.params && typeof context.params.then === "function"
       ? await context.params

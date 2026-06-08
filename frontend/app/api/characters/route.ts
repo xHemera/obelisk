@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { rateLimit } from "@/lib/rateLimit";
 import { redis } from "@/lib/redis";
 import type { CharacterData, CharacterSkill, CharacterStats, PlayerResources } from "@/components/organisms/characters/types";
+import { auth } from "@/lib/auth";
 
 export async function GET(req: Request)
 {
@@ -20,6 +21,10 @@ export async function GET(req: Request)
       return Response.json({error: "Too many request"}, {status: 429});
   }
   try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session || !session.user) {
+        return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const {searchParams} = new URL(req.url);
     const currentUser = searchParams.get("username");
     if (!currentUser)
@@ -125,6 +130,10 @@ export async function POST(req: Request)
       return Response.json({error: "Too many request"}, {status: 429});
   }
   try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session || !session.user) {
+        return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const data = await req.json();
     const { name } = data;
     const userId = await prisma.user.findFirst({
@@ -197,6 +206,10 @@ export async function PUT(req: Request)
       return Response.json({error: "Too many request"}, {status: 429});
   }
   try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session || !session.user) {
+        return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const data = await req.json();
     const { name, skillId } = data;
     const user = await prisma.user.findFirst({
@@ -244,6 +257,10 @@ export async function PATCH(req: Request)
       return Response.json({error: "Too many request"}, {status: 429});
   }
   try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session || !session.user) {
+        return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const data = await req.json();
     const { name, skillId } = data;
     const user = await prisma.user.findFirst({

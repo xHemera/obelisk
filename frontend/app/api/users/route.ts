@@ -3,6 +3,7 @@ import { rateLimit } from "@/lib/rateLimit";
 import { redis } from "@/lib/redis";
 import { headers } from "next/headers";
 import { CHARACTERS } from "@/public/gameResources/heroes";
+import { auth } from "@/lib/auth";
 
 export async function GET() {
   const h = await headers();
@@ -18,6 +19,10 @@ export async function GET() {
       return Response.json({error: "Too many request"}, {status: 429});
   }
   try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session || !session.user) {
+        return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const users = await prisma.user.findMany({
       select: {
         id: true,

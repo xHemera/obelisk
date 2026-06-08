@@ -3,6 +3,7 @@ import { PROFILE_ICONS } from "@/lib/profile-icons";
 import { headers } from "next/headers";
 import { rateLimit } from "@/lib/rateLimit";
 import { redis } from "@/lib/redis";
+import { auth } from "@/lib/auth";
 
 export async function GET() {
   const h = await headers();
@@ -19,6 +20,10 @@ export async function GET() {
   }
 
   try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session || !session.user) {
+        return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
     let avatars = await prisma.avatar.findMany({
       orderBy: [{ name: "asc" }, { id: "asc" }],
     });

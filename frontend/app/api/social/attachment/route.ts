@@ -4,6 +4,7 @@ import { rateLimit } from "@/lib/rateLimit";
 import { redis } from "@/lib/redis";
 import fs from "fs";
 import path from "path";
+import { auth } from "@/lib/auth";
 
 export async function POST(req: Request)
 {
@@ -21,6 +22,10 @@ export async function POST(req: Request)
     }
 
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const formData = await req.formData();
 
         const file = formData.get("file") as File;
@@ -63,6 +68,10 @@ export async function DELETE(req: Request)
     }
 
     try {
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session || !session.user) {
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const {searchParams} = new URL(req.url);
         const attachmentId = searchParams.get("attachmentId");
         const url = searchParams.get("url");
