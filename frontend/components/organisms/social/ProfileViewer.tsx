@@ -206,7 +206,7 @@ export default function ProfileViewerModal({
       currentUser: currentUser.name,
       otherUser: inputUser.name,
     });
-    const res = await fetch(`api/social/friend?${params.toString()}`, {
+    const res = await fetch(`/api/social/friend?${params.toString()}`, {
       method: "DELETE",
     });
     if (!res.ok) {
@@ -236,7 +236,7 @@ export default function ProfileViewerModal({
       const fdata = await fres.json();
       const oUser: type.Friend = fdata.friend;
       if (oUser) {
-        const bres = await fetch(`/api/social/block?${params}`, {
+        const bres = await fetch(`/api/social/block?${params.toString()}`, {
           method: "DELETE",
         });
         if (!bres) return;

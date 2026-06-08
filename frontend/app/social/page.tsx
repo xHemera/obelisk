@@ -14,6 +14,7 @@ import { DuelRequestBanner } from "@/components/molecules/social/DuelRequestBann
 import { DuelWaitingModal } from "@/components/molecules/social/DuelWaitingModal";
 import { type } from "./index"
 import { emitGlobalError, emitGlobalNotification } from "@/lib/error-events";
+import { handleLogout } from "@/lib/logout";
 
 const toSizeLabel = (bytes: number) => {
   if (bytes < 1024) return `${bytes} o`;
@@ -173,27 +174,13 @@ export default function SocialPage() {
     if (!userPseudo) return;
     socket.on("ban", (banned) => {
       if (banned === userPseudo)
-        handleLogout();
+        handleLogoutLocal();
     });
   }, [userPseudo])
 
-  const handleLogout = async () => {
-    const response = await fetch("/api/profile", {
-        method: "PUT",
-      })
-      const user: unknown = await response.json();
-      if (!response.ok) {
-        const errorMessage =
-        typeof user === "object" && user !== null && "error" in user
-          ? String((user as { error: string }).error ?? "Impossible de charger l'utilisateur")
-          : "Impossible de charger l'utilisateur";
-        throw new Error(errorMessage);
-      }
-    socket.emit("isdisconnecting");
-    socket.disconnect();
-    await authClient.signOut();
-    router.push("/");
-  };
+  const handleLogoutLocal = () => {
+      handleLogout(router).catch(() => router.push("/"));
+    };
 
   //fetch users and their inboxes
   useEffect(() => {

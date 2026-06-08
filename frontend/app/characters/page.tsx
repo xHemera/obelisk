@@ -8,6 +8,7 @@ import type { CharacterData, PlayerResources } from "@/components/organisms/char
 import { socket } from "../../socket"
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { handleLogout } from "@/lib/logout";
 
 export default function CharactersPage() {
   const [characters, setCharacters] = useState<CharacterData[]>([]);
@@ -109,27 +110,13 @@ export default function CharactersPage() {
     if (!userPseudo) return;
     socket.on("ban", (banned) => {
       if (banned === userPseudo)
-        handleLogout();
+        handleLogoutLocal();
     });
   }, [userPseudo])
 
-  const handleLogout = async () => {
-    const response = await fetch("/api/profile", {
-        method: "PUT",
-      })
-      const user: unknown = await response.json();
-      if (!response.ok) {
-        const errorMessage =
-        typeof user === "object" && user !== null && "error" in user
-          ? String((user as { error: string }).error ?? "Impossible de charger l'utilisateur")
-          : "Impossible de charger l'utilisateur";
-        throw new Error(errorMessage);
-      }
-    socket.emit("isdisconnecting");
-    socket.disconnect();
-    await authClient.signOut();
-    router.push("/");
-  };
+  const handleLogoutLocal = () => {
+      handleLogout(router).catch(() => router.push("/"));
+    };
 
   const handlePlusOne = async (skillId: string): Promise<boolean> => {
     const response = await fetch("/api/characters", {

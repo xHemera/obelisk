@@ -12,6 +12,7 @@ import { persistAvatarPreference } from "@/lib/avatar-preference";
 import { applyAccentPalette, DEFAULT_PROFILE_ICON, resolveProfileIcon } from "@/lib/profile-icons";
 import { socket } from "../../../socket";
 import Footer from "@/components/Footer";
+import { handleLogout } from "@/lib/logout";
 
 type MatchHistoryEntry = {
   id: string;
@@ -92,7 +93,7 @@ export default function ProfileClientView({
     if (!userPseudo) return;
     socket.on("ban", (banned) => {
       if (banned === userPseudo)
-        handleLogout();
+        handleLogoutLocal();
     });
   }, [userPseudo]);
 
@@ -100,7 +101,7 @@ export default function ProfileClientView({
   useEffect(() => {
     const onBan = (banned: string) => {
       if (banned === userPseudo) {
-        void handleLogout();
+        void handleLogoutLocal();
       }
     };
 
@@ -184,21 +185,8 @@ export default function ProfileClientView({
     });
   };
 
-  const handleLogout = async () => {
-    if (isActionLoading) return;
-
-    setIsActionLoading(true);
-    try {
-      await fetch("/api/profile", {
-        method: "PUT"
-      })
-      socket.emit("isdisconnecting");
-      socket.disconnect();
-      await authClient.signOut();
-      router.push("/not-connected");
-    } finally {
-      setIsActionLoading(false);
-    }
+  const handleLogoutLocal = () => {
+    handleLogout(router).catch(() => router.push("/"));
   };
 
   const verifyDeleteAccount = () => {
@@ -272,7 +260,7 @@ export default function ProfileClientView({
           currentAvatar={currentAvatar}
           totalWins={totalWins}
           onAvatarUploadClick={() => avatarUploadRef.current?.click()}
-          onLogout={() => void handleLogout()}
+          onLogout={() => void handleLogoutLocal()}
           onDeleteAccount={() => void deleteProfile()}
           isActionLoading={isActionLoading}
         />

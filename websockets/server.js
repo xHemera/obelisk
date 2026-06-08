@@ -79,13 +79,17 @@ io.on("connection", (socket) => {
       const oldOpponent = await redis.hGet("inGamePlayers", user);
       if (oldOpponent) {
         let opponentName = oldOpponent;
-        try {
-          const parsed = JSON.parse(oldOpponent);
-          opponentName = parsed.opp;
-        } catch {
-          // Plain string format — use as-is
-        }
-        await redis.hDel("inGamePlayers", user, opponentName);
+          try {
+            const parsed = JSON.parse(oldOpponent);
+            opponentName = parsed.opp ?? opponentName;
+          } catch {
+            // Plain string format — use as-is
+          }
+          if (opponentName) {
+            await redis.hDel("inGamePlayers", user, opponentName);
+          } else {
+            await redis.hDel("inGamePlayers", user);
+          }
       }
     }
 
@@ -127,7 +131,7 @@ io.on("connection", (socket) => {
     const receiverSock = await redis.hGet("online_users", friend);
     if (receiverSock)
     {
-      io.to(receiverSock).emit("adding", user, friend);
+      io.to(receiverSock).emit("adding", {user, friend});
     }
     io.to(socket.id).emit("adding", {user, friend});
   })
@@ -529,7 +533,11 @@ io.on("connection", (socket) => {
         if (opponentSock) {
           io.to(opponentSock).emit("forceDisconnect", { reason: "opponent_disconnected" });
         }
-        await redis.hDel("inGamePlayers", fieldToDelete, opponentName);
+        if (opponentName) {
+          await redis.hDel("inGamePlayers", fieldToDelete, opponentName);
+        } else {
+          await redis.hDel("inGamePlayers", fieldToDelete);
+        }
       }
     }
     if (fieldToDelete)

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { socket, ensureLoggedIn, clearCurrentUser } from "@/socket";
+import { handleLogout } from "@/lib/logout";
 
 export default function PongPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -110,7 +111,7 @@ export default function PongPage() {
     isPlayer1.current = userPseudo < opponent;    
     const handleBan = (banned: string) => {
       if (banned === userPseudo)
-        handleLogout();
+        handleLogoutLocal();
     };
     
     const handlePongUpdate = (data: { y: number }) => {
@@ -185,24 +186,9 @@ export default function PongPage() {
     };
   }, [opponent])
 
-  const handleLogout = async () => {
-    const response = await fetch("/api/profile", {
-        method: "PUT",
-      })
-      const user: unknown = await response.json();
-      if (!response.ok) {
-        const errorMessage =
-        typeof user === "object" && user !== null && "error" in user
-          ? String((user as { error: string }).error ?? "Impossible de charger l'utilisateur")
-          : "Impossible de charger l'utilisateur";
-        throw new Error(errorMessage);
-      }
-    clearCurrentUser();
-    socket.emit("isdisconnecting");
-    socket.disconnect();
-    await authClient.signOut();
-    router.push("/");
-  };
+  const handleLogoutLocal = () => {
+      handleLogout(router).catch(() => router.push("/"));
+    };
 
   // Fonction pour récolter l'XP
   const handleCollectXp = async () => {
