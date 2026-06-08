@@ -526,17 +526,14 @@ io.on("connection", (socket) => {
         }
         const opponentSock = await redis.hGet("online_users", opponentName);
         if (opponentSock) {
-          console.log("[Pong Server] Player disconnected during match, forcing opponent to leave:", { player: fieldToDelete, opponent, opponentSocket: opponentSock });
           io.to(opponentSock).emit("forceDisconnect", { reason: "opponent_disconnected" });
         }
         await redis.hDel("inGamePlayers", fieldToDelete, opponentName);
-        console.log("[Pong Server] Removed both players from inGamePlayers on disconnect:", { fieldToDelete, opponent });
       }
     }
     if (fieldToDelete)
       await redis.hDel("online_users", fieldToDelete);
     const users = await redis.hGetAll("online_users");
-    console.log("Client disconnected: ", users);
     io.emit("online_users", users);
   });
 });
