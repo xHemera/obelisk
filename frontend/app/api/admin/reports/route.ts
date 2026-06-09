@@ -83,12 +83,9 @@ export async function DELETE(req: Request)
         const reporter = searchParams.get("reporter");
         const reported = searchParams.get("reported");
         const session = await auth.api.getSession({ headers: await headers() });
-        if (!reporter || !reported)
-            return Response.json({error: "Internal server error"}, {status: 500});
-        if (!session || !session.user) {
+        if (!reporter || !reported || !session || !session.user) {
             return Response.json({ error: "Unauthorized" }, { status: 401 });
         }
-
         await prisma.reported_Conv.deleteMany({
             where: {
                 reportedUser: reported,

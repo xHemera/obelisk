@@ -76,7 +76,7 @@ export async function DELETE(req: Request)
         const attachmentId = searchParams.get("attachmentId");
         const url = searchParams.get("url");
         if (!attachmentId || !url)
-            return Response.json({error: "Internal server error"}, {status: 500});
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
 
         await prisma.attachment.delete({
             where: { id: attachmentId }

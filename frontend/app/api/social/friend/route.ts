@@ -28,7 +28,7 @@ export async function GET(req: Request)
         const currentUser = searchParams.get("currentUser");
         const otherUser = searchParams.get("otherUser");
         if (!currentUser || !otherUser)
-            return Response.json({error: "Internal server error"}, {status: 500});
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
 
         const cUser = await prisma.user.findFirst({
             where: {name: currentUser},
@@ -208,7 +208,7 @@ export async function DELETE(req: Request)
         const currentUser = searchParams.get("currentUser");
         const otherUser = searchParams.get("otherUser");
         if (!currentUser || !otherUser)
-            return Response.json({error: "Internal server error"}, {status: 500});
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
 
         const cUser = await prisma.user.findFirst({
             where: {name: currentUser},

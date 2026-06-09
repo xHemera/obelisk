@@ -26,7 +26,7 @@ export async function GET(req: Request)
         const {searchParams} = new URL(req.url);
         const currentUser = searchParams.get("pseudo");
         if (!currentUser)
-            return Response.json({error: "Internal server error"}, {status: 500});
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
         const raw = await redis.hGet("inGamePlayers", currentUser);
         if (!raw)
             return Response.json({error: "Internal server error"}, {status: 500});

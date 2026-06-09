@@ -27,7 +27,7 @@ export async function GET(req: Request)
     const {searchParams} = new URL(req.url);
     const currentUser = searchParams.get("user");
     if (!currentUser)
-        return Response.json({error: "Internal server error"}, {status: 500});
+        return Response.json({ error: "Unauthorized" }, { status: 401 });
 
     const results: Record<string, number> = {};
     const cUser = await prisma.user.findFirst({

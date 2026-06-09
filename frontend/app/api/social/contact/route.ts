@@ -28,7 +28,7 @@ export async function GET(req: Request)
         const currentUser = searchParams.get("currentUser");
         const addUser = searchParams.get("addUser");
         if (!currentUser || !addUser)
-            return Response.json({error: "Internal server error"}, {status: 500});
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
 
         const user1 = await prisma.user.findFirst({
             where: { name: currentUser }

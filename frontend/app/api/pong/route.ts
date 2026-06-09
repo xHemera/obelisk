@@ -26,10 +26,10 @@ export async function GET(req: Request)
         const {searchParams} = new URL(req.url);
         const currentUser = searchParams.get("pseudo");
         if (!currentUser)
-            return Response.json({error: "User pseudo is required"}, {status: 400});
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
         const raw = await redis.hGet("inGamePlayers", currentUser);
         if (!raw)
-            return Response.json({error: "Opponent not found - start a matchmaking first"}, {status: 404});
+            return Response.json({error: "Internal Server Error"}, {status: 500});
         const opponent = raw;
         return Response.json({name: opponent}, {status: 200});
     }
@@ -92,7 +92,7 @@ export async function DELETE(req: Request)
         const {searchParams} = new URL(req.url);
         const userPseudo = searchParams.get("userPseudo");
         if (!userPseudo)
-            return Response.json({error: "Internal server error"}, {status: 500});
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
         
         // Enlever le joueur de la queue
         await redis.lRem("pong_queue", 1, userPseudo);

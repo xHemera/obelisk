@@ -27,7 +27,7 @@ export async function GET(req: Request)
         const {searchParams} = new URL(req.url);
         const currentUser = searchParams.get("currentUser");
         if (!currentUser)
-            return Response.json({error: "Internal server error"}, {status: 500});
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
         const user = await prisma.user.findFirst({
             where: {
                 name: currentUser,
@@ -145,7 +145,7 @@ export async function DELETE(req: Request)
         const {searchParams} = new URL(req.url);
         const userPseudo = searchParams.get("userPseudo");
         if (!userPseudo)
-            return Response.json({error: "Internal server error"}, {status: 500});
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
         await redis.lRem("players_queue", 1, userPseudo);
         return Response.json({msg: "OK"}, {status: 200});
     }

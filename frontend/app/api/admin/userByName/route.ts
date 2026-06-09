@@ -25,7 +25,7 @@ export async function GET(req: Request)
         const reporter = searchParams.get("reporter");
         const reported = searchParams.get("reported");
         if (!reporter || !reported)
-            return Response.json({error: "Internal server error"}, {status: 500});
+            return Response.json({ error: "Unauthorized" }, { status: 401 });
         const session = await auth.api.getSession({ headers: await headers() });
         if (!session || !session.user) {
             return Response.json({ error: "Unauthorized" }, { status: 401 });
