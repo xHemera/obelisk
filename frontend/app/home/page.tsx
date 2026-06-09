@@ -15,6 +15,7 @@ import {socket, ensureLoggedIn} from "../../socket"
 import { handleLogout } from "@/lib/logout";
 import NotificationToast from "@/components/organisms/home/NotificationToast";
 import Footer from "@/components/Footer";
+import { emitGlobalError } from "@/lib/error-events";
 
 const PvpMatchmakingModal = dynamic(() => import("@/components/organisms/home/PvpMatchmakingModal"), { ssr: false });
 const PongMatchmakingModal = dynamic(() => import("@/components/organisms/home/PongMatchmakingModal"), { ssr: false });
@@ -244,6 +245,11 @@ export default function Home() {
 
   const handleStartPvp = async () => {
     if (!userPseudo) return;
+    if (!teamSlots[0] && !teamSlots[1] && !teamSlots[2])
+    {
+      emitGlobalError("Can't start a game with an empty team.");
+      return ;
+    }
 
     await fetch("/api/home", {
       method: "PUT",
