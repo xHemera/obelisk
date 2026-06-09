@@ -311,7 +311,7 @@ export default function SocialPage() {
 
     //resets status dynamically
     socket.on("unblocking", async ({user, oUser}) => {
-      if (oUser == selectedUser)
+      if (user == selectedUser)
         setIsBlocked(false);
       if (user == userPseudo)
         setHasBlocked(false);
@@ -1133,6 +1133,7 @@ export default function SocialPage() {
                   </button>
 
                   <input
+                    disabled={isBlocked || hasBlocked}
                     type="text"
                     placeholder={hasBlocked ? "You have blocked this user" : isBlocked ? "You are blocked by this user" : `Send a message to @${selectedUser}`}
                     value={message}
