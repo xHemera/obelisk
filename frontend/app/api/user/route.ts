@@ -95,10 +95,6 @@ export async function POST(req: Request)
     }
 
     try {
-        const session = await auth.api.getSession({ headers: await headers() });
-        if (!session || !session.user) {
-            return Response.json({ error: "Unauthorized" }, { status: 401 });
-        }
         const data = await req.json();
         const { name, email, password } = data;
         await authClient.signUp.email({

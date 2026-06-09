@@ -28,7 +28,7 @@ export async function GET(req: Request)
     const {searchParams} = new URL(req.url);
     const currentUser = searchParams.get("username");
     if (!currentUser)
-      return Response.json({error: "Internal server error"}, {status: 500});
+      return Response.json({error: "Unauthorized"}, {status: 401});
     
     let characters: CharacterData[] = [];
     const user = await prisma.user.findFirst({
@@ -130,10 +130,6 @@ export async function POST(req: Request)
       return Response.json({error: "Too many request"}, {status: 429});
   }
   try {
-    const session = await auth.api.getSession({ headers: await headers() });
-    if (!session || !session.user) {
-        return Response.json({ error: "Unauthorized" }, { status: 401 });
-    }
     const data = await req.json();
     const { name } = data;
     const userId = await prisma.user.findFirst({
