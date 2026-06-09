@@ -884,10 +884,7 @@ export default function SocialPage() {
           msg: cleanMessage, receiver: selectedUser,
           draftIds: draftIds}),
       });
-      
 
-
-    const data = await response.json();
     if (!response.ok)
       return ;
 
