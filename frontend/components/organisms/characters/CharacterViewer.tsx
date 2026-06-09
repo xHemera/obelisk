@@ -32,13 +32,13 @@ export default function CharacterViewer({
 
   const power = useMemo(() => calculatePower(selectedCharacter.name, selectedCharacter.level, selectedCharacter.stats, selectedCharacter.skills), [selectedCharacter.stats]);
   const characterRole = CHARACTER_ROLES[selectedCharacter.name] ?? {
-    title: "Adventurer",
+    title: "Hero",
     color: "#c9a227",
     icon: "fa-user",
   };
 
   const canUpgradeSkill = (skill: CharacterSkill) => {
-    return skill.level < maxSkillLevel && resources.ruby >= skill.cost;
+    return skill.level < maxSkillLevel && resources.ruby >= skill.level;
   };
 
   return (
