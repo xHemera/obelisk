@@ -16,7 +16,11 @@ import GameArenaBackground from "@/components/backgrounds/GameArenaBackground";
 import BottomBar from "@/components/backgrounds/BottomBar";
 import FloatingDamage from "@/components/atoms/game/FloatingDamage";
 import PixelAnimation from "@/components/atoms/game/PixelAnimation";
-import { getTargetAnim, getSpellAnim, preloadAllAnimations } from "@/lib/animationManager";
+import {
+  getTargetAnim,
+  getSpellAnim,
+  preloadAllAnimations,
+} from "@/lib/animationManager";
 import type { AnimDef } from "@/lib/animationManager";
 import type { CharacterState, DamageEvent, ModEntry } from "./types";
 
@@ -39,7 +43,7 @@ type PixelAnimInstance = {
 };
 
 function findCharByHeroId(chars: CharacterState[] | undefined, heroId: string) {
-  return chars?.find(c => c.uid.split("_").at(-2) === heroId) ?? null;
+  return chars?.find((c) => c.uid.split("_").at(-2) === heroId) ?? null;
 }
 
 function eventsToAnims(events: DamageEvent[], startId: number): DamageAnim[] {
@@ -63,10 +67,11 @@ function findAnimsForFighter(
   charState?: CharacterState | null,
 ): DamageAnim[] {
   if (charState) {
-    return anims.filter(a => a.targetUid === charState.uid);
+    return anims.filter((a) => a.targetUid === charState.uid);
   }
   return anims.filter(
-    a => a.targetHeroId === heroId && a.targetUid.startsWith(ownerPrefix + "_"),
+    (a) =>
+      a.targetHeroId === heroId && a.targetUid.startsWith(ownerPrefix + "_"),
   );
 }
 
@@ -75,7 +80,9 @@ function maxTurns(mods: ModEntry[]): number | undefined {
   return max > 0 ? max : undefined;
 }
 
-function toStatusEffects(charState: CharacterState | undefined | null): StatusEffect[] {
+function toStatusEffects(
+  charState: CharacterState | undefined | null,
+): StatusEffect[] {
   if (!charState) return [];
   const effects: StatusEffect[] = [];
 
@@ -83,7 +90,11 @@ function toStatusEffects(charState: CharacterState | undefined | null): StatusEf
     effects.push({ type: "cc", label: "Stunned", turns: charState.stunned });
   }
   if (charState.invisible > 0) {
-    effects.push({ type: "buff", label: "Invisible", turns: charState.invisible });
+    effects.push({
+      type: "buff",
+      label: "Invisible",
+      turns: charState.invisible,
+    });
   }
   if (charState.shieldHp > 0) {
     effects.push({ type: "buff", label: "Shield" });
@@ -92,10 +103,18 @@ function toStatusEffects(charState: CharacterState | undefined | null): StatusEf
     effects.push({ type: "buff", label: "Overheal" });
   }
   if (charState.invul > 0) {
-    effects.push({ type: "buff", label: "Invulnerable", turns: charState.invul });
+    effects.push({
+      type: "buff",
+      label: "Invulnerable",
+      turns: charState.invul,
+    });
   }
   if (charState.taunted > 0) {
-    effects.push({ type: "debuff", label: "Taunted", turns: charState.taunted });
+    effects.push({
+      type: "debuff",
+      label: "Taunted",
+      turns: charState.taunted,
+    });
   }
   for (const p of charState.poison) {
     if (p.turn > 0) {
@@ -104,22 +123,46 @@ function toStatusEffects(charState: CharacterState | undefined | null): StatusEf
   }
 
   if (charState.phyMod.length > 0) {
-    effects.push({ type: "buff", label: "Phys. Attack", turns: maxTurns(charState.phyMod) });
+    effects.push({
+      type: "buff",
+      label: "Phys. Attack",
+      turns: maxTurns(charState.phyMod),
+    });
   }
   if (charState.magMod.length > 0) {
-    effects.push({ type: "buff", label: "Mag. Attack", turns: maxTurns(charState.magMod) });
+    effects.push({
+      type: "buff",
+      label: "Mag. Attack",
+      turns: maxTurns(charState.magMod),
+    });
   }
   if (charState.phyResMod.length > 0) {
-    effects.push({ type: "buff", label: "Phys. Defense", turns: maxTurns(charState.phyResMod) });
+    effects.push({
+      type: "buff",
+      label: "Phys. Defense",
+      turns: maxTurns(charState.phyResMod),
+    });
   }
   if (charState.magResMod.length > 0) {
-    effects.push({ type: "buff", label: "Mag. Defense", turns: maxTurns(charState.magResMod) });
+    effects.push({
+      type: "buff",
+      label: "Mag. Defense",
+      turns: maxTurns(charState.magResMod),
+    });
   }
   if (charState.critChanceMod.length > 0) {
-    effects.push({ type: "buff", label: "Crit Chance", turns: maxTurns(charState.critChanceMod) });
+    effects.push({
+      type: "buff",
+      label: "Crit Chance",
+      turns: maxTurns(charState.critChanceMod),
+    });
   }
   if (charState.critDamageMod.length > 0) {
-    effects.push({ type: "buff", label: "Crit Damage", turns: maxTurns(charState.critDamageMod) });
+    effects.push({
+      type: "buff",
+      label: "Crit Damage",
+      turns: maxTurns(charState.critDamageMod),
+    });
   }
 
   return effects;
@@ -170,7 +213,12 @@ export default function Game() {
     handleCastSpell,
     handleTargetSelect,
     handleSkipTurn,
-  } = useTargeting(activeCharacterUid, myCharacters, oppCharacters, activeHeroDef);
+  } = useTargeting(
+    activeCharacterUid,
+    myCharacters,
+    oppCharacters,
+    activeHeroDef,
+  );
 
   // Preload all animation frames on mount (while loading screen is shown)
   useEffect(() => {
@@ -190,7 +238,7 @@ export default function Game() {
     if (gameState.damageEvents?.length) {
       const newAnims = eventsToAnims(gameState.damageEvents, animIdRef.current);
       animIdRef.current += gameState.damageEvents.length;
-      setDamageAnims(prev => [...prev, ...newAnims]);
+      setDamageAnims((prev) => [...prev, ...newAnims]);
 
       const newPix: PixelAnimInstance[] = [];
       for (const ev of gameState.damageEvents) {
@@ -201,7 +249,7 @@ export default function Game() {
         });
         pixAnimIdRef.current += 1;
       }
-      setPixelAnims(prev => [...prev, ...newPix]);
+      setPixelAnims((prev) => [...prev, ...newPix]);
     }
 
     if (gameState.spellEvents?.length) {
@@ -216,29 +264,35 @@ export default function Game() {
         });
         pixAnimIdRef.current += 1;
       }
-      setPixelAnims(prev => [...prev, ...newPix]);
+      setPixelAnims((prev) => [...prev, ...newPix]);
     }
   }, [gameState]);
 
   const removeAnim = useCallback((id: number) => {
-    setDamageAnims(prev => prev.filter(a => a.id !== id));
+    setDamageAnims((prev) => prev.filter((a) => a.id !== id));
   }, []);
 
   const removePixelAnim = useCallback((id: number) => {
-    setPixelAnims(prev => prev.filter(a => a.id !== id));
+    setPixelAnims((prev) => prev.filter((a) => a.id !== id));
   }, []);
 
   const isAnimating = damageAnims.length > 0 || turnTransitioning;
   const animLogRef = useRef<{ t: boolean; d: number } | null>(null);
   useEffect(() => {
     const prev = animLogRef.current;
-    if (!prev || prev.t !== turnTransitioning || prev.d !== damageAnims.length) {
+    if (
+      !prev ||
+      prev.t !== turnTransitioning ||
+      prev.d !== damageAnims.length
+    ) {
       animLogRef.current = { t: turnTransitioning, d: damageAnims.length };
     }
   });
 
   // Team selection mapping — string[] → hero definitions
-  const [teamSelected, setTeamSelected] = useState<Array<(typeof CHARACTERS)[number] | null> | null>(null);
+  const [teamSelected, setTeamSelected] = useState<Array<
+    (typeof CHARACTERS)[number] | null
+  > | null>(null);
 
   useEffect(() => {
     if (team) {
@@ -264,7 +318,13 @@ export default function Game() {
     xpGained: number;
     rubisGained: number;
     isWinner: boolean;
-    characters: { name: string; level: number; xp: number; leveledUp: boolean; levelsGained: number }[];
+    characters: {
+      name: string;
+      level: number;
+      xp: number;
+      leveledUp: boolean;
+      levelsGained: number;
+    }[];
   } | null>(null);
   const [isRewarding, setIsRewarding] = useState(false);
   const rewardFetchedRef = useRef(false);
@@ -297,11 +357,21 @@ export default function Game() {
   const opponentRef = useRef(opponent);
   const oppTeamRef = useRef(oppTeam);
   const isWinnerRef = useRef(isWinner);
-  useEffect(() => { userPseudoRef.current = userPseudo; }, [userPseudo]);
-  useEffect(() => { teamRef.current = team; }, [team]);
-  useEffect(() => { opponentRef.current = opponent; }, [opponent]);
-  useEffect(() => { oppTeamRef.current = oppTeam; }, [oppTeam]);
-  useEffect(() => { isWinnerRef.current = isWinner; }, [isWinner]);
+  useEffect(() => {
+    userPseudoRef.current = userPseudo;
+  }, [userPseudo]);
+  useEffect(() => {
+    teamRef.current = team;
+  }, [team]);
+  useEffect(() => {
+    opponentRef.current = opponent;
+  }, [opponent]);
+  useEffect(() => {
+    oppTeamRef.current = oppTeam;
+  }, [oppTeam]);
+  useEffect(() => {
+    isWinnerRef.current = isWinner;
+  }, [isWinner]);
 
   useEffect(() => {
     if (!isGameOver || rewardFetchedRef.current) return;
@@ -381,14 +451,16 @@ export default function Game() {
 
   const selectedHeroCard = selectedHero ?? firstHero;
   const selectedCharacter =
-    playerCharacters?.find((c) => c.name === selectedHeroCard.identity.name) ?? null;
+    playerCharacters?.find((c) => c.name === selectedHeroCard.identity.name) ??
+    null;
 
   // --- Targeting helpers for render ---
   const isTarget = (uid: string | undefined, _chars: CharacterState[]) =>
     targetingMode && !!uid && validTargetUids.has(uid);
 
   return (
-    <div className="relative text-[16px] leading-7 text-[#f5e6c8]"
+    <div
+      className="relative text-[16px] leading-7 text-[#f5e6c8]"
       style={{ fontFamily: "Inter, system-ui, sans-serif" }}
     >
       <GameArenaBackground />
@@ -410,22 +482,43 @@ export default function Game() {
                 const charState = findCharByHeroId(oppCharacters, heroId);
                 const dead = !charState;
                 const targetUid = charState?.uid;
-                const anims = findAnimsForFighter(damageAnims, heroId, opponent, charState);
-                const pixs = pixelAnims.filter(p => anims.some(a => a.targetUid === p.uid) || p.uid === targetUid);
+                const anims = findAnimsForFighter(
+                  damageAnims,
+                  heroId,
+                  opponent,
+                  charState,
+                );
+                const pixs = pixelAnims.filter(
+                  (p) =>
+                    anims.some((a) => a.targetUid === p.uid) ||
+                    p.uid === targetUid,
+                );
                 return (
                   <div key={heroId} className="relative w-full">
-                    <div className={`transition-opacity duration-300 ${dead ? "opacity-30 pointer-events-none" : "opacity-90"}`}>
+                    <div
+                      className={`transition-opacity duration-300 ${dead ? "opacity-30 pointer-events-none" : "opacity-90"}`}
+                    >
                       <Fighter
                         variant="enemy"
                         character={character}
-                        currentHp={charState ? Math.round(charState.currentHp) : 0}
+                        currentHp={
+                          charState ? Math.round(charState.currentHp) : 0
+                        }
                         effects={toStatusEffects(charState)}
-                        active={charState ? charState.uid === activeCharacterUid : false}
-                        onClick={isTarget(charState?.uid, oppCharacters) && charState ? () => handleTargetSelect(charState.uid) : undefined}
+                        active={
+                          charState
+                            ? charState.uid === activeCharacterUid
+                            : false
+                        }
+                        onClick={
+                          isTarget(charState?.uid, oppCharacters) && charState
+                            ? () => handleTargetSelect(charState.uid)
+                            : undefined
+                        }
                         isTargetable={isTarget(charState?.uid, oppCharacters)}
                       />
                     </div>
-                    {pixs.map(p => (
+                    {pixs.map((p) => (
                       <PixelAnimation
                         key={p.id}
                         anim={p.anim}
@@ -456,27 +549,51 @@ export default function Game() {
                   : undefined;
                 const dead = !charState;
                 const targetUid = charState?.uid;
-                const anims = heroId ? findAnimsForFighter(damageAnims, heroId, userPseudo, charState) : [];
-                const pixs = pixelAnims.filter(p => anims.some(a => a.targetUid === p.uid) || p.uid === targetUid);
+                const anims = heroId
+                  ? findAnimsForFighter(
+                      damageAnims,
+                      heroId,
+                      userPseudo,
+                      charState,
+                    )
+                  : [];
+                const pixs = pixelAnims.filter(
+                  (p) =>
+                    anims.some((a) => a.targetUid === p.uid) ||
+                    p.uid === targetUid,
+                );
                 return (
                   <div key={heroId ?? `own-slot-${index}`}>
                     {character ? (
                       <div className="relative">
-                        <div className={`transition-opacity duration-300 ${dead ? "opacity-30 pointer-events-none" : ""}`}>
+                        <div
+                          className={`transition-opacity duration-300 ${dead ? "opacity-30 pointer-events-none" : ""}`}
+                        >
                           <Fighter
                             character={character}
                             active={
                               charState
                                 ? charState.uid === activeCharacterUid
-                                : selectedHero?.identity.id === character.identity.id
+                                : selectedHero?.identity.id ===
+                                  character.identity.id
                             }
-                            currentHp={charState ? Math.round(charState.currentHp) : 0}
+                            currentHp={
+                              charState ? Math.round(charState.currentHp) : 0
+                            }
                             effects={toStatusEffects(charState)}
-                            onClick={isTarget(charState?.uid, myCharacters) && charState ? () => handleTargetSelect(charState.uid) : undefined}
-                            isTargetable={isTarget(charState?.uid, myCharacters)}
+                            onClick={
+                              isTarget(charState?.uid, myCharacters) &&
+                              charState
+                                ? () => handleTargetSelect(charState.uid)
+                                : undefined
+                            }
+                            isTargetable={isTarget(
+                              charState?.uid,
+                              myCharacters,
+                            )}
                           />
                         </div>
-                        {pixs.map(p => (
+                        {pixs.map((p) => (
                           <PixelAnimation
                             key={p.id}
                             anim={p.anim}
@@ -510,7 +627,9 @@ export default function Game() {
       {/* Opponent info */}
       <div className="fixed right-4 top-4 flex flex-col items-end gap-1 pr-2 sm:pr-0">
         <div className="flex items-start justify-end gap-4">
-          <ProfileInfo account={{ pseudo: opponent, profilePhoto: oppAvatar }} />
+          <ProfileInfo
+            account={{ pseudo: opponent, profilePhoto: oppAvatar }}
+          />
         </div>
         <p className="hidden text-xs text-[#8b82a6] sm:block">
           Session ID: {roomId || "—"}
@@ -565,7 +684,9 @@ export default function Game() {
               {isRewarding && !rewards && (
                 <div className="flex flex-col items-center gap-4 py-8">
                   <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#c9a84c] border-t-transparent" />
-                  <p className="font-serif text-lg text-[#c9b896]">Distribution des récompenses...</p>
+                  <p className="font-serif text-lg text-[#c9b896]">
+                    Distribution des récompenses...
+                  </p>
                 </div>
               )}
 
@@ -586,23 +707,33 @@ export default function Game() {
                   {/* Rewards summary */}
                   <div className="mb-5 grid grid-cols-2 gap-2 sm:gap-3">
                     <div className="rounded-xl border border-[#3c3650]/50 bg-[#0f0e13]/80 px-2 py-2 sm:px-4 sm:py-3 text-center">
-                      <p className="text-xs uppercase tracking-wider text-[#8b82a6]">XP gagnée</p>
+                      <p className="text-xs uppercase tracking-wider text-[#8b82a6]">
+                        XP gagnée
+                      </p>
                       <p className="mt-1 font-bold text-[#a8e6cf] text-xl">
                         +{rewards.xpGained}
                       </p>
                     </div>
                     <div className="rounded-xl border border-[#3c3650]/50 bg-[#0f0e13]/80 px-4 py-3 text-center">
-                      <p className="text-xs uppercase tracking-wider text-[#8b82a6]">Rubis</p>
+                      <p className="text-xs uppercase tracking-wider text-[#8b82a6]">
+                        Rubis
+                      </p>
                       <p className="mt-1 flex items-center justify-center gap-1.5 font-bold text-[#e8a84c] text-xl">
                         +{rewards.rubisGained}
-                        <img src="/gameResources/items/ruby.webp" alt="rubis" className="h-5 w-5" />
+                        <img
+                          src="/gameResources/items/ruby.webp"
+                          alt="rubis"
+                          className="h-5 w-5"
+                        />
                       </p>
                     </div>
                   </div>
 
                   {/* Characters */}
                   <div className="mb-6 space-y-2">
-                    <p className="text-xs uppercase tracking-wider text-[#8b82a6]">Personnages</p>
+                    <p className="text-xs uppercase tracking-wider text-[#8b82a6]">
+                      Personnages
+                    </p>
                     {rewards.characters.map((char) => {
                       const heroDef = HERO_MAP.byName.get(char.name);
                       return (
@@ -621,7 +752,9 @@ export default function Game() {
                               )}
                             </div>
                             <div>
-                              <p className="text-sm font-medium text-[#e8dcc8]">{char.name}</p>
+                              <p className="text-sm font-medium text-[#e8dcc8]">
+                                {char.name}
+                              </p>
                               <p className="text-xs text-[#8b82a6]">
                                 Niveau {char.level}{" "}
                                 {char.leveledUp && (
@@ -633,7 +766,9 @@ export default function Game() {
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="text-sm font-medium text-[#a8e6cf]">+{rewards.xpGained} XP</p>
+                            <p className="text-sm font-medium text-[#a8e6cf]">
+                              +{rewards.xpGained} XP
+                            </p>
                             <div className="mt-1 h-1.5 w-20 overflow-hidden rounded-full bg-[#1f1a2e]">
                               <div
                                 className="h-full rounded-full bg-[#a8e6cf] transition-all"
@@ -683,11 +818,23 @@ export default function Game() {
         </div>
       )}
 
+      <InfoModal
+        open={isInfoModalOpen && !isGameOver}
+        isYourTurn={isYourTurn}
+        onClose={() => setIsInfoModalOpen(false)}
+      />
+
       {/* Targeting mode banner */}
       {targetingMode && (
         <div className="fixed inset-x-0 top-0 z-40 flex items-center justify-center bg-gradient-to-b from-[#c9a84c]/20 to-transparent py-3">
           <div className="rounded-lg border border-[#c9a84c]/40 bg-[#1f1810] px-6 py-2 font-serif text-sm text-[#e8dcc8] shadow-[0_0_20px_rgba(201,168,76,0.15)]">
-            Select a target — <button onClick={() => handleTargetSelect(null)} className="underline text-[#8a7a5a] hover:text-[#c9b896]">Cancel (Esc)</button>
+            Select a target —{" "}
+            <button
+              onClick={() => handleTargetSelect(null)}
+              className="underline text-[#8a7a5a] hover:text-[#c9b896]"
+            >
+              Cancel (Esc)
+            </button>
           </div>
         </div>
       )}
