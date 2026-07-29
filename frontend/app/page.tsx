@@ -28,59 +28,6 @@ export default function LoginPage() {
   const router = useRouter();
   const ran = useRef(false);
 
-
-  useEffect(() => {
-    if (ran.current) return;
-      ran.current = true;
-    const fetchUsers = async () => {
-
-      const response = await fetch("/api/users", {
-        method: "GET"
-      })
-      const data: unknown = await response.json();
-      if (!response.ok) {
-      const errorMessage =
-        typeof data === "object" && data !== null && "error" in data
-          ? String((data as { error: string }).error ?? "Impossible de charger les utilisateurs")
-          : "Impossible de charger les utilisateurs";
-        throw new Error(errorMessage);
-      }
-      const users = data as User[];
-      if (users.length === 0)
-      {
-        try {
-          await authClient.signUp.email({
-            name: "Xoco",
-            email: "Xoco@gmail.com",
-            password: "12345678",
-          });
-          await authClient.signUp.email({
-            name: "Hemera",
-            email: "hemera@gmail.com",
-            password: "12345678",
-          });
-        }
-        catch {
-          setMessage("Registration error");
-          return;
-        }
-        setIsRegisterMode(false);
-        setPassword("");
-        setName("");
-        const res = await fetch("/api/users", {
-          method: "POST",
-        });
-        if (!res.ok)
-        {
-          const data = await res.json();
-          const error = data.error;
-          setMessage(`${error}: Registration error`);
-        }
-      }
-    }
-    fetchUsers();
-  }, [])
-
   //Vérifier si l'utilisateur est déjà connecté
   useEffect(() => {
     const checkSession = async () => {
@@ -171,6 +118,12 @@ export default function LoginPage() {
         if (res.status === 403)
         {
           setMessage("This account has been banned");
+          await authClient.signOut();
+          return;
+        }
+        if (res.status === 401)
+        {
+          setMessage("This account is already online on another device/window");
           await authClient.signOut();
           return;
         }

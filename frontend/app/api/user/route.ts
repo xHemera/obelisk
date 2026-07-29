@@ -167,13 +167,14 @@ export async function PATCH()
         where: {
             id: session.user.id
         },
-        select: { banned: true }
+        select: { banned: true, online: true }
     })
     if (!user) return Response.json({error: "User not found"}, {status: 404});
     if (user.banned === true) return Response.json({error: "Forbidden"}, {status: 403});
+    if (user.online === true) return Response.json({error: "Unauthorized"}, {status: 401});
 
     const userUpdate = await prisma.user.update({
-        where: { id: session.user.id },
+        where: { id: session.user.id},
         data: {
             online: true
         }
